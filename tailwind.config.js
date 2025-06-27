@@ -118,12 +118,12 @@ module.exports = {
       },
       
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'fade-in-up': 'fadeInUp 0.6s ease-out',
-        'fade-in-down': 'fadeInDown 0.6s ease-out',
-        'slide-in-right': 'slideInRight 0.5s ease-out',
-        'slide-in-left': 'slideInLeft 0.5s ease-out',
-        'scale-in': 'scaleIn 0.3s ease-out',
+        'fade-in': 'fadeIn 0.5s ease-in-out both',
+        'fade-in-up': 'fadeInUp 0.6s ease-out both',
+        'fade-in-down': 'fadeInDown 0.6s ease-out both',
+        'slide-in-right': 'slideInRight 0.5s ease-out both',
+        'slide-in-left': 'slideInLeft 0.5s ease-out both',
+        'scale-in': 'scaleIn 0.3s ease-out both',
         'bounce-soft': 'bounceSoft 2s infinite',
         'pulse-soft': 'pulseSoft 2s infinite',
         'float': 'float 6s ease-in-out infinite',

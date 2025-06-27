@@ -81,7 +81,7 @@ const Home = () => {
               <span>Trusted by 10,000+ Veterinary Professionals</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-neutral-900 mb-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-neutral-900 mb-8 animate-fade-in" style={{ animationDelay: '200ms', willChange: 'opacity' }}>
               Elevate Your{' '}
               <span className="text-gradient-primary">Veterinary</span>{' '}
               Practice
