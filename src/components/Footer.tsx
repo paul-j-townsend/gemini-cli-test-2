@@ -46,7 +46,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gradient-primary">Vet Sidekick</h3>
-                  <p className="text-xs text-neutral-400">Professional Care</p>
+                  <p className="text-xs text-neutral-400">Professional CPD</p>
                 </div>
               </div>
               <p className="text-neutral-300 leading-relaxed mb-6">

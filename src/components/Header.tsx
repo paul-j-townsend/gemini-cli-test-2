@@ -35,7 +35,7 @@ const Header = () => {
               <h1 className="text-xl lg:text-2xl font-bold text-gradient-primary">
                 Vet Sidekick
               </h1>
-              <p className="text-xs text-neutral-500 -mt-1">Professional Care</p>
+              <p className="text-xs text-neutral-500 -mt-1">Professional CPD</p>
             </div>
           </Link>
 
