@@ -21,11 +21,6 @@ const Podcasts = () => {
 
         <div className="relative container-wide">
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-primary-50 px-4 py-2 rounded-full text-primary-700 text-sm font-medium mb-6 animate-scale-in">
-              <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse-soft"></div>
-              <span>Professional Veterinary Content</span>
-            </div>
-            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
               Expert <span className="text-gradient-primary">Veterinary</span> Podcasts
             </h1>
