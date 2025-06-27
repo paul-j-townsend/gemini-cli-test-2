@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Head from 'next/head';
 import Layout from '../components/Layout';
 
 export default function Calculators() {
@@ -36,6 +37,10 @@ export default function Calculators() {
 
   return (
     <Layout>
+      <Head>
+        <title>Veterinary Calculators - Vet Sidekick</title>
+        <meta name="description" content="Essential veterinary calculators for drug dosages, fluid therapy, and clinical assessments." />
+      </Head>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Veterinary Calculators</h1>
         

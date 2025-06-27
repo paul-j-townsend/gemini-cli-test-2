@@ -8,7 +8,6 @@ const Podcasts = () => {
       <Head>
         <title>Podcasts - Vet Sidekick</title>
         <meta name="description" content="Expert veterinary insights and educational podcasts for professionals" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       {/* Hero Section */}

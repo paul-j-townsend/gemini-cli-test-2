@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Layout from '../components/Layout';
 
 export default function News() {
@@ -66,6 +67,10 @@ export default function News() {
 
   return (
     <Layout>
+      <Head>
+        <title>Veterinary News - Vet Sidekick</title>
+        <meta name="description" content="Stay updated with the latest developments in veterinary medicine, research breakthroughs, and industry news." />
+      </Head>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Veterinary News</h1>

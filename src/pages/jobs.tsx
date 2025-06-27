@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Layout from '../components/Layout';
 
 export default function Jobs() {
@@ -70,6 +71,10 @@ export default function Jobs() {
 
   return (
     <Layout>
+      <Head>
+        <title>Veterinary Jobs - Vet Sidekick</title>
+        <meta name="description" content="Find your next career opportunity in veterinary medicine. Browse jobs from general practice to specialized roles." />
+      </Head>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Veterinary Jobs</h1>

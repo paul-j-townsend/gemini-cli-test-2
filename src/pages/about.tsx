@@ -78,7 +78,6 @@ const About = () => {
       <Head>
         <title>About - Vet Sidekick</title>
         <meta name="description" content="Learn about our mission to advance veterinary education and support professional development worldwide." />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       {/* Hero Section */}
@@ -92,7 +91,7 @@ const About = () => {
           <div className="text-center animate-fade-in-up">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 mb-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
               Advancing <span className="text-gradient-primary">Veterinary</span> Education
-            </h1>
+        </h1>
 
             <p className="text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               We're dedicated to providing veterinary professionals with expert insights, 
@@ -126,6 +125,17 @@ const About = () => {
             </div>
             <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
               <div className="relative">
+                {/* Mission Image */}
+                <div className="relative mb-8">
+                  <img
+                    src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&h=400&fit=crop"
+                    alt="Veterinary professionals collaborating"
+                    className="w-full h-64 lg:h-80 object-cover rounded-2xl shadow-soft"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                </div>
+                
+                {/* Stats Card */}
                 <div className="card p-8">
                   <div className="grid grid-cols-2 gap-6">
                     {stats.map((stat, index) => (
@@ -253,7 +263,7 @@ const About = () => {
               </Link>
             </div>
           </div>
-        </div>
+    </div>
       </section>
     </Layout>
   );

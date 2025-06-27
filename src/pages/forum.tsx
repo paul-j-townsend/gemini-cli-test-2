@@ -1,8 +1,13 @@
+import Head from 'next/head';
 import Layout from '../components/Layout';
 
 export default function Forum() {
   return (
     <Layout>
+      <Head>
+        <title>Community Forum - Vet Sidekick</title>
+        <meta name="description" content="Connect with veterinary professionals, share experiences, and discuss the latest in animal healthcare." />
+      </Head>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Community Forum</h1>
         

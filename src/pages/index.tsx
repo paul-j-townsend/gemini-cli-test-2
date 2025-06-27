@@ -62,7 +62,6 @@ const Home = () => {
       <Head>
         <title>Vet Sidekick - Expert Veterinary Insights & Education</title>
         <meta name="description" content="Empowering veterinary professionals with expert insights, educational podcasts, and community-driven resources." />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       {/* Hero Section */}
@@ -93,7 +92,7 @@ const Home = () => {
               Elevate Your{' '}
               <span className="text-gradient-primary">Veterinary</span>{' '}
               Practice
-            </h1>
+        </h1>
 
             <p className="text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed mb-12 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               Join thousands of veterinary professionals who trust Vet Sidekick for expert insights, 
@@ -102,12 +101,13 @@ const Home = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
               <Link href="/podcasts" className="relative group btn-primary btn-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-                <span className="relative z-10">Start Listening</span>
+                <div className="relative z-10 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                  <span>Start Listening</span>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-secondary-400 to-secondary-500 rounded-full animate-pulse-soft"></div>
               </Link>
               <Link href="/about" className="relative group btn-secondary btn-lg hover:scale-105 transition-all duration-300">
                 <span className="relative z-10">Learn More</span>
@@ -297,7 +297,7 @@ const Home = () => {
               </Link>
             </div>
           </div>
-        </div>
+    </div>
       </section>
     </Layout>
   );
