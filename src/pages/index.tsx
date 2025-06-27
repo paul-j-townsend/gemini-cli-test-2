@@ -12,7 +12,7 @@ const Home = () => {
       ),
       title: 'Expert Podcasts',
       description: 'Access cutting-edge veterinary insights from industry leaders and specialists.',
-      gradient: 'from-primary-500 to-primary-600',
+      gradient: 'from-red-500 to-red-600',
     },
     {
       icon: (
@@ -22,7 +22,7 @@ const Home = () => {
       ),
       title: 'Educational Resources',
       description: 'Comprehensive learning materials to enhance your veterinary practice.',
-      gradient: 'from-secondary-500 to-secondary-600',
+      gradient: 'from-orange-500 to-orange-600',
     },
     {
       icon: (
@@ -32,7 +32,7 @@ const Home = () => {
       ),
       title: 'Professional Community',
       description: 'Connect with veterinary professionals and share knowledge worldwide.',
-      gradient: 'from-emerald-500 to-emerald-600',
+      gradient: 'from-yellow-500 to-yellow-600',
     },
   ];
 
@@ -65,24 +65,24 @@ const Home = () => {
       </Head>
 
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-primary-50 via-white to-neutral-50 overflow-hidden">
+      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-red-200/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-orange-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-yellow-200/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
           
           {/* Geometric Flourishes */}
-          <div className="absolute top-20 left-10 w-32 h-32 border border-primary-200/30 rounded-3xl rotate-12 animate-pulse-soft"></div>
-          <div className="absolute bottom-20 right-20 w-24 h-24 bg-gradient-to-br from-secondary-200/20 to-primary-200/20 rounded-2xl rotate-45 animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/3 right-1/4 w-16 h-16 border-2 border-emerald-300/40 rounded-full animate-bounce-soft"></div>
+          <div className="absolute top-20 left-10 w-32 h-32 border border-red-200/30 rounded-3xl rotate-12 animate-pulse-soft"></div>
+          <div className="absolute bottom-20 right-20 w-24 h-24 bg-gradient-to-br from-orange-200/20 to-red-200/20 rounded-2xl rotate-45 animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/3 right-1/4 w-16 h-16 border-2 border-yellow-300/40 rounded-full animate-bounce-soft"></div>
           
           {/* Dotted Pattern */}
           <div className="absolute top-0 left-0 w-full h-full opacity-20">
-            <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-primary-400 rounded-full animate-pulse-soft"></div>
-            <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-secondary-400 rounded-full animate-pulse-soft" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse-soft" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-1/3 left-2/3 w-1 h-1 bg-primary-500 rounded-full animate-pulse-soft" style={{ animationDelay: '0.5s' }}></div>
+            <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-red-400 rounded-full animate-pulse-soft"></div>
+            <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-orange-400 rounded-full animate-pulse-soft" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse-soft" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-1/3 left-2/3 w-1 h-1 bg-red-500 rounded-full animate-pulse-soft" style={{ animationDelay: '0.5s' }}></div>
           </div>
         </div>
 
@@ -90,7 +90,7 @@ const Home = () => {
           <div className="text-center animate-fade-in-up">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-neutral-900 mb-8 animate-fade-in" style={{ animationDelay: '200ms', willChange: 'opacity' }}>
               Elevate Your{' '}
-              <span className="text-gradient-primary">Veterinary</span>{' '}
+              <span className="text-gradient-to-r from-red-600 to-orange-600">Veterinary</span>{' '}
               Practice
         </h1>
 
@@ -100,18 +100,18 @@ const Home = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
-              <Link href="/podcasts" className="relative group btn-primary btn-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+              <Link href="/podcasts" className="relative group btn-red btn-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                 <div className="relative z-10 flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                   </svg>
                   <span>Start Listening</span>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
-              <Link href="/about" className="relative group btn-secondary btn-lg hover:scale-105 transition-all duration-300">
+              <Link href="/about" className="relative group btn-orange btn-lg hover:scale-105 transition-all duration-300">
                 <span className="relative z-10">Learn More</span>
-                <div className="absolute inset-0 border-2 border-primary-200 rounded-xl scale-110 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300"></div>
+                <div className="absolute inset-0 border-2 border-red-200 rounded-xl scale-110 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300"></div>
               </Link>
             </div>
 
@@ -145,8 +145,8 @@ const Home = () => {
         {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-10 right-10 w-40 h-40 border border-neutral-100 rounded-full"></div>
-          <div className="absolute bottom-20 left-20 w-32 h-32 border border-primary-100 rounded-2xl rotate-45"></div>
-          <div className="absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-br from-emerald-50 to-primary-50 rounded-full"></div>
+          <div className="absolute bottom-20 left-20 w-32 h-32 border border-red-100 rounded-2xl rotate-45"></div>
+          <div className="absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-br from-yellow-50 to-red-50 rounded-full"></div>
         </div>
 
         <div className="relative container-wide">
@@ -168,15 +168,15 @@ const Home = () => {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 {/* Card Background Flourishes */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-neutral-50 to-primary-50 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
-                <div className="absolute bottom-0 left-0 w-16 h-16 border border-primary-100 rounded-2xl rotate-12 -translate-x-8 translate-y-8 opacity-60"></div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-neutral-50 to-red-50 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
+                <div className="absolute bottom-0 left-0 w-16 h-16 border border-red-100 rounded-2xl rotate-12 -translate-x-8 translate-y-8 opacity-60"></div>
                 
                 <div className={`relative w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center text-white mx-auto mb-6 group-hover:scale-110 transition-all duration-500 shadow-soft group-hover:shadow-glow`}>
                   {feature.icon}
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-white/30 rounded-full animate-pulse-soft"></div>
                 </div>
                 
-                <h3 className="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors duration-300">
+                <h3 className="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-red-600 transition-colors duration-300">
                   {feature.title}
                 </h3>
                 <p className="text-neutral-600 leading-relaxed">
@@ -184,7 +184,7 @@ const Home = () => {
                 </p>
                 
                 {/* Hover Accent Line */}
-                <div className="absolute bottom-0 left-1/2 w-0 h-1 bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-500 group-hover:w-20 transform -translate-x-1/2"></div>
+                <div className="absolute bottom-0 left-1/2 w-0 h-1 bg-gradient-to-r from-red-400 to-red-600 transition-all duration-500 group-hover:w-20 transform -translate-x-1/2"></div>
               </div>
             ))}
           </div>
@@ -192,13 +192,13 @@ const Home = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-neutral-50 to-primary-50 overflow-hidden">
+      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-neutral-50 to-red-50 overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary-200/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-secondary-200/15 rounded-full blur-2xl"></div>
-          <div className="absolute top-1/3 right-10 w-32 h-32 border border-primary-200/30 rounded-3xl rotate-12"></div>
-          <div className="absolute bottom-1/4 left-10 w-24 h-24 bg-gradient-to-br from-emerald-200/20 to-primary-200/20 rounded-2xl rotate-45"></div>
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-red-200/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-orange-200/15 rounded-full blur-2xl"></div>
+          <div className="absolute top-1/3 right-10 w-32 h-32 border border-red-200/30 rounded-3xl rotate-12"></div>
+          <div className="absolute bottom-1/4 left-10 w-24 h-24 bg-gradient-to-br from-yellow-200/20 to-red-200/20 rounded-2xl rotate-45"></div>
         </div>
 
         <div className="relative container-wide">
@@ -219,24 +219,24 @@ const Home = () => {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 {/* Quote Decoration */}
-                <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-bold opacity-80">
+                <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold opacity-80">
                   "
                 </div>
                 
                 {/* Card Accent Corner */}
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary-100/50 to-transparent rounded-bl-3xl"></div>
+                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-red-100/50 to-transparent rounded-bl-3xl"></div>
                 
                 <div className="flex items-center mb-6">
                   <div className="relative">
                     <img
                       src={testimonial.avatar}
                       alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4 object-cover ring-2 ring-primary-200 group-hover:ring-primary-400 transition-all duration-300"
+                      className="w-12 h-12 rounded-full mr-4 object-cover ring-2 ring-red-200 group-hover:ring-red-400 transition-all duration-300"
                     />
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full border-2 border-white"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full border-2 border-white"></div>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-neutral-900 group-hover:text-primary-700 transition-colors duration-300">{testimonial.name}</h4>
+                    <h4 className="font-semibold text-neutral-900 group-hover:text-red-700 transition-colors duration-300">{testimonial.name}</h4>
                     <p className="text-sm text-neutral-500">{testimonial.role}</p>
                   </div>
                 </div>
@@ -252,7 +252,7 @@ const Home = () => {
                 </div>
                 
                 {/* Subtle Gradient Overlay on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-50/0 to-primary-50/0 group-hover:from-primary-50/20 group-hover:to-transparent rounded-2xl transition-all duration-500 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-red-50/0 to-red-50/0 group-hover:from-red-50/20 group-hover:to-transparent rounded-2xl transition-all duration-500 pointer-events-none"></div>
               </div>
             ))}
           </div>
@@ -260,12 +260,12 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 lg:py-32 bg-gradient-to-r from-primary-500 to-primary-600 text-white overflow-hidden">
+      <section className="relative py-20 lg:py-32 bg-gradient-to-r from-red-500 to-orange-600 text-white overflow-hidden">
         {/* Dynamic Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-400/20 via-transparent to-primary-700/20"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-400/20 via-transparent to-orange-700/20"></div>
           <div className="absolute top-10 right-10 w-80 h-80 bg-white/5 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-10 left-10 w-64 h-64 bg-secondary-400/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-10 left-10 w-64 h-64 bg-yellow-400/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
           <div className="absolute top-1/2 left-1/2 w-32 h-32 border border-white/20 rounded-3xl rotate-45 animate-pulse-soft"></div>
           
           {/* Subtle Pattern Overlay */}
@@ -281,15 +281,15 @@ const Home = () => {
             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
               Ready to Advance Your Practice?
             </h2>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto mb-10">
+            <p className="text-xl text-red-100 max-w-3xl mx-auto mb-10">
               Join thousands of veterinary professionals who are staying ahead with expert insights, 
               continuing education, and professional development resources.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/podcasts" className="relative group btn-secondary btn-lg bg-white text-primary-600 hover:bg-neutral-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+              <Link href="/podcasts" className="relative group btn-orange btn-lg bg-white text-red-600 hover:bg-neutral-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                 <span className="relative z-10">Start Learning Today</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white to-primary-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full animate-bounce-soft"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white to-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full animate-bounce-soft"></div>
               </Link>
               <Link href="/about" className="relative group btn-ghost btn-lg text-white border-white hover:bg-white/10 hover:scale-105 transition-all duration-300">
                 <span className="relative z-10">Learn More About Us</span>
