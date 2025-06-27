@@ -7,6 +7,10 @@ const Footer = () => {
     platform: [
       { label: 'Home', href: '/' },
       { label: 'Podcasts', href: '/podcasts' },
+      { label: 'Calculators', href: '/calculators' },
+      { label: 'News', href: '/news' },
+      { label: 'Forum', href: '/forum' },
+      { label: 'Jobs', href: '/jobs' },
       { label: 'About', href: '/about' },
     ],
     resources: [

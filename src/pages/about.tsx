@@ -246,15 +246,15 @@ const About = () => {
               Join Our Mission
             </h2>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto mb-10">
-              Whether you're a seasoned veterinarian or just starting your career, 
-              we invite you to be part of our community dedicated to advancing veterinary excellence.
+              We're looking for passionate veterinary professionals to contribute to our platform. 
+              If you're an expert in your field, we invite you to collaborate with us.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/podcasts" className="btn-secondary btn-lg bg-white text-primary-600 hover:bg-neutral-50">
-                Start Learning
+              <Link href="#" className="btn-secondary btn-lg bg-white text-primary-600 hover:bg-neutral-50">
+                Become a Contributor
               </Link>
               <Link href="#" className="btn-ghost btn-lg text-white border-white hover:bg-white/10">
-                Get In Touch
+                Contact Us
               </Link>
             </div>
           </div>
