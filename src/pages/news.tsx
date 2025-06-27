@@ -66,97 +66,95 @@ export default function News() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Veterinary News</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Stay updated with the latest developments in veterinary medicine, research breakthroughs, 
-              and industry news that matters to animal healthcare professionals.
-            </p>
-          </div>
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Veterinary News</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Stay updated with the latest developments in veterinary medicine, research breakthroughs, 
+            and industry news that matters to animal healthcare professionals.
+          </p>
+        </div>
 
-          {/* Featured Article */}
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-12">
-            <div className="md:flex">
-              <div className="md:w-1/2">
-                <img 
-                  src={newsArticles[0].image} 
-                  alt={newsArticles[0].title}
-                  className="w-full h-64 md:h-full object-cover"
-                />
+        {/* Featured Article */}
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-12">
+          <div className="md:flex">
+            <div className="md:w-1/2">
+              <img 
+                src={newsArticles[0].image} 
+                alt={newsArticles[0].title}
+                className="w-full h-64 md:h-full object-cover"
+              />
+            </div>
+            <div className="md:w-1/2 p-8">
+              <div className="flex items-center mb-4">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(newsArticles[0].category)}`}>
+                  {newsArticles[0].category}
+                </span>
+                <span className="text-gray-500 text-sm ml-4">Featured Article</span>
               </div>
-              <div className="md:w-1/2 p-8">
-                <div className="flex items-center mb-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(newsArticles[0].category)}`}>
-                    {newsArticles[0].category}
-                  </span>
-                  <span className="text-gray-500 text-sm ml-4">Featured Article</span>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{newsArticles[0].title}</h2>
+              <p className="text-gray-600 mb-6">{newsArticles[0].summary}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center text-sm text-gray-500">
+                  <span>{newsArticles[0].date}</span>
+                  <span className="mx-2">•</span>
+                  <span>{newsArticles[0].readTime}</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{newsArticles[0].title}</h2>
-                <p className="text-gray-600 mb-6">{newsArticles[0].summary}</p>
+                <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  Read Full Article
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Article Grid */}
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {newsArticles.slice(1).map((article, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <img 
+                src={article.image} 
+                alt={article.title}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
+                    {article.category}
+                  </span>
+                  <span className="text-gray-500 text-sm">{article.readTime}</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                  {article.title}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.summary}</p>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span>{newsArticles[0].date}</span>
-                    <span className="mx-2">•</span>
-                    <span>{newsArticles[0].readTime}</span>
-                  </div>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    Read Full Article
+                  <span className="text-gray-500 text-sm">{article.date}</span>
+                  <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                    Read More →
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Article Grid */}
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {newsArticles.slice(1).map((article, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <img 
-                  src={article.image} 
-                  alt={article.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
-                      {article.category}
-                    </span>
-                    <span className="text-gray-500 text-sm">{article.readTime}</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {article.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.summary}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-sm">{article.date}</span>
-                    <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                      Read More →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Newsletter Signup */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-8 mt-12 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Stay Informed</h2>
-            <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-              Subscribe to our newsletter to receive the latest veterinary news, research updates, 
-              and professional development opportunities directly in your inbox.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 px-4 py-2 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              />
-              <button className="bg-white text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium">
-                Subscribe
-              </button>
-            </div>
+        {/* Newsletter Signup */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-8 mt-12 text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Stay Informed</h2>
+          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
+            Subscribe to our newsletter to receive the latest veterinary news, research updates, 
+            and professional development opportunities directly in your inbox.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              className="flex-1 px-4 py-2 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <button className="bg-white text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+              Subscribe
+            </button>
           </div>
         </div>
       </div>
