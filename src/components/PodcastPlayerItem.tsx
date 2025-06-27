@@ -350,6 +350,22 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
           </button>
         </div>
       </div>
+
+      {/* Action Buttons */}
+      <div className="mt-6 pt-6 border-t border-neutral-200/80 flex flex-col sm:flex-row gap-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+        <button className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+            <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+          </svg>
+          Take Quiz
+        </button>
+        <button className="btn-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+            <path d="M9.25 12.25a.75.75 0 0 0 1.5 0V4.57l2.053 2.053a.75.75 0 0 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06L9.25 4.57v7.68ZM2 14.25a.75.75 0 0 0 0 1.5h16a.75.75 0 0 0 0-1.5H2Z" />
+          </svg>
+          Get Certificate
+        </button>
+      </div>
     </div>
   );
 };
