@@ -15,7 +15,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="glass border-b border-white/10 sticky top-0 z-50 animate-fade-in-down">
+    <header className="glass border-b border-white/10 sticky top-0 z-50">
       <nav className="container-wide">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
