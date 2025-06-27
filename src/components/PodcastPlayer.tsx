@@ -11,12 +11,12 @@ const podcasts: Podcast[] = [
     {
         title: 'The Future of UK Companion Animal Veterinary Care',
         description: 'A discussion on the future of veterinary care for companion animals in the UK.',
-        audioSrc: '/audio/the_future_of_uk_companion_animal_veterinary_care.wav'
+        audioSrc: '/audio/the_future_of_uk_companion_animal_veterinary_care.mp3'
     },
     {
         title: 'The Evolving World of Animal Healthcare',
         description: 'A look at the evolving world of animal healthcare.',
-        audioSrc: '/audio/the_evolving_world_of_animal_healthcare.wav'
+        audioSrc: '/audio/the_evolving_world_of_animal_healthcare.mp3'
     },
 ];
 
