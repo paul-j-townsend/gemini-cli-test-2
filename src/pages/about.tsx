@@ -22,7 +22,7 @@ const About = () => {
       name: 'Dr. Emily Rodriguez',
       role: 'Educational Coordinator',
       bio: 'Specializing in veterinary pedagogy and continuing professional development programs.',
-      image: 'https://images.unsplash.com/photo-1594824388853-c6dd8c72c397?w=300&h=300&fit=crop&crop=face',
+      image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=300&h=300&fit=crop&crop=face',
       expertise: ['Veterinary Education', 'CPD Programs', 'Online Learning'],
     },
   ];
@@ -192,35 +192,35 @@ const About = () => {
             {teamMembers.map((member, index) => (
               <div
                 key={index}
-                className="card-hover text-center group animate-fade-in-up"
+                className="card-hover text-center group animate-fade-in-up p-6 h-full flex flex-col"
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 <div className="relative mb-6">
                   <img
                     src={member.image}
                     alt={member.name}
-                    className="w-32 h-32 rounded-full mx-auto object-cover shadow-medium group-hover:shadow-hard transition-all duration-300"
+                    className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto object-cover shadow-medium group-hover:shadow-hard transition-all duration-300"
                   />
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">
                   {member.name}
                 </h3>
-                <p className="text-primary-600 font-medium mb-4">{member.role}</p>
-                <p className="text-neutral-600 leading-relaxed mb-6">{member.bio}</p>
+                <p className="text-primary-600 font-medium mb-4 text-sm sm:text-base">{member.role}</p>
+                <p className="text-neutral-600 leading-relaxed mb-6 text-sm sm:text-base flex-grow">{member.bio}</p>
                 
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-neutral-900">Areas of Expertise:</h4>
-                  <div className="flex flex-wrap gap-2 justify-center">
+                <div className="space-y-3 mt-auto">
+                  <h4 className="text-xs sm:text-sm font-semibold text-neutral-900">Areas of Expertise:</h4>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
                     {member.expertise.map((skill, skillIndex) => (
                       <span
                         key={skillIndex}
-                        className="px-3 py-1 bg-primary-100 text-primary-700 text-xs rounded-full"
+                        className="px-2 sm:px-3 py-1 bg-primary-100 text-primary-700 text-xs rounded-full whitespace-nowrap"
                       >
                         {skill}
                       </span>
