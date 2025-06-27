@@ -1,4 +1,3 @@
-
 import Head from 'next/head';
 import PodcastPlayer from '@/components/PodcastPlayer';
 
@@ -11,13 +10,20 @@ const Podcasts = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <h1 className="text-4xl font-bold text-center">
-          Our Podcasts
-        </h1>
+      <main className="bg-gradient-to-br from-vet-cream to-white min-h-screen py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-vet-teal mb-4">
+              Our Podcasts
+            </h1>
+            <p className="text-lg text-vet-orange max-w-xl mx-auto">
+              Explore the latest insights in veterinary care and animal healthcare
+            </p>
+          </div>
 
-        <div className="mt-8">
-          <PodcastPlayer />
+          <div className="mt-8">
+            <PodcastPlayer />
+          </div>
         </div>
       </main>
     </div>

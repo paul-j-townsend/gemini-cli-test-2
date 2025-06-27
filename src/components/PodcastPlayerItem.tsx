@@ -159,12 +159,12 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-2">{podcast.title}</h2>
-      <p className="text-slate-600 mb-4">{podcast.description}</p>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-slate-50 rounded-lg p-3">
+    <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-vet-teal">
+      <h2 className="text-2xl font-semibold mb-2 text-vet-teal">{podcast.title}</h2>
+      <p className="text-gray-600 mb-4">{podcast.description}</p>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-vet-cream rounded-lg p-3">
         <div className="flex w-full items-center space-x-2 order-1 md:order-2 md:flex-grow min-w-0">
-          <span className="text-sm text-slate-500 w-12 text-center">{formatTime(currentTime)}</span>
+          <span className="text-sm text-vet-orange w-12 text-center font-medium">{formatTime(currentTime)}</span>
           <input
             type="range"
             min="0"
@@ -173,21 +173,24 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
             onChange={handleScrubberChange}
             onMouseDown={handleScrubberMouseDown}
             onMouseUp={handleScrubberMouseUp}
-            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+            className="w-full h-2 bg-vet-peach rounded-lg appearance-none cursor-pointer slider"
+            style={{
+              background: `linear-gradient(to right, #03A6A1 0%, #03A6A1 ${(currentTime / duration) * 100}%, #FFA673 ${(currentTime / duration) * 100}%, #FFA673 100%)`
+            }}
           />
-          <span className="text-sm text-slate-500 w-12 text-center">{formatTime(duration)}</span>
+          <span className="text-sm text-vet-orange w-12 text-center font-medium">{formatTime(duration)}</span>
         </div>
         <div className="flex w-full items-center justify-center space-x-4 order-2 md:order-1 md:w-auto flex-shrink-0">
-          <button onClick={handleRewind} className="text-slate-500 hover:text-slate-700 transition-colors">
+          <button onClick={handleRewind} className="text-vet-teal hover:text-vet-orange transition-colors p-2 rounded-full hover:bg-white">
             <RewindIcon />
           </button>
-          <button onClick={handlePlayPause} className="text-slate-700 hover:text-slate-900 transition-colors">
+          <button onClick={handlePlayPause} className="text-vet-teal hover:text-vet-orange transition-colors p-2 rounded-full hover:bg-white">
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
-          <button onClick={handleForward} className="text-slate-500 hover:text-slate-700 transition-colors">
+          <button onClick={handleForward} className="text-vet-teal hover:text-vet-orange transition-colors p-2 rounded-full hover:bg-white">
             <ForwardIcon />
           </button>
-          <button onClick={handleVolumeToggle} className="text-slate-500 hover:text-slate-700 transition-colors">
+          <button onClick={handleVolumeToggle} className="text-vet-teal hover:text-vet-orange transition-colors p-2 rounded-full hover:bg-white">
             {isMuted ? <VolumeMuteIcon /> : <VolumeHighIcon />}
           </button>
         </div>
