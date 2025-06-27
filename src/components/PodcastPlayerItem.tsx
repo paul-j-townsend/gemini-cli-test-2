@@ -4,6 +4,7 @@ interface Podcast {
   title: string;
   description: string;
   audioSrc: string;
+  thumbnail: string;
 }
 
 interface PodcastPlayerItemProps {
@@ -160,9 +161,21 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-vet-teal">
-      <h2 className="text-2xl font-semibold mb-2 text-vet-teal">{podcast.title}</h2>
-      <p className="text-gray-600 mb-4">{podcast.description}</p>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-vet-cream rounded-lg p-3">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex-shrink-0">
+          <img 
+            src={podcast.thumbnail} 
+            alt={`${podcast.title} thumbnail`}
+            className="w-24 h-24 md:w-32 md:h-32 rounded-lg object-cover"
+          />
+        </div>
+        <div className="flex-grow">
+          <h2 className="text-2xl font-semibold mb-2 text-vet-teal">{podcast.title}</h2>
+          <p className="text-gray-600 mb-4">{podcast.description}</p>
+        </div>
+      </div>
+      
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-vet-cream rounded-lg p-3 mt-4">
         <div className="flex w-full items-center space-x-2 order-1 md:order-2 md:flex-grow min-w-0">
           <span className="text-sm text-vet-orange w-12 text-center font-medium">{formatTime(currentTime)}</span>
           <input
