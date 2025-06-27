@@ -21,7 +21,7 @@ const Header = () => {
           {/* Logo */}
           <Link 
             href="/" 
-            className="flex items-center space-x-3 group"
+            className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0"
           >
             <div className="relative">
               <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-soft group-hover:shadow-glow transition-all duration-300 transform group-hover:scale-110">
@@ -29,10 +29,9 @@ const Header = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-secondary-400 rounded-full animate-pulse-soft"></div>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xl lg:text-2xl font-bold text-gradient-primary">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gradient-primary">
                 Vet Sidekick
               </h1>
               <p className="text-xs text-neutral-500 -mt-1">Professional CPD</p>
