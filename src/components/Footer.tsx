@@ -14,10 +14,10 @@ const Footer = () => {
       { label: 'About', href: '/about' },
     ],
     resources: [
-      { label: 'Help Center', href: '#' },
-      { label: 'Contact', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
+      { label: 'Help Center', href: '/help-center' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'Privacy Policy', href: '/privacy-policy' },
+      { label: 'Terms of Service', href: '/terms-of-service' },
     ],
     connect: [
       { label: 'Twitter', href: '#' },
