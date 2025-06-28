@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image';
 import Layout from '@/components/Layout';
 
 const About = () => {
@@ -127,10 +128,12 @@ const About = () => {
               <div className="relative">
                 {/* Mission Image */}
                 <div className="relative mb-8">
-                  <img
+                  <Image
                     src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&h=400&fit=crop"
                     alt="Veterinary professionals collaborating"
                     className="w-full h-64 lg:h-80 object-cover rounded-2xl shadow-soft"
+                    width={600}
+                    height={400}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
                 </div>
@@ -206,10 +209,12 @@ const About = () => {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 <div className="relative mb-6">
-                  <img
+                  <Image
                     src={member.image}
                     alt={member.name}
                     className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto object-cover shadow-medium group-hover:shadow-hard transition-all duration-300"
+                    width={96}
+                    height={96}
                   />
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-primary-500 rounded-full flex items-center justify-center">
                     <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

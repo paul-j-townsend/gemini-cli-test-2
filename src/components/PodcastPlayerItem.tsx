@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 
 interface Podcast {
   title: string;
@@ -202,10 +203,12 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
       <div className="flex items-start gap-4 mb-6">
         <div className="relative flex-shrink-0">
           <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl overflow-hidden shadow-medium group-hover:shadow-hard transition-all duration-300">
-            <img 
+            <Image 
               src={podcast.thumbnail} 
               alt={`${podcast.title} thumbnail`}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              width={80}
+              height={80}
             />
           </div>
           {isPlaying && (

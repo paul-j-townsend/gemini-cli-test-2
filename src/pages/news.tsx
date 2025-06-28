@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Layout from '../components/Layout';
+import Image from 'next/image';
 
 export default function News() {
   const newsArticles = [
@@ -84,10 +85,12 @@ export default function News() {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-12">
           <div className="md:flex">
             <div className="md:w-1/2">
-              <img 
+              <Image 
                 src={newsArticles[0].image} 
                 alt={newsArticles[0].title}
                 className="w-full h-64 md:h-full object-cover"
+                width={400}
+                height={250}
               />
             </div>
             <div className="md:w-1/2 p-8">
@@ -117,10 +120,12 @@ export default function News() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {newsArticles.slice(1).map((article, index) => (
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <img 
+              <Image 
                 src={article.image} 
                 alt={article.title}
                 className="w-full h-48 object-cover"
+                width={400}
+                height={250}
               />
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
