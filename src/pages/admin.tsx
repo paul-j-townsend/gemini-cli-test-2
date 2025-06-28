@@ -16,6 +16,7 @@ interface Article {
   created_at: string
   updated_at: string
   original_url: string
+  image_url?: string
 }
 
 const ArticlesTest = () => {
@@ -25,6 +26,8 @@ const ArticlesTest = () => {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
   
   // Form state
   const initialFormData = {
@@ -35,7 +38,8 @@ const ArticlesTest = () => {
     category: '',
     published: false,
     featured: false,
-    slug: ''
+    slug: '',
+    image_url: ''
   };
   const [formData, setFormData] = useState(initialFormData)
 
@@ -96,12 +100,61 @@ const ArticlesTest = () => {
     setFormData(initialFormData);
     setEditingArticleId(null);
     setShowForm(false);
+    setImageFile(null);
   };
+
+  // Handle image upload to Supabase Storage
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `article-images/${fileName}`
+
+      console.log('Uploading image:', { fileName, filePath, fileSize: file.size, fileType: file.type })
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('images')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('Upload error details:', uploadError)
+        throw uploadError
+      }
+
+      console.log('Upload successful:', data)
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath)
+
+      console.log('Public URL:', urlData.publicUrl)
+      return urlData.publicUrl
+    } catch (error: any) {
+      console.error('Error uploading image:', error)
+      setError(`Failed to upload image: ${error.message || error}`)
+      return null
+    }
+  }
 
   // Handle form submission for create and update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) return
+
+    setUploadingImage(true)
+    let imageUrl = formData.image_url
+
+    // Upload new image if selected
+    if (imageFile) {
+      const uploadedUrl = await uploadImage(imageFile)
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl
+      } else {
+        setUploadingImage(false)
+        return // Stop if image upload failed
+      }
+    }
 
     const slug = formData.slug || generateSlug(formData.title)
     
@@ -113,7 +166,8 @@ const ArticlesTest = () => {
       category: formData.category,
       published: formData.published,
       featured: formData.featured,
-      slug: slug
+      slug: slug,
+      image_url: imageUrl
     }
 
     try {
@@ -140,6 +194,8 @@ const ArticlesTest = () => {
       fetchArticles()
     } catch (err) {
       setError('Failed to save article')
+    } finally {
+      setUploadingImage(false)
     }
   }
 
@@ -165,13 +221,27 @@ const ArticlesTest = () => {
 
   const handleEdit = (article: Article) => {
     setEditingArticleId(article.id)
-    setFormData(article)
+    setFormData({
+      title: article.title,
+      content: article.content,
+      excerpt: article.excerpt,
+      author: article.author,
+      category: article.category,
+      published: article.published,
+      featured: article.featured,
+      slug: article.slug,
+      image_url: article.image_url || ''
+    })
     setShowForm(true)
   }
 
   useEffect(() => {
     fetchArticles()
     fetchCategories()
+    
+    // Check Supabase configuration
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('Supabase configured:', !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   }, [])
 
   return (
@@ -298,6 +368,39 @@ const ArticlesTest = () => {
                   </select>
                 </div>
 
+                <div>
+                  <label htmlFor="image" className="block text-sm font-medium text-neutral-700 mb-2">
+                    Article Image
+                  </label>
+                  <input
+                    type="file"
+                    id="image"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        setImageFile(file)
+                        // Preview the image
+                        const reader = new FileReader()
+                        reader.onloadend = () => {
+                          setFormData({ ...formData, image_url: reader.result as string })
+                        }
+                        reader.readAsDataURL(file)
+                      }
+                    }}
+                    className="input"
+                  />
+                  {formData.image_url && (
+                    <div className="mt-2">
+                      <img 
+                        src={formData.image_url} 
+                        alt="Preview" 
+                        className="w-32 h-32 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex items-center space-x-6">
                   <label className="flex items-center">
                     <input
@@ -322,9 +425,9 @@ const ArticlesTest = () => {
                 <button
                   type="submit"
                   className="btn-primary"
-                  disabled={!formData.title.trim()}
+                  disabled={!formData.title.trim() || uploadingImage}
                 >
-                  {editingArticleId ? 'Update Article' : 'Create Article'}
+                  {uploadingImage ? 'Uploading...' : editingArticleId ? 'Update Article' : 'Create Article'}
                 </button>
               </form>
             </div>
@@ -349,30 +452,41 @@ const ArticlesTest = () => {
                   <div key={article.id} className="border border-neutral-200 rounded-lg p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-xl font-semibold text-neutral-900">{article.title}</h3>
-                          <div className="flex items-center space-x-2">
-                            {article.published && (
-                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                                Published
-                              </span>
+                        <div className="flex items-start space-x-4">
+                          {article.image_url && (
+                            <img 
+                              src={article.image_url} 
+                              alt={article.title}
+                              className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="text-xl font-semibold text-neutral-900">{article.title}</h3>
+                              <div className="flex items-center space-x-2">
+                                {article.published && (
+                                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                    Published
+                                  </span>
+                                )}
+                                {article.featured && (
+                                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                                    Featured
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {article.excerpt && (
+                              <p className="text-neutral-600 mb-3">{article.excerpt}</p>
                             )}
-                            {article.featured && (
-                              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                                Featured
-                              </span>
-                            )}
+                            
+                            <div className="flex items-center space-x-4 text-sm text-neutral-500">
+                              {article.author && <span>By {article.author}</span>}
+                              {article.category && <span>• {article.category}</span>}
+                              <span>• {new Date(article.created_at).toLocaleDateString()}</span>
+                            </div>
                           </div>
-                        </div>
-                        
-                        {article.excerpt && (
-                          <p className="text-neutral-600 mb-3">{article.excerpt}</p>
-                        )}
-                        
-                        <div className="flex items-center space-x-4 text-sm text-neutral-500">
-                          {article.author && <span>By {article.author}</span>}
-                          {article.category && <span>• {article.category}</span>}
-                          <span>• {new Date(article.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                       
