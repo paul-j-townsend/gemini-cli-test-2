@@ -1,6 +1,30 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
+import Badge from '@/components/Badge';
+import {
+  PawIcon,
+  HeadphoneIcon,
+  PlayIcon,
+  FireIcon,
+  CompassIcon,
+  RepeatIcon,
+  PencilIcon,
+  BrainIcon,
+  TargetIcon,
+  ArrowUpRightIcon,
+  LaurelWreathIcon,
+  CertificateIcon,
+  MicroscopeIcon,
+  UsersIcon,
+  UserCheckIcon,
+  ShareIcon,
+  MessageSquareIcon,
+  GiftIcon,
+  StarIcon,
+  CalendarIcon,
+  CheckSquareIcon,
+} from '@/components/icons/BadgeIcons';
 
 const Badges = () => {
   const badgeCategories = [
@@ -10,38 +34,33 @@ const Badges = () => {
       badges: [
         {
           name: 'First Listener',
-          description: 'Welcome to the Vet Sidekick community!',
-          icon: '🎧',
-          rarity: 'common',
-          criteria: 'Watched/listened to 1 full podcast',
+          description: 'Listened to your first podcast episode.',
+          icon: <HeadphoneIcon />,
+          color: 'blue',
         },
         {
           name: 'Podcast Binger',
-          description: 'Getting into the learning groove',
-          icon: '📺',
-          rarity: 'uncommon',
-          criteria: 'Completed 5 podcasts',
+          description: 'Listened to 5 full podcast episodes.',
+          icon: <PlayIcon />,
+          color: 'blue',
         },
         {
           name: 'On a Roll',
-          description: 'Serious dedication to learning this month',
-          icon: '🔥',
-          rarity: 'rare',
-          criteria: 'Completed 10 podcasts in a month',
+          description: 'Listened to 3 episodes in one week.',
+          icon: <FireIcon />,
+          color: 'orange',
         },
         {
           name: 'Season Explorer',
-          description: 'Diverse learning across all our content',
-          icon: '🗺️',
-          rarity: 'epic',
-          criteria: 'Listened to at least one episode from each series',
+          description: 'Finished a whole podcast season.',
+          icon: <CompassIcon />,
+          color: 'green',
         },
         {
           name: 'Repeat Visitor',
-          description: 'Building a consistent learning habit',
-          icon: '📅',
-          rarity: 'uncommon',
-          criteria: 'Returned to the site 5 days in a row',
+          description: 'Visited the site 10 times.',
+          icon: <RepeatIcon />,
+          color: 'teal',
         },
       ],
     },
@@ -51,79 +70,69 @@ const Badges = () => {
       badges: [
         {
           name: 'First Attempt',
-          description: 'Taking the first step in testing your knowledge',
-          icon: '✏️',
-          rarity: 'common',
-          criteria: 'Completed your first quiz',
+          description: 'Completed your first quiz.',
+          icon: <PencilIcon />,
+          color: 'yellow',
         },
         {
           name: 'Quiz Wiz',
-          description: 'Becoming a quiz master',
-          icon: '🧠',
-          rarity: 'uncommon',
-          criteria: 'Completed 5 quizzes',
+          description: 'Scored 100% on any quiz.',
+          icon: <BrainIcon />,
+          color: 'purple',
         },
         {
           name: 'Knowledge Hound',
-          description: 'Perfect performance in multiple assessments',
-          icon: '🎯',
-          rarity: 'rare',
-          criteria: 'Achieved 100% in 3 quizzes',
+          description: 'Completed 10 quizzes.',
+          icon: <TargetIcon />,
+          color: 'green',
         },
         {
           name: 'Bounce Back',
-          description: 'Perseverance and improvement mindset',
-          icon: '⚡',
-          rarity: 'uncommon',
-          criteria: 'Scored poorly (<50%) but later aced the same quiz',
+          description: 'Improved your score on a retaken quiz.',
+          icon: <ArrowUpRightIcon />,
+          color: 'blue',
         },
         {
           name: 'Vet Savvy',
-          description: 'Consistently high performance across assessments',
-          icon: '🏆',
-          rarity: 'epic',
-          criteria: 'Averaged over 80% across 10+ quizzes',
+          description: 'Passed 5 RCVS-certified quizzes.',
+          icon: <LaurelWreathIcon />,
+          color: '#FFD700',
         },
       ],
     },
     {
-      title: 'Certification Badges',
+      title: 'Certification & CPD Badges',
       description: 'Highlight user learning achievements with visual flair',
       badges: [
         {
           name: 'Certified Starter',
-          description: 'Your journey to professional excellence begins',
-          icon: '🎓',
-          rarity: 'common',
-          criteria: 'Earned first certificate',
+          description: 'Gained your first CPD certificate.',
+          icon: <CertificateIcon />,
+          color: '#FFD700',
         },
         {
           name: 'CPD Collector',
-          description: 'Building a solid foundation of knowledge',
-          icon: '📜',
-          rarity: 'uncommon',
-          criteria: 'Earned 5 CPD certificates',
+          description: 'Collected 5 CPD certificates.',
+          icon: <CertificateIcon />,
+          color: '#FFD700',
         },
         {
           name: 'Specialist Path',
-          description: 'Deep expertise in a focused area',
-          icon: '🔬',
-          rarity: 'rare',
-          criteria: 'Completed all certificates in a particular category',
+          description: 'Completed a learning track.',
+          icon: <MicroscopeIcon />,
+          color: 'purple',
         },
         {
           name: 'Marathon Learner',
-          description: 'Exceptional commitment to professional development',
-          icon: '🏃‍♂️',
-          rarity: 'epic',
-          criteria: 'Earned 10+ certificates',
+          description: 'Logged 10 hours of CPD.',
+          icon: <PlayIcon />,
+          color: 'orange',
         },
         {
           name: 'Lifelong Learner',
-          description: 'Consistent dedication to continuous education',
-          icon: '📚',
-          rarity: 'legendary',
-          criteria: 'Earned at least one certificate every month for 6 months',
+          description: 'Logged 50 hours of CPD.',
+          icon: <LaurelWreathIcon />,
+          color: '#FFD700',
         },
       ],
     },
@@ -133,31 +142,27 @@ const Badges = () => {
       badges: [
         {
           name: '3-Day Streak',
-          description: 'Building a learning habit',
-          icon: '📈',
-          rarity: 'common',
-          criteria: 'Engaged with the site 3 days in a row',
+          description: 'Logged in three days in a row.',
+          icon: <FireIcon />,
+          color: 'orange',
         },
         {
           name: 'Weekly Winner',
-          description: 'Consistent weekly engagement pattern',
-          icon: '🗓️',
-          rarity: 'uncommon',
-          criteria: 'Completed a podcast + quiz each week for 4 weeks',
+          description: 'Logged in every day for a week.',
+          icon: <CalendarIcon />,
+          color: 'blue',
         },
         {
           name: 'Monthly Mastery',
-          description: 'Regular professional development routine',
-          icon: '📆',
-          rarity: 'rare',
-          criteria: 'Earned at least one certificate per calendar month',
+          description: 'Logged in 20 times in a month.',
+          icon: <CheckSquareIcon />,
+          color: 'green',
         },
         {
           name: 'No Days Off',
-          description: 'Incredible dedication and consistency',
-          icon: '🔥',
-          rarity: 'legendary',
-          criteria: '30-day engagement streak',
+          description: 'Maintained a 30-day login streak.',
+          icon: <FireIcon style={{ color: 'red' }} />,
+          color: 'red',
         },
       ],
     },
@@ -167,31 +172,27 @@ const Badges = () => {
       badges: [
         {
           name: 'Early Adopter',
-          description: 'Among the first to join our community',
-          icon: '🌟',
-          rarity: 'rare',
-          criteria: 'Joined within first 1000 users',
+          description: 'Joined within the first month of launch.',
+          icon: <StarIcon />,
+          color: 'teal',
         },
         {
           name: 'Profile Complete',
-          description: 'Professional presentation matters',
-          icon: '👤',
-          rarity: 'common',
-          criteria: 'Filled out all profile information',
+          description: 'Filled out your entire user profile.',
+          icon: <UserCheckIcon />,
+          color: 'blue',
         },
         {
           name: 'Social Sharer',
-          description: 'Spreading veterinary knowledge',
-          icon: '📱',
-          rarity: 'uncommon',
-          criteria: 'Shared a podcast/achievement to social media',
+          description: 'Shared a podcast or article.',
+          icon: <ShareIcon />,
+          color: 'purple',
         },
         {
           name: 'Feedback Giver',
-          description: 'Helping improve our platform',
-          icon: '💬',
-          rarity: 'uncommon',
-          criteria: 'Submitted a review or quiz feedback',
+          description: 'Submitted feedback through the site.',
+          icon: <MessageSquareIcon />,
+          color: 'yellow',
         },
       ],
     },
@@ -200,39 +201,28 @@ const Badges = () => {
       description: 'Add some personality and playfulness to your achievements',
       badges: [
         {
-          name: 'Paw-dcast Pup',
-          description: 'Welcome to the pack!',
-          icon: '🐶',
-          rarity: 'common',
-          criteria: 'First-time podcast listener',
+          name: 'Vet Squad',
+          description: 'For being part of the team.',
+          icon: <UsersIcon />,
+          color: 'blue',
         },
         {
-          name: 'Top Dog Learner',
-          description: 'Leading the pack in knowledge',
-          icon: '🥇',
-          rarity: 'uncommon',
-          criteria: 'Earned highest score in a quiz that week',
+          name: 'Hidden Gem',
+          description: 'Found an easter egg on the site.',
+          icon: <GiftIcon />,
+          color: 'yellow',
         },
         {
-          name: 'CPD Cat',
-          description: 'Curious and always learning',
-          icon: '🐱',
-          rarity: 'uncommon',
-          criteria: 'Collected 5 certificates',
+          name: 'Fearless Explorer',
+          description: 'Visited every main page.',
+          icon: <CompassIcon />,
+          color: 'green',
         },
         {
-          name: 'Fetching Facts',
-          description: 'Perfect retrieval of knowledge',
-          icon: '🎾',
-          rarity: 'rare',
-          criteria: 'Got every quiz answer right in a row (streak of 5)',
-        },
-        {
-          name: 'Vet Sidekick Superfan',
-          description: 'The ultimate achievement - you are a true sidekick!',
-          icon: '🏆',
-          rarity: 'legendary',
-          criteria: 'Unlock all other badges',
+          name: 'Holiday Special',
+          description: 'Logged in during a special event.',
+          icon: <GiftIcon />,
+          color: 'red',
         },
       ],
     },
@@ -276,7 +266,7 @@ const Badges = () => {
     <Layout>
       <Head>
         <title>Badges - Vet Sidekick</title>
-        <meta name="description" content="Earn badges for your professional achievements and contributions to the veterinary community." />
+        <meta name="description" content="Browse all the badges you can earn on Vet Sidekick." />
       </Head>
 
       {/* Hero Section */}
@@ -307,49 +297,31 @@ const Badges = () => {
       </section>
 
       {/* Badge Categories */}
-      {badgeCategories.map((category, categoryIndex) => (
-        <section key={categoryIndex} className={`py-20 lg:py-32 ${categoryIndex % 2 === 0 ? 'bg-white' : 'bg-gradient-to-br from-neutral-50 to-primary-50'}`}>
-          <div className="container-wide">
-            <div className="text-center mb-16 animate-fade-in-up">
-              <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-6">
-                {category.title}
-              </h2>
-              <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
-                {category.description}
-              </p>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-4">Your Badges</h1>
+        <p className="text-lg text-gray-600 text-center mb-12">
+          Unlock achievements, show off your expertise, and get recognized for
+          your contributions.
+        </p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {category.badges.map((badge, badgeIndex) => (
-                <div
-                  key={badgeIndex}
-                  className={`card-hover text-center group animate-fade-in-up p-6 ${getBorderColor(badge.rarity)} border-2`}
-                  style={{ animationDelay: `${badgeIndex * 200}ms` }}
-                >
-                  <div className="relative mb-6">
-                    <div className={`w-20 h-20 bg-gradient-to-r ${getRarityColor(badge.rarity)} rounded-full flex items-center justify-center text-white mx-auto shadow-soft group-hover:shadow-hard transition-all duration-300 text-3xl`}>
-                      {badge.icon}
-                    </div>
-                    <div className={`absolute -bottom-2 -right-2 px-2 py-1 bg-gradient-to-r ${getRarityColor(badge.rarity)} rounded-full text-white text-xs font-semibold uppercase tracking-wide`}>
-                      {badge.rarity}
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-3">
-                    {badge.name}
-                  </h3>
-                  <p className="text-neutral-600 leading-relaxed mb-4">{badge.description}</p>
-                  
-                  <div className="bg-neutral-50 rounded-lg p-4 mt-4">
-                    <h4 className="text-sm font-semibold text-neutral-900 mb-2">Criteria:</h4>
-                    <p className="text-sm text-neutral-600">{badge.criteria}</p>
-                  </div>
-                </div>
+        {badgeCategories.map((category) => (
+          <div key={category.title} className="mb-12">
+            <h2 className="text-2xl font-semibold mb-2">{category.title}</h2>
+            <p className="text-gray-500 mb-6">{category.description}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+              {category.badges.map((badge) => (
+                <Badge
+                  key={badge.name}
+                  name={badge.name}
+                  description={badge.description}
+                  icon={badge.icon}
+                  color={badge.color}
+                />
               ))}
             </div>
           </div>
-        </section>
-      ))}
+        ))}
+      </div>
 
       {/* CTA Section */}
       <section className="py-20 lg:py-32 bg-gradient-to-r from-primary-500 to-primary-600 text-white">

@@ -8,7 +8,8 @@ src/.DS_Store
 .DS_Store
 public/.DS_Store
 .env.local
-supabase/migrations/001_create_articles_table.sql
+supabase/migrations/
 public/.DS_Store
-supabase/migrations/004_add_article_views.sql
 next.config.js
+my_docs
+
