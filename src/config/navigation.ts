@@ -5,5 +5,6 @@ export const navigationItems = [
   { href: '/news', label: 'News' },
   { href: '/forum', label: 'Forum' },
   { href: '/jobs', label: 'Jobs' },
+  { href: '/badges', label: 'Badges' },
   { href: '/about', label: 'About' },
 ];
