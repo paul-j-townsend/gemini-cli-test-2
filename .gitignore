@@ -7,3 +7,4 @@ public/images/imgres.html
 src/.DS_Store
 .DS_Store
 public/.DS_Store
+.env.local
