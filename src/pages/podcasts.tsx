@@ -46,7 +46,7 @@ const Podcasts = () => {
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <span className="text-sm font-medium">CPD Accredited</span>
+                <span className="text-sm font-medium">CPD Approved</span>
               </div>
             </div>
           </div>
@@ -81,7 +81,7 @@ const Podcasts = () => {
               Latest Episodes
             </h2>
             <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Dive into our latest discussions on veterinary practice, animal welfare, 
+              Dive into our latest discussions on veterinary practice, animal welfare 
               and the future of companion animal care.
             </p>
           </div>
