@@ -20,14 +20,14 @@ interface Article {
 
 const ArticlesTest = () => {
   const [articles, setArticles] = useState<Article[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null)
   
   // Form state
-  const [formData, setFormData] = useState({
-    id: null,
+  const initialFormData = {
     title: '',
     content: '',
     excerpt: '',
@@ -36,7 +36,8 @@ const ArticlesTest = () => {
     published: false,
     featured: false,
     slug: ''
-  })
+  };
+  const [formData, setFormData] = useState(initialFormData)
 
   // Fetch articles from Supabase
   const fetchArticles = async () => {
@@ -64,6 +65,23 @@ const ArticlesTest = () => {
     }
   }
 
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vsk_valid_keywords')
+        .select('keyword')
+        .order('keyword', { ascending: true })
+
+      if (error) {
+        console.error(`Error fetching categories: ${error.message}`)
+      } else {
+        setCategories(data?.map((item: any) => item.keyword) || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch categories', err)
+    }
+  }
+
   // Generate slug from title
   const generateSlug = (title: string) => {
     return title
@@ -74,48 +92,43 @@ const ArticlesTest = () => {
       .trim()
   }
 
-  // Handle editing an article
-  const handleEdit = (article: Article) => {
-    setEditingArticleId(article.id)
-    setFormData(article)
-    setShowForm(true)
-  }
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setEditingArticleId(null);
+    setShowForm(false);
+  };
 
-  // Handle form submission
+  // Handle form submission for create and update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) return
 
     const slug = formData.slug || generateSlug(formData.title)
+    
+    const articleData = {
+      title: formData.title,
+      content: formData.content,
+      excerpt: formData.excerpt,
+      author: formData.author,
+      category: formData.category,
+      published: formData.published,
+      featured: formData.featured,
+      slug: slug
+    }
 
     try {
-      let error = null
+      let error;
       if (editingArticleId) {
         const { error: updateError } = await supabase
           .from('vsk_articles')
-          .update({
-            title: formData.title,
-            content: formData.content,
-            excerpt: formData.excerpt,
-            author: formData.author,
-            category: formData.category,
-            published: formData.published,
-            featured: formData.featured,
-            slug: slug,
-            updated_at: new Date().toISOString(),
-          })
+          .update(articleData)
           .eq('id', editingArticleId)
-        error = updateError
+        error = updateError;
       } else {
         const { error: insertError } = await supabase
           .from('vsk_articles')
-          .insert([{
-            ...formData,
-            slug,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }])
-        error = insertError
+          .insert([articleData])
+        error = insertError;
       }
 
       if (error) {
@@ -123,20 +136,7 @@ const ArticlesTest = () => {
         return
       }
 
-      // Reset form and refresh list
-      setFormData({
-        id: null,
-        title: '',
-        content: '',
-        excerpt: '',
-        author: '',
-        category: '',
-        published: false,
-        featured: false,
-        slug: ''
-      })
-      setEditingArticleId(null)
-      setShowForm(false)
+      resetForm()
       fetchArticles()
     } catch (err) {
       setError('Failed to save article')
@@ -163,8 +163,15 @@ const ArticlesTest = () => {
     }
   }
 
+  const handleEdit = (article: Article) => {
+    setEditingArticleId(article.id)
+    setFormData(article)
+    setShowForm(true)
+  }
+
   useEffect(() => {
     fetchArticles()
+    fetchCategories()
   }, [])
 
   return (
@@ -179,21 +186,7 @@ const ArticlesTest = () => {
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-4xl font-bold text-neutral-900">Articles Management</h1>
             <button
-              onClick={() => {
-                setShowForm(!showForm)
-                setEditingArticleId(null)
-                setFormData({
-                  id: null,
-                  title: '',
-                  content: '',
-                  excerpt: '',
-                  author: '',
-                  category: '',
-                  published: false,
-                  featured: false,
-                  slug: ''
-                })
-              }}
+              onClick={() => (showForm ? resetForm() : setShowForm(true))}
               className="btn-primary"
             >
               {showForm ? 'Cancel' : 'Add Article'}
@@ -223,7 +216,9 @@ const ArticlesTest = () => {
           {/* Article Form */}
           {showForm && (
             <div className="card p-6 mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{editingArticleId ? 'Edit Article' : 'Add New Article'}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {editingArticleId ? 'Edit Article' : 'Add New Article'}
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -253,6 +248,20 @@ const ArticlesTest = () => {
                       placeholder="Author name"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label htmlFor="slug" className="block text-sm font-medium text-neutral-700 mb-2">
+                    Slug (optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    className="input"
+                    placeholder="auto-generated-from-title"
+                  />
                 </div>
 
                 <div>
@@ -294,10 +303,11 @@ const ArticlesTest = () => {
                     className="input"
                   >
                     <option value="">Select category</option>
-                    <option value="Education">Education</option>
-                    <option value="Surgery">Surgery</option>
-                    <option value="Preventive Care">Preventive Care</option>
-                    <option value="Emergency Medicine">Emergency Medicine</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -329,29 +339,6 @@ const ArticlesTest = () => {
                 >
                   {editingArticleId ? 'Update Article' : 'Create Article'}
                 </button>
-                {editingArticleId && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingArticleId(null)
-                      setFormData({
-                        id: null,
-                        title: '',
-                        content: '',
-                        excerpt: '',
-                        author: '',
-                        category: '',
-                        published: false,
-                        featured: false,
-                        slug: ''
-                      })
-                      setShowForm(false)
-                    }}
-                    className="btn-secondary ml-4"
-                  >
-                    Cancel Edit
-                  </button>
-                )}
               </form>
             </div>
           )}
@@ -402,24 +389,26 @@ const ArticlesTest = () => {
                         </div>
                       </div>
                       
-                      <button
-                        onClick={() => handleEdit(article)}
-                        className="text-blue-600 hover:text-blue-800 ml-4"
-                        title="Edit article"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => deleteArticle(article.id)}
-                        className="text-red-600 hover:text-red-800 ml-2"
-                        title="Delete article"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      <div className="flex items-center space-x-2 ml-4">
+                        <button
+                          onClick={() => handleEdit(article)}
+                          className="text-blue-600 hover:text-blue-800"
+                          title="Edit article"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => deleteArticle(article.id)}
+                          className="text-red-600 hover:text-red-800"
+                          title="Delete article"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
