@@ -23,9 +23,11 @@ const ArticlesTest = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [editingArticleId, setEditingArticleId] = useState<number | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
+    id: null,
     title: '',
     content: '',
     excerpt: '',
@@ -41,7 +43,7 @@ const ArticlesTest = () => {
     try {
       setLoading(true)
       const { data, error } = await supabase
-        .from('articles')
+        .from('vsk_articles')
         .select('*')
         .order('created_at', { ascending: false })
 
@@ -72,6 +74,13 @@ const ArticlesTest = () => {
       .trim()
   }
 
+  // Handle editing an article
+  const handleEdit = (article: Article) => {
+    setEditingArticleId(article.id)
+    setFormData(article)
+    setShowForm(true)
+  }
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,20 +89,43 @@ const ArticlesTest = () => {
     const slug = formData.slug || generateSlug(formData.title)
 
     try {
-      const { error } = await supabase
-        .from('articles')
-        .insert([{
-          ...formData,
-          slug
-        }])
+      let error = null
+      if (editingArticleId) {
+        const { error: updateError } = await supabase
+          .from('vsk_articles')
+          .update({
+            title: formData.title,
+            content: formData.content,
+            excerpt: formData.excerpt,
+            author: formData.author,
+            category: formData.category,
+            published: formData.published,
+            featured: formData.featured,
+            slug: slug,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingArticleId)
+        error = updateError
+      } else {
+        const { error: insertError } = await supabase
+          .from('vsk_articles')
+          .insert([{
+            ...formData,
+            slug,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }])
+        error = insertError
+      }
 
       if (error) {
-        setError(`Error creating article: ${error.message}`)
+        setError(`Error saving article: ${error.message}`)
         return
       }
 
       // Reset form and refresh list
       setFormData({
+        id: null,
         title: '',
         content: '',
         excerpt: '',
@@ -103,6 +135,7 @@ const ArticlesTest = () => {
         featured: false,
         slug: ''
       })
+      setEditingArticleId(null)
       setShowForm(false)
       fetchArticles()
     } catch (err) {
@@ -116,7 +149,7 @@ const ArticlesTest = () => {
 
     try {
       const { error } = await supabase
-        .from('articles')
+        .from('vsk_articles')
         .delete()
         .eq('id', id)
 
@@ -146,7 +179,21 @@ const ArticlesTest = () => {
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-4xl font-bold text-neutral-900">Articles Management</h1>
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                setShowForm(!showForm)
+                setEditingArticleId(null)
+                setFormData({
+                  id: null,
+                  title: '',
+                  content: '',
+                  excerpt: '',
+                  author: '',
+                  category: '',
+                  published: false,
+                  featured: false,
+                  slug: ''
+                })
+              }}
               className="btn-primary"
             >
               {showForm ? 'Cancel' : 'Add Article'}
@@ -176,7 +223,7 @@ const ArticlesTest = () => {
           {/* Article Form */}
           {showForm && (
             <div className="card p-6 mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Add New Article</h2>
+              <h2 className="text-2xl font-semibold mb-4">{editingArticleId ? 'Edit Article' : 'Add New Article'}</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -280,8 +327,31 @@ const ArticlesTest = () => {
                   className="btn-primary"
                   disabled={!formData.title.trim()}
                 >
-                  Create Article
+                  {editingArticleId ? 'Update Article' : 'Create Article'}
                 </button>
+                {editingArticleId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingArticleId(null)
+                      setFormData({
+                        id: null,
+                        title: '',
+                        content: '',
+                        excerpt: '',
+                        author: '',
+                        category: '',
+                        published: false,
+                        featured: false,
+                        slug: ''
+                      })
+                      setShowForm(false)
+                    }}
+                    className="btn-secondary ml-4"
+                  >
+                    Cancel Edit
+                  </button>
+                )}
               </form>
             </div>
           )}
@@ -333,8 +403,17 @@ const ArticlesTest = () => {
                       </div>
                       
                       <button
+                        onClick={() => handleEdit(article)}
+                        className="text-blue-600 hover:text-blue-800 ml-4"
+                        title="Edit article"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
+                        </svg>
+                      </button>
+                      <button
                         onClick={() => deleteArticle(article.id)}
-                        className="text-red-600 hover:text-red-800 ml-4"
+                        className="text-red-600 hover:text-red-800 ml-2"
                         title="Delete article"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
