@@ -73,6 +73,16 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
+        <style>{`
+          .no-focus-border:focus,
+          .no-focus-border:active,
+          .no-focus-border:focus-visible,
+          .no-focus-border:focus-within {
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+        `}</style>
       </Head>
 
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -148,7 +158,15 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
                 href={article.original_url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium no-focus-border"
+                style={{ 
+                  outline: 'none', 
+                  border: 'none',
+                  boxShadow: 'none',
+                  textDecoration: 'none'
+                }}
+                onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
+                onFocus={(e) => e.currentTarget.style.outline = 'none'}
               >
                 <span>Read original article</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +176,18 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
             ) : (
               <div></div>
             )}
-            <Link href="/articles" className="text-teal-600 hover:text-teal-700 font-medium">
+            <Link 
+              href="/articles" 
+              className="text-teal-600 hover:text-teal-700 font-medium no-focus-border"
+              style={{ 
+                outline: 'none', 
+                border: 'none',
+                boxShadow: 'none',
+                textDecoration: 'none'
+              }}
+              onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
+              onFocus={(e) => e.currentTarget.style.outline = 'none'}
+            >
               ← Back to Articles
             </Link>
           </div>
