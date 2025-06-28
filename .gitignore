@@ -9,3 +9,5 @@ src/.DS_Store
 public/.DS_Store
 .env.local
 supabase/migrations/001_create_articles_table.sql
+public/.DS_Store
+public/.DS_Store
