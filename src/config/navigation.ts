@@ -7,4 +7,5 @@ export const navigationItems = [
   { href: '/jobs', label: 'Jobs' },
   { href: '/badges', label: 'Badges' },
   { href: '/about', label: 'About' },
+  { href: '/admin', label: 'Admin' },
 ];
