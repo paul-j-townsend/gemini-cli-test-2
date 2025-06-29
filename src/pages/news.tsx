@@ -5,7 +5,7 @@ import Image from 'next/image';
 export default function News() {
   const newsArticles = [
     {
-      title: "New WSAVA Guidelines for Vaccination Protocols Released",
+      title: "xNew WSAVA Guidelines for Vaccination Protocols Released",
       summary: "The World Small Animal Veterinary Association has published updated guidelines for core and non-core vaccination schedules for dogs and cats.",
       date: "2024-01-15",
       category: "Vaccination",
