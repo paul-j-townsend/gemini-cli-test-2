@@ -9,4 +9,5 @@ export const navigationItems = [
   { href: '/badges', label: 'Badges' },
   { href: '/about', label: 'About' },
   { href: '/admin', label: 'Admin' },
+  { href: '/podcast-admin', label: 'Podcast Admin' },
 ];
