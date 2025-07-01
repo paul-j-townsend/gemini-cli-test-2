@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { DataTable, Column } from './DataTable';
 
 interface Article {
   id: number;
@@ -219,6 +220,79 @@ const ArticlesManagement = () => {
     setShowForm(true);
   };
 
+  const articleColumns: Column<Article>[] = [
+    {
+      key: 'title',
+      header: 'Title',
+      width: 300,
+      minWidth: 200,
+      sortable: true,
+      render: (value, article) => (
+        <div>
+          <div className="font-medium text-gray-900">{value}</div>
+          {article.excerpt && (
+            <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+              {article.excerpt}
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'author',
+      header: 'Author',
+      width: 150,
+      sortable: true,
+      render: (value) => value || 'Unknown'
+    },
+    {
+      key: 'category',
+      header: 'Category',
+      width: 140,
+      sortable: true,
+      render: (value) => value || 'Uncategorized'
+    },
+    {
+      key: 'published',
+      header: 'Status',
+      width: 120,
+      sortable: true,
+      searchable: false,
+      render: (published, article) => (
+        <div className="flex flex-col space-y-1">
+          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            published 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-yellow-100 text-yellow-800'
+          }`}>
+            {published ? 'Published' : 'Draft'}
+          </span>
+          {article.featured && (
+            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+              Featured
+            </span>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'created_at',
+      header: 'Created',
+      width: 120,
+      sortable: true,
+      searchable: false,
+      render: (value) => new Date(value).toLocaleDateString()
+    },
+    {
+      key: 'updated_at',
+      header: 'Updated',
+      width: 120,
+      sortable: true,
+      searchable: false,
+      render: (value) => new Date(value).toLocaleDateString()
+    }
+  ];
+
   useEffect(() => {
     fetchArticles();
     fetchCategories();
@@ -394,98 +468,15 @@ const ArticlesManagement = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold mb-4">Articles List</h2>
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-          </div>
-        ) : articles.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">No articles found. Create your first article to get started.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Author
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {articles.map((article) => (
-                  <tr key={article.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{article.title}</div>
-                      {article.excerpt && (
-                        <div className="text-sm text-gray-500 truncate max-w-xs">
-                          {article.excerpt}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {article.author || 'Unknown'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {article.category || 'Uncategorized'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-1">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          article.published 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {article.published ? 'Published' : 'Draft'}
-                        </span>
-                        {article.featured && (
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                            Featured
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(article.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => handleEdit(article)}
-                        className="text-primary-600 hover:text-primary-900"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteArticle(article.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <DataTable
+        data={articles}
+        columns={articleColumns}
+        loading={loading}
+        onEdit={handleEdit}
+        onDelete={(article) => deleteArticle(article.id)}
+        emptyMessage="No articles found. Create your first article to get started."
+        searchPlaceholder="Search articles..."
+      />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import EpisodeForm from '@/components/EpisodeForm';
 import EpisodeList from '@/components/EpisodeList';
 
 interface Episode {
-  id: number;
+  id: string;
   title: string;
   description: string;
   audio_url: string;
@@ -75,7 +75,7 @@ const PodcastManagement = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this episode?')) {
       return;
     }

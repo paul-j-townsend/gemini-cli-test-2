@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
+import { DataTable, Column } from '@/components/admin/DataTable';
 
 interface Episode {
   id: string;
@@ -20,8 +21,6 @@ interface EpisodeListProps {
 }
 
 export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = false }: EpisodeListProps) {
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Not set';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -33,134 +32,118 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
     });
   };
 
-  const handleDeleteClick = (episodeId: string) => {
-    setDeleteConfirm(episodeId);
+  const handleDelete = (episode: Episode) => {
+    if (confirm('Are you sure you want to delete this episode?')) {
+      onDelete(episode.id);
+    }
   };
 
-  const handleDeleteConfirm = (episodeId: string) => {
-    onDelete(episodeId);
-    setDeleteConfirm(null);
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirm(null);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex space-x-4">
-                <div className="w-16 h-16 bg-gray-200 rounded"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
+  const episodeColumns: Column<Episode>[] = useMemo(() => [
+    {
+      key: 'image_url',
+      header: 'Image',
+      width: 80,
+      minWidth: 80,
+      maxWidth: 80,
+      sortable: false,
+      searchable: false,
+      render: (imageUrl, episode) => (
+        <div className="w-12 h-12">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={episode.title}
+              width={48}
+              height={48}
+              className="rounded-lg object-cover"
+              onError={(e: any) => {
+                e.target.src = '/placeholder-image.jpg';
+              }}
+            />
+          ) : (
+            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+              <span className="text-gray-400 text-xs">No Image</span>
+            </div>
+          )}
         </div>
-      </div>
-    );
-  }
-
-  if (episodes.length === 0) {
-    return (
-      <div className="bg-white rounded-lg shadow-md p-6 text-center">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No Episodes Yet</h3>
-        <p className="text-gray-600">Create your first podcast episode to get started.</p>
-      </div>
-    );
-  }
+      )
+    },
+    {
+      key: 'title',
+      header: 'Title',
+      width: 300,
+      minWidth: 200,
+      sortable: true,
+      render: (title, episode) => (
+        <div>
+          <div className="font-medium text-gray-900 truncate">{title}</div>
+          {episode.description && (
+            <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+              {episode.description}
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'published_at',
+      header: 'Status',
+      width: 120,
+      sortable: true,
+      searchable: false,
+      render: (publishedAt) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+          publishedAt 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-yellow-100 text-yellow-800'
+        }`}>
+          {publishedAt ? 'Published' : 'Draft'}
+        </span>
+      )
+    },
+    {
+      key: 'audio_url',
+      header: 'Audio',
+      width: 100,
+      sortable: false,
+      searchable: false,
+      render: (audioUrl) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+          audioUrl 
+            ? 'bg-blue-100 text-blue-800' 
+            : 'bg-gray-100 text-gray-800'
+        }`}>
+          {audioUrl ? 'Has Audio' : 'No Audio'}
+        </span>
+      )
+    },
+    {
+      key: 'created_at',
+      header: 'Created',
+      width: 140,
+      sortable: true,
+      searchable: false,
+      render: (value) => formatDate(value)
+    },
+    {
+      key: 'published_at',
+      header: 'Published',
+      width: 140,
+      sortable: true,
+      searchable: false,
+      render: (value) => formatDate(value)
+    }
+  ], []);
 
   return (
-    <div className="bg-white rounded-lg shadow-md">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">Episodes ({episodes.length})</h3>
-      </div>
-      
-      <div className="divide-y divide-gray-200">
-        {episodes.map((episode) => (
-          <div key={episode.id} className="p-6 hover:bg-gray-50">
-            <div className="flex items-start space-x-4">
-              {episode.image_url && (
-                <div className="flex-shrink-0">
-                  <Image
-                    src={episode.image_url}
-                    alt={episode.title}
-                    width={64}
-                    height={64}
-                    className="rounded-lg object-cover"
-                    onError={(e: any) => {
-                      e.target.src = '/placeholder-image.jpg';
-                    }}
-                  />
-                </div>
-              )}
-              
-              <div className="flex-1 min-w-0">
-                <h4 className="text-lg font-medium text-gray-900 truncate">
-                  {episode.title}
-                </h4>
-                
-                {episode.description && (
-                  <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-                    {episode.description}
-                  </p>
-                )}
-                
-                <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-500">
-                  <span>Created: {formatDate(episode.created_at)}</span>
-                  {episode.published_at ? (
-                    <span>Published: {formatDate(episode.published_at)}</span>
-                  ) : (
-                    <span className="text-orange-600">Draft</span>
-                  )}
-                  {episode.audio_url && (
-                    <span className="text-green-600">Has Audio</span>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex-shrink-0 flex space-x-2">
-                <button
-                  onClick={() => onEdit(episode)}
-                  className="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  Edit
-                </button>
-                
-                {deleteConfirm === episode.id ? (
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => handleDeleteConfirm(episode.id)}
-                      className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100"
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={handleDeleteCancel}
-                      className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleDeleteClick(episode.id)}
-                    className="inline-flex items-center px-3 py-1 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <DataTable
+      data={episodes}
+      columns={episodeColumns}
+      loading={isLoading}
+      onEdit={onEdit}
+      onDelete={handleDelete}
+      emptyMessage="No episodes found. Create your first podcast episode to get started."
+      searchPlaceholder="Search episodes..."
+    />
   );
 }
