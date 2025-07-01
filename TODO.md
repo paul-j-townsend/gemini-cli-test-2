@@ -21,7 +21,6 @@ This is a list of tasks to be completed based on the code review from July 27th,
 
 ## Podcast Admin System
 - [x] **Database:** Renamed `podcast_episodes` table to `vsk_podcast_episodes`
-- [x] **Admin Interface:** Created podcast admin page at `/podcast-admin`
 - [x] **Episode Management:** Built episode creation, editing, and deletion functionality
 - [x] **Audio Upload:** Implemented tabbed audio input (Upload File vs Select Existing)
 - [x] **Storage Integration:** Connected to Supabase storage with organized bucket structure

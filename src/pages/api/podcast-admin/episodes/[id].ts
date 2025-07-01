@@ -10,12 +10,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     switch (req.method) {
-      case 'GET':
-        return await getEpisode(id, res);
       case 'PUT':
-        return await updateEpisode(id, req, res);
+        return await updateEpisode(req, res, id);
       case 'DELETE':
-        return await deleteEpisode(id, res);
+        return await deleteEpisode(req, res, id);
       default:
         return res.status(405).json({ message: 'Method not allowed' });
     }
@@ -25,22 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function getEpisode(id: string, res: NextApiResponse) {
-  const { data: episode, error } = await supabaseAdmin
-    .from('vsk_podcast_episodes')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    console.error('Error fetching episode:', error);
-    return res.status(404).json({ message: 'Episode not found' });
-  }
-
-  return res.status(200).json({ episode });
-}
-
-async function updateEpisode(id: string, req: NextApiRequest, res: NextApiResponse) {
+async function updateEpisode(req: NextApiRequest, res: NextApiResponse, id: string) {
   const { title, description, audio_url, image_url, published_at } = req.body;
 
   if (!title) {
@@ -55,6 +38,7 @@ async function updateEpisode(id: string, req: NextApiRequest, res: NextApiRespon
       audio_url,
       image_url,
       published_at,
+      updated_at: new Date().toISOString(),
     })
     .eq('id', id)
     .select()
@@ -68,7 +52,7 @@ async function updateEpisode(id: string, req: NextApiRequest, res: NextApiRespon
   return res.status(200).json({ episode });
 }
 
-async function deleteEpisode(id: string, res: NextApiResponse) {
+async function deleteEpisode(req: NextApiRequest, res: NextApiResponse, id: string) {
   const { error } = await supabaseAdmin
     .from('vsk_podcast_episodes')
     .delete()
@@ -80,4 +64,4 @@ async function deleteEpisode(id: string, res: NextApiResponse) {
   }
 
   return res.status(200).json({ message: 'Episode deleted successfully' });
-}
+} 
