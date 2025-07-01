@@ -228,10 +228,20 @@ const ArticlesManagement = () => {
       minWidth: 200,
       sortable: true,
       render: (value, article) => (
-        <div>
-          <div className="font-medium text-gray-900">{value}</div>
+        <div className="max-w-full overflow-hidden">
+          <div className="font-medium text-gray-900 truncate" title={value}>
+            {value}
+          </div>
           {article.excerpt && (
-            <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+            <div 
+              className="text-sm text-gray-500 mt-1 break-words overflow-hidden" 
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
+              }}
+              title={article.excerpt}
+            >
               {article.excerpt}
             </div>
           )}
@@ -248,7 +258,7 @@ const ArticlesManagement = () => {
     {
       key: 'category',
       header: 'Category',
-      width: 140,
+      width: 180,
       sortable: true,
       render: (value) => value || 'Uncategorized'
     },
@@ -287,6 +297,8 @@ const ArticlesManagement = () => {
       key: 'updated_at',
       header: 'Updated',
       width: 120,
+      minWidth: 100,
+      maxWidth: 200,
       sortable: true,
       searchable: false,
       render: (value) => new Date(value).toLocaleDateString()
@@ -311,7 +323,7 @@ const ArticlesManagement = () => {
       </div>
 
       {error && (
-        <div className="card p-6 mb-8 bg-red-50 border-red-200">
+        <div className="bg-red-50 border border-gray-200 rounded-lg p-6 mb-8">
           <h3 className="text-lg font-semibold text-red-900 mb-2">Error</h3>
           <p className="text-red-700">{error}</p>
         </div>

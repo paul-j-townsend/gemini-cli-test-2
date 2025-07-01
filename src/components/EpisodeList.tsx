@@ -75,10 +75,20 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
       minWidth: 200,
       sortable: true,
       render: (title, episode) => (
-        <div>
-          <div className="font-medium text-gray-900 truncate">{title}</div>
+        <div className="max-w-full overflow-hidden">
+          <div className="font-medium text-gray-900 truncate" title={title}>
+            {title}
+          </div>
           {episode.description && (
-            <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+            <div 
+              className="text-sm text-gray-500 mt-1 break-words overflow-hidden" 
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
+              }}
+              title={episode.description}
+            >
               {episode.description}
             </div>
           )}

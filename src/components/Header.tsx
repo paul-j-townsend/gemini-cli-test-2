@@ -81,37 +81,8 @@ const Header = () => {
               })}
             </div>
 
-            {/* CTA Button */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Link 
-                href="/podcasts" 
-                className="btn-secondary btn-sm whitespace-nowrap no-focus-border"
-                style={{ 
-                  outline: 'none', 
-                  border: 'none',
-                  boxShadow: 'none',
-                  textDecoration: 'none'
-                }}
-                onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
-                onFocus={(e) => e.currentTarget.style.outline = 'none'}
-              >
-                Listen Now
-              </Link>
-              <Link 
-                href="/about" 
-                className="btn-primary btn-sm whitespace-nowrap no-focus-border"
-                style={{ 
-                  outline: 'none', 
-                  border: 'none',
-                  boxShadow: 'none',
-                  textDecoration: 'none'
-                }}
-                onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
-                onFocus={(e) => e.currentTarget.style.outline = 'none'}
-              >
-                Get Started
-              </Link>
-            </div>
+
+
 
             {/* Mobile Menu Button */}
             <button
@@ -149,7 +120,7 @@ const Header = () => {
           {/* Mobile Menu */}
           <div 
             className={`md:hidden transition-all duration-300 ease-out overflow-hidden ${
-              isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+              isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
             <div className="py-4 space-y-2">
@@ -179,42 +150,8 @@ const Header = () => {
                   </Link>
                 );
               })}
-              
-              {/* Mobile CTA Buttons */}
-              <div className="pt-4 space-y-3">
-                <Link
-                  href="/podcasts"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-center btn-secondary btn-sm w-full whitespace-nowrap animate-slide-in-left no-focus-border"
-                  style={{ 
-                    animationDelay: '300ms',
-                    outline: 'none', 
-                    border: 'none',
-                    boxShadow: 'none',
-                    textDecoration: 'none'
-                  }}
-                  onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
-                  onFocus={(e) => e.currentTarget.style.outline = 'none'}
-                >
-                  Listen Now
-                </Link>
-                <Link
-                  href="/about"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-center btn-primary btn-sm w-full whitespace-nowrap animate-slide-in-left no-focus-border"
-                  style={{ 
-                    animationDelay: '400ms',
-                    outline: 'none', 
-                    border: 'none',
-                    boxShadow: 'none',
-                    textDecoration: 'none'
-                  }}
-                  onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
-                  onFocus={(e) => e.currentTarget.style.outline = 'none'}
-                >
-                  Get Started
-                </Link>
-              </div>
+
+
             </div>
           </div>
         </nav>

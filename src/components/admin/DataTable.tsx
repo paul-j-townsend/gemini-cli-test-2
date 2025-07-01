@@ -58,6 +58,10 @@ export function DataTable<T extends Record<string, any>>({
     });
     return initialWidths;
   });
+
+  const totalTableWidth = useMemo(() => {
+    return Object.values(columnWidths).reduce((sum, width) => sum + width, 0);
+  }, [columnWidths]);
   
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -113,6 +117,7 @@ export function DataTable<T extends Record<string, any>>({
 
   const handleMouseDown = useCallback((e: React.MouseEvent, columnKey: string) => {
     e.preventDefault();
+    e.stopPropagation();
     setResizing({
       column: columnKey,
       startX: e.clientX,
@@ -124,15 +129,16 @@ export function DataTable<T extends Record<string, any>>({
     if (!resizing) return;
     
     const diff = e.clientX - resizing.startX;
-    const newWidth = Math.max(50, resizing.startWidth + diff);
+    const newWidth = resizing.startWidth + diff;
     const column = columns.find(col => String(col.key) === resizing.column);
     
-    if (column?.maxWidth && newWidth > column.maxWidth) return;
-    if (column?.minWidth && newWidth < column.minWidth) return;
+    const minWidth = column?.minWidth || 100;
+    const maxWidth = column?.maxWidth || 800;
+    const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
     
     setColumnWidths(prev => ({
       ...prev,
-      [resizing.column]: newWidth
+      [resizing.column]: clampedWidth
     }));
   }, [resizing, columns]);
 
@@ -175,14 +181,14 @@ export function DataTable<T extends Record<string, any>>({
           <h3 className="text-lg font-semibold text-gray-900">
             {filteredAndSortedData.length} {filteredAndSortedData.length === 1 ? 'item' : 'items'}
           </h3>
-          <div className="relative">
+          <div className="relative w-64">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -194,7 +200,14 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table ref={tableRef} className="min-w-full">
+          <table 
+            ref={tableRef} 
+            className="w-full border-collapse"
+            style={{ 
+              minWidth: `${totalTableWidth}px`,
+              tableLayout: 'fixed'
+            }}
+          >
             <thead className="bg-gray-50">
               <tr>
                 {columns.map((column) => {
@@ -204,7 +217,9 @@ export function DataTable<T extends Record<string, any>>({
                     <th
                       key={key}
                       className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative select-none"
-                      style={{ width: columnWidths[key] }}
+                      style={{ 
+                        width: `${columnWidths[key]}px`
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <button
@@ -215,31 +230,28 @@ export function DataTable<T extends Record<string, any>>({
                         >
                           <span>{column.header}</span>
                           {column.sortable !== false && (
-                            <div className="flex flex-col">
-                              <ChevronUpIcon 
-                                className={`h-3 w-3 ${
-                                  isActive && sortDirection === 'asc' ? 'text-primary-600' : 'text-gray-400'
-                                }`} 
-                              />
-                              <ChevronDownIcon 
-                                className={`h-3 w-3 ${
-                                  isActive && sortDirection === 'desc' ? 'text-primary-600' : 'text-gray-400'
-                                }`} 
-                              />
+                            <div className="flex flex-col ml-1">
+                              {isActive && sortDirection === 'asc' ? (
+                                <ChevronUpIcon className="h-4 w-4 text-primary-600" />
+                              ) : isActive && sortDirection === 'desc' ? (
+                                <ChevronDownIcon className="h-4 w-4 text-primary-600" />
+                              ) : (
+                                <div className="flex flex-col">
+                                  <ChevronUpIcon className="h-3 w-3 text-gray-300" />
+                                  <ChevronDownIcon className="h-3 w-3 text-gray-300 -mt-1" />
+                                </div>
+                              )}
                             </div>
                           )}
                         </button>
-                        <div
-                          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-300 active:bg-primary-400"
-                          onMouseDown={(e) => handleMouseDown(e, key)}
-                        />
+
                       </div>
                     </th>
                   );
                 })}
                 {(onEdit || onDelete) && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 border-l border-gray-200" style={{ minWidth: '120px' }}>
+                    ACTIONS
                   </th>
                 )}
               </tr>
@@ -253,17 +265,23 @@ export function DataTable<T extends Record<string, any>>({
                     return (
                       <td
                         key={key}
-                        className="px-4 py-3 text-sm text-gray-900"
-                        style={{ width: columnWidths[key] }}
+                        className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0"
+                        style={{ 
+                          width: `${columnWidths[key]}px`
+                        }}
                       >
-                        <div className="truncate">
-                          {column.render ? column.render(value, row) : String(value || '')}
+                        <div className="overflow-hidden">
+                          {column.render ? column.render(value, row) : (
+                            <div className="truncate">
+                              {String(value || '')}
+                            </div>
+                          )}
                         </div>
                       </td>
                     );
                   })}
                   {(onEdit || onDelete) && (
-                    <td className="px-4 py-3 text-sm font-medium">
+                    <td className="px-4 py-3 text-sm font-medium sticky right-0 bg-white border-l border-gray-200" style={{ minWidth: '120px' }}>
                       <div className="flex space-x-2">
                         {onEdit && (
                           <button
