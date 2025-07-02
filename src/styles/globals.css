@@ -198,34 +198,66 @@
   .audio-player-progress::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: theme('colors.yellow.400'); /* yellow-400 */
+    background: rgb(20, 184, 166);
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
   }
 
   .audio-player-progress::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+    transform: scale(1.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .audio-player-progress::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: theme('colors.yellow.400'); /* yellow-400 */
+    background: rgb(20, 184, 166);
     cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
   }
 
   .audio-player-progress::-moz-range-thumb:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+    transform: scale(1.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Volume slider styles */
+  .volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: transparent;
+    outline: none;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgb(20, 184, 166);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgb(20, 184, 166);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
   }
 }
 

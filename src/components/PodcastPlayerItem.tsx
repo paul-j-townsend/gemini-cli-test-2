@@ -68,7 +68,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
   const [volume, setVolume] = useState(1);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isScrubbing, setIsScrubbing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -126,11 +126,20 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
     if (isPlaying) {
       audio.pause();
     } else {
+      // Set loading state if audio hasn't loaded yet
+      if (audio.readyState < 2) {
+        setIsLoading(true);
+      }
+      
       // Pause all other players before playing this one
       document.querySelectorAll('audio').forEach(otherAudio => {
         if (otherAudio !== audio) otherAudio.pause();
       });
-      audio.play();
+      
+      audio.play().catch(error => {
+        console.error('Error playing audio:', error);
+        setIsLoading(false);
+      });
     }
   };
 
@@ -246,7 +255,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
             onMouseUp={handleScrubberMouseUp}
             onTouchStart={handleScrubberMouseDown}
             onTouchEnd={handleScrubberMouseUp}
-            className="w-full h-2 bg-neutral-200 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200"
+            className="audio-player-progress w-full cursor-pointer"
             style={{
               background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${progressPercentage}%, rgb(228, 228, 231) ${progressPercentage}%, rgb(228, 228, 231) 100%)`
             }}
@@ -308,7 +317,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
             >
               <VolumeIcon isMuted={isMuted} />
             </button>
-            <div className="opacity-0 group-hover/volume:opacity-100 transition-opacity duration-200">
+            <div className="transition-opacity duration-200">
               <input
                 type="range"
                 min="0"
@@ -316,7 +325,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
                 step="0.1"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-16 h-1 bg-neutral-200 rounded-full appearance-none cursor-pointer"
+                className="volume-slider w-20"
                 style={{
                   background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) 100%)`
                 }}
