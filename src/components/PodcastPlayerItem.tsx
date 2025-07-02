@@ -308,7 +308,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
             >
               <VolumeIcon isMuted={isMuted} />
             </button>
-            <div className="opacity-0 group-hover/volume:opacity-100 transition-opacity duration-200">
+            <div className="transition-opacity duration-200">
               <input
                 type="range"
                 min="0"
@@ -316,7 +316,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
                 step="0.1"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-16 h-1 bg-neutral-200 rounded-full appearance-none cursor-pointer"
+                className="w-20 h-1 bg-neutral-200 rounded-full appearance-none cursor-pointer"
                 style={{
                   background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) 100%)`
                 }}
