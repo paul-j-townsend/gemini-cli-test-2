@@ -36,7 +36,7 @@ const podcasts: Podcast[] = [
 
 const PodcastPlayer = () => {
   return (
-    <div className="space-y-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {podcasts.map((podcast, index) => (
         <PodcastPlayerItem key={index} podcast={podcast} />
       ))}
