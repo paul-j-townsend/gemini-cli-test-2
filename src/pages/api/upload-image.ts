@@ -10,19 +10,19 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log('Upload handler called:', req.method);
+  console.log('Image upload handler called:', req.method);
   
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    console.log('Starting file processing...');
+    console.log('Starting image file processing...');
     
     const form = formidable({
-      maxFileSize: 100 * 1024 * 1024, // 100MB
+      maxFileSize: 10 * 1024 * 1024, // 10MB
       filter: ({ mimetype }) => {
-        return mimetype?.startsWith('audio/') || false;
+        return mimetype?.startsWith('image/') || false;
       },
     });
 
@@ -33,26 +33,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: 'No file provided' });
     }
 
-    // Generate clean filename (temporary simple structure)
-    const fileExt = file.originalFilename?.split('.').pop() || 'mp3';
-    const originalName = file.originalFilename?.replace(/\.[^/.]+$/, "") || 'episode';
+    // Generate clean filename
+    const fileExt = file.originalFilename?.split('.').pop() || 'jpg';
+    const originalName = file.originalFilename?.replace(/\.[^/.]+$/, "") || 'thumbnail';
     const cleanName = originalName.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_').toLowerCase();
     const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const fileName = `${timestamp}_${cleanName}.${fileExt}`;
-    const filePath = `podcasts/${fileName}`; // Upload to podcasts subfolder
+    const filePath = `podcast-thumbnails/${fileName}`; // Upload to podcast-thumbnails subfolder
 
     // Read file data
     const fileData = fs.readFileSync(file.filepath);
 
-    // Upload to Supabase storage
-    console.log('Attempting to upload:', filePath, 'Size:', fileData.length);
+    // Upload to Supabase storage (images bucket, podcast-thumbnails folder)
+    console.log('Attempting to upload image:', filePath, 'Size:', fileData.length);
     
     const { data, error } = await supabaseAdmin.storage
-      .from('audio')
+      .from('images')
       .upload(filePath, fileData, {
         cacheControl: '3600',
         upsert: true,
-        contentType: file.mimetype || 'audio/mpeg',
+        contentType: file.mimetype || 'image/jpeg',
       });
 
     if (error) {
@@ -67,16 +67,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Get the public URL
     const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('audio')
+      .from('images')
       .getPublicUrl(filePath);
 
     // Clean up temp file
     fs.unlinkSync(file.filepath);
 
     return res.status(200).json({ 
-      url: publicUrl,
       path: filePath,
-      filename: fileName 
+      filename: fileName,
+      url: publicUrl // Keep for preview purposes
     });
 
   } catch (error) {

@@ -7,7 +7,7 @@ interface Episode {
   title: string;
   description: string;
   audio_url: string;
-  image_url: string;
+  thumbnail_path: string;
   published_at: string;
   created_at: string;
   updated_at: string;

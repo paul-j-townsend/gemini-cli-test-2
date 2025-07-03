@@ -15,7 +15,7 @@ interface PodcastEpisode {
   title: string;
   description: string;
   audio_url: string;
-  image_url: string;
+  thumbnail_path: string;
   published_at: string;
 }
 
@@ -28,6 +28,16 @@ const PodcastPlayer = () => {
     fetchPodcasts();
   }, []);
 
+  const getThumbnailUrl = (episode: PodcastEpisode): string => {
+    if (!episode.thumbnail_path) {
+      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+    }
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl(episode.thumbnail_path);
+    return data.publicUrl;
+  };
+
   const fetchPodcasts = async () => {
     try {
       setLoading(true);
@@ -35,7 +45,7 @@ const PodcastPlayer = () => {
       
       const { data, error } = await supabase
         .from('vsk_podcast_episodes')
-        .select('id, title, description, audio_url, image_url, published_at')
+        .select('id, title, description, audio_url, thumbnail_path, published_at')
         .order('published_at', { ascending: false })
         .limit(4);
 
@@ -46,7 +56,7 @@ const PodcastPlayer = () => {
         title: episode.title,
         description: episode.description || '',
         audioSrc: episode.audio_url || '',
-        thumbnail: episode.image_url || 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center'
+        thumbnail: getThumbnailUrl(episode)
       }));
 
       setPodcasts(formattedPodcasts);

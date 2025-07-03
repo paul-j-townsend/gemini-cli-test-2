@@ -32,7 +32,7 @@ async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
-  const { title, description, audio_url, image_url, published_at } = req.body;
+  const { title, description, audio_url, thumbnail_path, published_at } = req.body;
 
   if (!title) {
     return res.status(400).json({ message: 'Title is required' });
@@ -45,7 +45,7 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
         title,
         description,
         audio_url,
-        image_url,
+        thumbnail_path,
         published_at,
       },
     ])

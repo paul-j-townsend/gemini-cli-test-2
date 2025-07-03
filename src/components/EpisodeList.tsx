@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { DataTable, Column } from '@/components/admin/DataTable';
+import { supabase } from '@/lib/supabase';
 
 interface Episode {
   id: string;
   title: string;
   description: string;
   audio_url: string;
-  image_url: string;
+  thumbnail_path: string;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -40,33 +41,45 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
 
   const episodeColumns: Column<Episode>[] = useMemo(() => [
     {
-      key: 'image_url',
+      key: 'thumbnail_path',
       header: 'Image',
       width: 80,
       minWidth: 80,
       maxWidth: 80,
       sortable: false,
       searchable: false,
-      render: (imageUrl, episode) => (
-        <div className="w-12 h-12">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={episode.title}
-              width={48}
-              height={48}
-              className="rounded-lg object-cover"
-              onError={(e: any) => {
-                e.target.src = '/placeholder-image.jpg';
-              }}
-            />
-          ) : (
-            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-gray-400 text-xs">No Image</span>
-            </div>
-          )}
-        </div>
-      )
+      render: (thumbnailPath, episode) => {
+        const getThumbnailUrl = () => {
+          if (!thumbnailPath) return null;
+          const { data } = supabase.storage
+            .from('images')
+            .getPublicUrl(thumbnailPath);
+          return data.publicUrl;
+        };
+
+        const imageUrl = getThumbnailUrl();
+        
+        return (
+          <div className="w-12 h-12">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={episode.title}
+                width={48}
+                height={48}
+                className="rounded-lg object-cover"
+                onError={(e: any) => {
+                  e.target.src = '/placeholder-image.jpg';
+                }}
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                <span className="text-gray-400 text-xs">No Image</span>
+              </div>
+            )}
+          </div>
+        );
+      }
     },
     {
       key: 'title',
