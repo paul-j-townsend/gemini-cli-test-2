@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import Layout from '@/components/Layout';
-import ArticlesManagement from '@/components/admin/ArticlesManagement';
-import PodcastManagement from '@/components/admin/PodcastManagement';
+import Layout from '../components/Layout';
+import ArticlesManagement from '../components/admin/ArticlesManagement';
+import PodcastManagement from '../components/admin/PodcastManagement';
 
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('articles');
