@@ -13,9 +13,10 @@ export const footerLinks = {
     { label: 'Contact', href: '/contact' },
     { label: 'Privacy Policy', href: '/privacy-policy' },
     { label: 'Terms of Service', href: '/terms-of-service' },
+    { label: 'Cookies', href: '/cookies' },
   ],
   connect: [
-    { label: 'Twitter', href: 'https://twitter.com/vetsidekick' },
+    { label: 'Twitter', href: 'https://x.com/vetsidekick' },
     { label: 'LinkedIn', href: 'https://linkedin.com/company/vetsidekick' },
     { label: 'YouTube', href: 'https://youtube.com/vetsidekick' },
     { label: 'Newsletter', href: '#newsletter-signup' }, // Assuming an anchor for newsletter

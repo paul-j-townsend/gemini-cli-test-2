@@ -60,8 +60,10 @@ export function DataTable<T extends Record<string, any>>({
   });
 
   const totalTableWidth = useMemo(() => {
-    return Object.values(columnWidths).reduce((sum, width) => sum + width, 0);
-  }, [columnWidths]);
+    const columnTotal = Object.values(columnWidths).reduce((sum, width) => sum + width, 0);
+    const actionsWidth = (onEdit || onDelete) ? 120 : 0;
+    return columnTotal + actionsWidth;
+  }, [columnWidths, onEdit, onDelete]);
   
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -126,21 +128,35 @@ export function DataTable<T extends Record<string, any>>({
   }, [columnWidths]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!resizing) return;
+    if (!resizing || !tableRef.current) return;
     
     const diff = e.clientX - resizing.startX;
     const newWidth = resizing.startWidth + diff;
     const column = columns.find(col => String(col.key) === resizing.column);
     
     const minWidth = column?.minWidth || 100;
-    const maxWidth = column?.maxWidth || 800;
-    const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+    const maxWidth = column?.maxWidth || 500; // Reduced max width to prevent overflow
+    
+    // Get the container width to ensure we don't exceed it
+    const containerWidth = tableRef.current.parentElement?.clientWidth || 1200;
+    const actionsWidth = (onEdit || onDelete) ? 120 : 0;
+    const otherColumnsWidth = Object.entries(columnWidths)
+      .filter(([key]) => key !== resizing.column)
+      .reduce((sum, [, width]) => sum + width, 0);
+    
+    // Calculate maximum allowed width based on container size
+    const maxAllowedWidth = Math.min(
+      maxWidth,
+      containerWidth - otherColumnsWidth - actionsWidth - 50 // 50px buffer
+    );
+    
+    const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxAllowedWidth);
     
     setColumnWidths(prev => ({
       ...prev,
       [resizing.column]: clampedWidth
     }));
-  }, [resizing, columns]);
+  }, [resizing, columns, columnWidths, onEdit, onDelete]);
 
   const handleMouseUp = useCallback(() => {
     setResizing(null);
@@ -200,15 +216,18 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table 
-            ref={tableRef} 
-            className="w-full border-collapse"
-            style={{ 
-              minWidth: `${totalTableWidth}px`,
-              tableLayout: 'fixed'
-            }}
-          >
-            <thead className="bg-gray-50">
+          <div className="relative" style={{ minWidth: '100%' }}>
+            {/* Header background that extends full width */}
+            <div className="absolute top-0 left-0 right-0 bg-gray-50 pointer-events-none" style={{ height: '3rem' }}></div>
+            <table 
+              ref={tableRef} 
+              className="border-collapse bg-white"
+              style={{ 
+                width: `${totalTableWidth}px`,
+                tableLayout: 'fixed'
+              }}
+            >
+            <thead className="relative z-20" style={{ width: '100%' }}>
               <tr>
                 {columns.map((column) => {
                   const key = String(column.key);
@@ -216,7 +235,7 @@ export function DataTable<T extends Record<string, any>>({
                   return (
                     <th
                       key={key}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative select-none"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative select-none bg-gray-50"
                       style={{ 
                         width: `${columnWidths[key]}px`
                       }}
@@ -246,6 +265,14 @@ export function DataTable<T extends Record<string, any>>({
                         </button>
 
                       </div>
+                      
+                      {/* Resize handle */}
+                      <div
+                        className="absolute right-0 top-0 bottom-0 w-1 bg-transparent hover:bg-gray-300 cursor-col-resize group"
+                        onMouseDown={(e) => handleMouseDown(e, key)}
+                      >
+                        <div className="w-full h-full bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      </div>
                     </th>
                   );
                 })}
@@ -256,16 +283,18 @@ export function DataTable<T extends Record<string, any>>({
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200 relative z-10">
               {filteredAndSortedData.map((row, index) => (
-                <tr key={index} className="hover:bg-gray-50">
+                <tr key={index} className="group relative">
+                  {/* Full-width hover background */}
+                  <td className="absolute inset-0 bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ left: 0, right: '-100vw', zIndex: -1 }}></td>
                   {columns.map((column) => {
                     const key = String(column.key);
                     const value = getValue(row, key);
                     return (
                       <td
                         key={key}
-                        className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0"
+                        className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0 bg-white relative z-10"
                         style={{ 
                           width: `${columnWidths[key]}px`
                         }}
@@ -281,7 +310,7 @@ export function DataTable<T extends Record<string, any>>({
                     );
                   })}
                   {(onEdit || onDelete) && (
-                    <td className="px-4 py-3 text-sm font-medium sticky right-0 bg-white border-l border-gray-200" style={{ minWidth: '120px' }}>
+                    <td className="px-4 py-3 text-sm font-medium sticky right-0 bg-white border-l border-gray-200 relative z-10" style={{ minWidth: '120px' }}>
                       <div className="flex space-x-2">
                         {onEdit && (
                           <button
@@ -305,7 +334,8 @@ export function DataTable<T extends Record<string, any>>({
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       )}
     </div>
