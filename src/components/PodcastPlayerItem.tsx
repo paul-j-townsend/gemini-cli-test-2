@@ -326,7 +326,7 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
                 step="0.1"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="volume-slider w-20"
+                className="w-20 h-1 bg-neutral-200 rounded-full appearance-none cursor-pointer"
                 style={{
                   background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) 100%)`
                 }}
