@@ -284,7 +284,7 @@ const Badges = () => {
 
             <p className="text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               Showcase your veterinary expertise and achievements. Earn badges for clinical excellence, 
-              continuous learning, and community contributions.
+              continuous learning and community contributions.
             </p>
 
             <div className="mt-10 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
@@ -300,7 +300,7 @@ const Badges = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-4">Your Badges</h1>
         <p className="text-lg text-gray-600 text-center mb-12">
-          Unlock achievements, show off your expertise, and get recognized for
+          Unlock achievements, show off your expertise and get recognized for
           your contributions.
         </p>
 

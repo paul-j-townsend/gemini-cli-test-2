@@ -10,7 +10,7 @@ const Contact = () => {
       </Head>
       <div className="container-wide py-12">
         <h1 className="text-4xl font-bold mb-8">Contact Us</h1>
-        <p>This is the Contact page. You can add a contact form or other contact information here.</p>
+        <p>admin@vetsidekick.com</p>
       </div>
     </Layout>
   );

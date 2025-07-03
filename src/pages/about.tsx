@@ -96,7 +96,7 @@ const About = () => {
 
             <p className="text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               We're dedicated to providing veterinary professionals with expert insights, 
-              evidence-based education, and innovative resources that elevate the standard of animal care worldwide.
+              evidence-based education and innovative resources that elevate the standard of animal care worldwide.
             </p>
           </div>
         </div>
@@ -116,7 +116,7 @@ const About = () => {
                 making advanced veterinary knowledge accessible to professionals at every stage of their career.
               </p>
               <p className="text-lg text-neutral-600 leading-relaxed mb-8">
-                Through our comprehensive podcast series, educational resources, and professional community, 
+                Through our comprehensive podcast series, educational resources and professional community, 
                 we're building a global network of veterinary professionals committed to lifelong learning 
                 and excellence in animal care.
               </p>

@@ -54,7 +54,7 @@ export default function Jobs() {
       type: "Full-time",
       salary: "£38,000 - £50,000",
       posted: "1 week ago",
-      description: "Join our large animal team serving farming communities. Experience with cattle, sheep, and pigs preferred.",
+      description: "Join our large animal team serving farming communities. Experience with cattle, sheep and pigs preferred.",
       requirements: ["RCVS registration", "Large animal experience", "On-call availability", "Valid driving license"],
       benefits: ["Company vehicle", "Rural lifestyle", "Varied work", "Supportive team"]
     }

@@ -25,7 +25,7 @@ const Podcasts = () => {
             </h1>
             
             <p className="text-lg lg:text-xl text-neutral-600 max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-              Stay ahead with cutting-edge insights, expert interviews, and practical guidance 
+              Stay ahead with cutting-edge insights, expert interviews and practical guidance 
               from leading veterinary professionals. Enhance your practice with evidence-based content.
             </p>
 

@@ -296,14 +296,14 @@ export default function Calculators() {
     <Layout>
       <Head>
         <title>UK Veterinary Calculators - Vet Sidekick</title>
-        <meta name="description" content="Comprehensive UK veterinary calculators for drug dosages, fluid therapy, toxicity assessments, anaesthesia, nutrition, and emergency medicine. Designed for UK veterinary practice." />
+        <meta name="description" content="Comprehensive UK veterinary calculators for drug dosages, fluid therapy, toxicity assessments, anaesthesia, nutrition and emergency medicine. Designed for UK veterinary practice." />
       </Head>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">UK Veterinary Calculators</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Essential calculators for UK veterinary professionals covering drug dosing, emergency toxicity assessments, 
-            anaesthesia planning, nutritional requirements, and clinical procedures. Designed for use in UK veterinary practice.
+            anaesthesia planning, nutritional requirements and clinical procedures. Designed for use in UK veterinary practice.
           </p>
         </div>
         

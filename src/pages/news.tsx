@@ -70,7 +70,7 @@ export default function News() {
     <Layout>
       <Head>
         <title>Veterinary News - Vet Sidekick</title>
-        <meta name="description" content="Stay updated with the latest developments in veterinary medicine, research breakthroughs, and industry news." />
+        <meta name="description" content="Stay updated with the latest developments in veterinary medicine, research breakthroughs and industry news." />
       </Head>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">

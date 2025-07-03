@@ -95,7 +95,7 @@ const Articles = () => {
             Veterinary Articles & Insights
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest in veterinary medicine, best practices, and industry insights
+            Stay updated with the latest in veterinary medicine, best practices and industry insights
           </p>
         </div>
 

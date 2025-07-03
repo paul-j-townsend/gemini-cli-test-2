@@ -1,16 +1,16 @@
 # Code Review - 27th July 2025
 
-This document outlines the findings and recommendations from a code review conducted on the Vet Sidekick project. The review focuses on improving code quality, maintainability, performance, and accessibility.
+This document outlines the findings and recommendations from a code review conducted on the Vet Sidekick project. The review focuses on improving code quality, maintainability, performance and accessibility.
 
 ## Overall Architecture & Best Practices
 
 ### 1. Configuration Management
 
 **Observation:**
-Hardcoded data such as navigation links, footer links, features, and testimonials are currently scattered throughout the components (`Header.tsx`, `Footer.tsx`, `index.tsx`).
+Hardcoded data such as navigation links, footer links, features and testimonials are currently scattered throughout the components (`Header.tsx`, `Footer.tsx`, `index.tsx`).
 
 **Recommendation:**
-Centralize all hardcoded data into dedicated configuration or data files (e.g., `src/config/navigation.ts`, `src/data/features.ts`). This will make the data easier to manage, update, and potentially fetch from a CMS in the future.
+Centralize all hardcoded data into dedicated configuration or data files (e.g., `src/config/navigation.ts`, `src/data/features.ts`). This will make the data easier to manage, update and potentially fetch from a CMS in the future.
 
 **Example (`src/config/navigation.ts`):**
 ```typescript
@@ -38,7 +38,7 @@ Inline SVGs are used extensively across multiple components. Additionally, the f
 
 **Recommendation:**
 - **Font Optimization:** Self-host the 'Inter' font using `@next/font/google` for improved performance and to avoid a separate network request.
-- **Image Optimization:** Use the Next.js `<Image>` component for all images (both local and remote). This will enable automatic image optimization, including resizing, optimization, and serving in modern formats like WebP.
+- **Image Optimization:** Use the Next.js `<Image>` component for all images (both local and remote). This will enable automatic image optimization, including resizing, optimization and serving in modern formats like WebP.
 
 ### 4. Styling
 
@@ -66,7 +66,7 @@ Remove all styles that suppress or remove focus outlines. Ensure that all intera
 Several links in the footer are either placeholders (`href="#"`) or incorrect.
 
 **Recommendation:**
-Update all footer links to point to their correct destinations. This includes the Privacy Policy, Terms of Service, and all social media links.
+Update all footer links to point to their correct destinations. This includes the Privacy Policy, Terms of Service and all social media links.
 
 ### `index.tsx`
 

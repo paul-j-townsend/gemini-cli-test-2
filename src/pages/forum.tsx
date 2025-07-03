@@ -6,7 +6,7 @@ export default function Forum() {
     <Layout>
       <Head>
         <title>Community Forum - Vet Sidekick</title>
-        <meta name="description" content="Connect with veterinary professionals, share experiences, and discuss the latest in animal healthcare." />
+        <meta name="description" content="Connect with veterinary professionals, share experiences and discuss the latest in animal healthcare." />
       </Head>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Community Forum</h1>
@@ -14,7 +14,7 @@ export default function Forum() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Welcome to the Veterinary Community</h2>
           <p className="text-gray-600 mb-4">
-            Connect with fellow veterinary professionals, share experiences, ask questions, and discuss the latest trends in animal healthcare.
+            Connect with fellow veterinary professionals, share experiences, ask questions and discuss the latest trends in animal healthcare.
           </p>
           <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             Start New Discussion

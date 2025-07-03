@@ -8,13 +8,13 @@
 
 # Veterinary Podcast CPD Website
 
-A modern, responsive website for veterinary podcasts built with Next.js, React, and Tailwind CSS.
+A modern, responsive website for veterinary podcasts built with Next.js, React and Tailwind CSS.
 
 ## Features
 
-- **Custom Veterinary Color Scheme**: Professional teal, cream, peach, and orange palette
+- **Custom Veterinary Color Scheme**: Professional teal, cream, peach and orange palette
 - **Responsive Design**: Mobile-first approach with beautiful layouts across all devices
-- **Podcast Player**: Custom audio player with thumbnail images, progress bar, and controls
+- **Podcast Player**: Custom audio player with thumbnail images, progress bar and controls
 - **Modern UI**: Clean, professional design with gradient backgrounds and smooth animations
 - **TypeScript**: Full type safety throughout the application
 

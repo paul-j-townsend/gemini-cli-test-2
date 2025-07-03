@@ -1,7 +1,7 @@
 # Podcast Episode Feature Creation Log
 
 ## Feature Overview
-Creating a podcast admin feature that allows users to create, edit, and delete podcast episodes through an admin interface.
+Creating a podcast admin feature that allows users to create, edit and delete podcast episodes through an admin interface.
 
 ## Requirements
 - New database table: `podcast_episodes`
@@ -33,7 +33,7 @@ Creating a podcast admin feature that allows users to create, edit, and delete p
 - ✅ Created `007_rename_podcast_episodes_to_vsk_podcast_episodes.sql` migration
 - ✅ Renamed table from `podcast_episodes` to `vsk_podcast_episodes`
 - ✅ Updated all API endpoints to use new table name
-- ✅ Updated triggers, indexes, and RLS policies for new table name
+- ✅ Updated triggers, indexes and RLS policies for new table name
 
 ### API Endpoints
 - ✅ Added proper error handling and validation

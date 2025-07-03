@@ -2,7 +2,7 @@
 
 This is a list of tasks to be completed based on the code review from July 27th, 2025.
 
-**Important: Make sure to use British English throughout all content, components, and documentation.**
+**Important: Make sure to use British English throughout all content, components and documentation.**
 
 ## Architectural Improvements
 - [x] Centralise hardcoded data (navigation, footer links) into configuration files. (Features and testimonials still need to be centralised)
@@ -21,7 +21,7 @@ This is a list of tasks to be completed based on the code review from July 27th,
 
 ## Podcast Admin System
 - [x] **Database:** Renamed `podcast_episodes` table to `vsk_podcast_episodes`
-- [x] **Episode Management:** Built episode creation, editing, and deletion functionality
+- [x] **Episode Management:** Built episode creation, editing and deletion functionality
 - [x] **Audio Upload:** Implemented tabbed audio input (Upload File vs Select Existing)
 - [x] **Storage Integration:** Connected to Supabase storage with organized bucket structure
 - [x] **File Management:** Added clean filename generation and dropdown population

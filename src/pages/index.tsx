@@ -62,7 +62,7 @@ const Home = () => {
     <Layout>
       <Head>
         <title>Vet Sidekick - Expert Veterinary Insights & Education</title>
-        <meta name="description" content="Empowering veterinary professionals with expert insights, educational podcasts, and community-driven resources." />
+        <meta name="description" content="Empowering veterinary professionals with expert insights, educational podcasts and community-driven resources." />
       </Head>
 
       {/* Hero Section */}
@@ -97,7 +97,7 @@ const Home = () => {
 
             <p className="text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed mb-12 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               Join thousands of veterinary professionals who trust Vet Sidekick for expert insights, 
-              continuing education, and the latest advances in companion animal care.
+              continuing education and the latest advances in companion animal care.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
@@ -286,7 +286,7 @@ const Home = () => {
             </h2>
             <p className="text-xl text-red-100 max-w-3xl mx-auto mb-10">
               Join thousands of veterinary professionals who are staying ahead with expert insights, 
-              continuing education, and professional development resources.
+              continuing education and professional development resources.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Link href="/podcasts" className="relative group btn-orange btn-lg bg-white text-red-600 hover:bg-neutral-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">

@@ -31,14 +31,14 @@ const Footer = () => {
                 </div>
               </div>
               <p className="text-neutral-300 leading-relaxed mb-6">
-                Empowering veterinary professionals with expert insights, educational podcasts, and community-driven resources.
+                Empowering veterinary professionals with expert insights, educational podcasts and community-driven resources.
               </p>
               <div className="flex space-x-4">
                 {/* Social media icons */}
                 <a 
                   href={footerLinks.connect[0].href} 
                   className="w-10 h-10 bg-neutral-800 hover:bg-primary-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
-                  aria-label="Follow us on Twitter"
+                  aria-label="Follow us on X"
                 >
                   <TwitterIcon />
                 </a>
