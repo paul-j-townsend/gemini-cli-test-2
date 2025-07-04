@@ -85,7 +85,7 @@ const ArticlesManagement = () => {
     
     if (!formData.title.trim()) {
       setError('Title is required');
-      return;
+        return;
     }
 
     setSaving(true);
@@ -219,7 +219,7 @@ const ArticlesManagement = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
+    <div>
           <h2 className="text-2xl font-bold text-gray-900">Articles Management</h2>
           <p className="text-gray-600 mt-1">Create and manage your articles</p>
         </div>

@@ -20,6 +20,7 @@ interface EpisodeFormData {
   description: string;
   audio_url: string;
   thumbnail_path: string;
+  image_url?: string;
   published_at: string;
 }
 
@@ -37,6 +38,7 @@ export default function PodcastManagement() {
     description: '',
     audio_url: '',
     thumbnail_path: '',
+    image_url: '',
     published_at: new Date().toISOString().slice(0, 16)
   });
 
@@ -109,6 +111,7 @@ export default function PodcastManagement() {
       description: episode.description,
       audio_url: episode.audio_url,
       thumbnail_path: episode.thumbnail_path,
+      image_url: episode.image_url || '',
       published_at: episode.published_at 
         ? new Date(episode.published_at).toISOString().slice(0, 16)
         : new Date().toISOString().slice(0, 16)
@@ -145,6 +148,7 @@ export default function PodcastManagement() {
       description: '',
       audio_url: '',
       thumbnail_path: '',
+      image_url: '',
       published_at: new Date().toISOString().slice(0, 16)
     });
     setError(null);
@@ -157,6 +161,7 @@ export default function PodcastManagement() {
       description: '',
       audio_url: '',
       thumbnail_path: '',
+      image_url: '',
       published_at: new Date().toISOString().slice(0, 16)
     });
     setShowForm(true);
@@ -198,7 +203,9 @@ export default function PodcastManagement() {
   };
 
   const handleImageUpload = (url: string, path: string) => {
-    setFormData({ ...formData, thumbnail_path: path });
+    // Store the full path for thumbnail_path (API expects the path for storage)
+    // But also store the URL for immediate display
+    setFormData({ ...formData, thumbnail_path: path, image_url: url });
     setError('');
     // Clear any previous errors and show success
   };
@@ -319,7 +326,7 @@ export default function PodcastManagement() {
                 type="image"
                 onUploadSuccess={handleImageUpload}
                 onUploadError={handleImageUploadError}
-                currentValue={formData.thumbnail_path ? getThumbnailUrl(formData.thumbnail_path) : ''}
+                currentValue={formData.image_url || (formData.thumbnail_path ? getThumbnailUrl(formData.thumbnail_path) : '')}
               />
             </div>
 
@@ -401,13 +408,13 @@ export default function PodcastManagement() {
                         <div className="w-12 h-12">
                           {episode.thumbnail_path ? (
                             <Image
-                              src={getThumbnailUrl(episode.thumbnail_path) || ''}
+                              src={(episode.image_url ?? getThumbnailUrl(episode.thumbnail_path)) || ''}
                               alt={episode.title}
                               width={48}
                               height={48}
                               className="rounded-lg object-cover"
                               onError={(e: any) => {
-                                e.target.src = '/placeholder-image.jpg';
+                                e.target.src = 'https://placehold.co/64';
                               }}
                             />
                           ) : (

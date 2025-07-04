@@ -12,7 +12,7 @@ interface FileItem {
 
 interface FileSelectorProps {
   type: 'image' | 'audio';
-  onFileSelect: (url: string, filename: string) => void;
+  onFileSelect: (url: string, path: string) => void;
   onClose: () => void;
   currentValue?: string;
 }
@@ -52,7 +52,8 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
     if (selectedFile) {
       const file = files.find(f => f.url === selectedFile);
       if (file) {
-        onFileSelect(file.url, file.name);
+        // For images we have file.path with folder, fallback to name for audio
+        onFileSelect(file.url, (file as any).path || file.name);
         onClose();
       }
     }
