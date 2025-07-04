@@ -8,7 +8,8 @@ interface Episode {
   title: string;
   description: string;
   audio_url: string;
-  thumbnail_path: string;
+  image_url: string | null; // Database field (legacy, often null)
+  thumbnail_path: string;   // Current field for thumbnails
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -109,18 +110,18 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
       )
     },
     {
-      key: 'published_at',
+      key: 'status',
       header: 'Status',
       width: 120,
       sortable: true,
       searchable: false,
-      render: (publishedAt) => (
+      render: (_, episode) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          publishedAt 
+          episode.published_at 
             ? 'bg-green-100 text-green-800' 
             : 'bg-yellow-100 text-yellow-800'
         }`}>
-          {publishedAt ? 'Published' : 'Draft'}
+          {episode.published_at ? 'Published' : 'Draft'}
         </span>
       )
     },

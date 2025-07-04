@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ message: 'Failed to fetch image files', error: error.message });
     }
 
-    console.log('Found image files:', data?.length || 0);
+
 
     // Filter out folders and get only image files
     const imageFilesData = data.filter(item => 

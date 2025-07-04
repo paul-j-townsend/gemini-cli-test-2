@@ -14,12 +14,8 @@ interface Article {
   author: string
   category: string
   slug: string
-  created_at: string
-  updated_at: string
   image_url?: string
-  original_url?: string
   featured: boolean
-  views?: number
 }
 
 interface ArticlePageProps {
@@ -125,9 +121,6 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
               <span>By: </span>
               <span className="font-medium text-gray-900">{article.author}</span>
             </div>
-            <time dateTime={article.created_at}>
-              {formatDate(article.created_at)}
-            </time>
           </div>
         </header>
 
@@ -151,31 +144,7 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
 
         {/* Article Footer */}
         <footer className="border-t pt-8">
-          <div className="flex items-center justify-between mb-8">
-            {/* Original Article Link */}
-            {article.original_url ? (
-              <a 
-                href={article.original_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium no-focus-border"
-                style={{ 
-                  outline: 'none', 
-                  border: 'none',
-                  boxShadow: 'none',
-                  textDecoration: 'none'
-                }}
-                onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
-                onFocus={(e) => e.currentTarget.style.outline = 'none'}
-              >
-                <span>Read original article</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            ) : (
-              <div></div>
-            )}
+          <div className="flex items-center justify-end mb-8">
             <Link 
               href="/articles" 
               className="text-teal-600 hover:text-teal-700 font-medium no-focus-border"
@@ -276,7 +245,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     .eq('published', true)
     .neq('id', article.id)
     .limit(4)
-    .order('created_at', { ascending: false })
+            .order('id', { ascending: false })
 
   return {
     props: {

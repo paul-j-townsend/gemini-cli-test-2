@@ -47,7 +47,7 @@ const ArticleSearch = ({ onSearchResults, onSearching }: ArticleSearchProps) => 
         .select('id, title, excerpt, slug, category')
         .eq('published', true)
         .or(`title.ilike.%${term}%,excerpt.ilike.%${term}%,content.ilike.%${term}%`)
-        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
         .limit(10)
 
       // Only update if this is still the active search

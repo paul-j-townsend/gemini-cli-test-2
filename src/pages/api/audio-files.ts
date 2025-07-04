@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ message: 'Failed to fetch audio files', error: error.message });
     }
 
-    console.log('Found audio files:', data?.length || 0);
+
 
     // Filter out folders and get only audio files (files have both name AND id, folders only have name)
     const audioFilesData = data.filter(item => 

@@ -13,7 +13,6 @@ interface Article {
   author: string
   category: string
   slug: string
-  created_at: string
   image_url?: string
 }
 
@@ -35,9 +34,9 @@ const Articles = () => {
       setLoading(true)
       let query = supabase
         .from('vsk_articles')
-        .select('id, title, excerpt, author, category, slug, created_at, image_url')
+        .select('id, title, excerpt, author, category, slug, image_url')
         .eq('published', true)
-        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
 
       if (selectedCategory !== 'all') {
         query = query.eq('category', selectedCategory)
@@ -199,9 +198,6 @@ const Articles = () => {
                       <span className="text-xs font-medium text-teal-600 uppercase tracking-wide">
                         {article.category}
                       </span>
-                      <time className="text-xs text-gray-500">
-                        {formatDate(article.created_at)}
-                      </time>
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
                       {article.title}
