@@ -350,27 +350,12 @@ const ArticlesManagement = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Article Image
-              </label>
               <FileUpload
                 type="image"
                 onUploadSuccess={handleImageUpload}
                 onUploadError={handleImageUploadError}
                 currentValue={formData.image_url}
               />
-              <div className="mt-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Or enter Image URL manually
-                </label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
             </div>
 
             <div className="flex items-center space-x-6">
@@ -437,6 +422,9 @@ const ArticlesManagement = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Title
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -459,6 +447,21 @@ const ArticlesManagement = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {articles.map((article) => (
                   <tr key={article.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      {article.image_url ? (
+                        <img
+                          src={article.image_url}
+                          alt={article.title}
+                          className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                    </td>
                     <td className="px-6 py-4">
                       <div>
                         <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={article.title}>

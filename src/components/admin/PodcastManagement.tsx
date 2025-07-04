@@ -306,53 +306,21 @@ export default function PodcastManagement() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Episode Audio
-              </label>
               <FileUpload
                 type="audio"
                 onUploadSuccess={handleAudioUpload}
                 onUploadError={handleAudioUploadError}
                 currentValue={formData.audio_url}
               />
-              <div className="mt-2">
-                <label htmlFor="audio_url" className="block text-sm font-medium text-gray-700 mb-1">
-                  Or enter Audio URL manually
-                </label>
-                <input
-                  type="url"
-                  id="audio_url"
-                  value={formData.audio_url}
-                  onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="https://example.com/audio.mp3"
-                />
-              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Episode Thumbnail
-              </label>
               <FileUpload
                 type="image"
                 onUploadSuccess={handleImageUpload}
                 onUploadError={handleImageUploadError}
                 currentValue={formData.thumbnail_path ? getThumbnailUrl(formData.thumbnail_path) : ''}
               />
-              <div className="mt-2">
-                <label htmlFor="thumbnail_path" className="block text-sm font-medium text-gray-700 mb-1">
-                  Or enter Thumbnail Path manually
-                </label>
-                <input
-                  type="text"
-                  id="thumbnail_path"
-                  value={formData.thumbnail_path}
-                  onChange={(e) => setFormData({ ...formData, thumbnail_path: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="podcast-thumbnails/image.jpg"
-                />
-              </div>
             </div>
 
             <div>

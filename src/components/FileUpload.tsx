@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import FileSelector from './FileSelector';
 
 interface FileUploadProps {
   type: 'image' | 'audio';
@@ -22,6 +23,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showFileSelector, setShowFileSelector] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const allowedTypes = type === 'image' 
@@ -177,8 +179,30 @@ const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
+  const handleFileFromSelector = (url: string, filename: string) => {
+    onUploadSuccess(url, filename);
+    setSuccessMessage(`✅ ${type === 'image' ? 'Image' : 'Audio'} selected successfully!`);
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
   return (
     <div className={`space-y-3 ${className}`}>
+      {/* Browse existing files button */}
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium text-gray-700">
+          {type === 'image' ? 'Article Image' : 'Audio File'}
+        </h4>
+        <button
+          type="button"
+          onClick={() => setShowFileSelector(true)}
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
+        >
+          Browse existing files
+        </button>
+      </div>
+
       <div
         className={`
           relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200
@@ -304,6 +328,16 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* File Selector Modal */}
+      {showFileSelector && (
+        <FileSelector
+          type={type}
+          onFileSelect={handleFileFromSelector}
+          onClose={() => setShowFileSelector(false)}
+          currentValue={currentValue}
+        />
       )}
     </div>
   );

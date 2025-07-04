@@ -7,23 +7,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // List all files in the images bucket podcast-thumbnails folder
-    const { data, error } = await supabaseAdmin.storage
-      .from('images')
-      .list('podcast-thumbnails', {
-        limit: 1000,
-        sortBy: { column: 'created_at', order: 'desc' }
-      });
+    // List all files from both folders
+    const [podcastThumbnails, articleImages] = await Promise.all([
+      supabaseAdmin.storage
+        .from('images')
+        .list('podcast-thumbnails', {
+          limit: 1000,
+          sortBy: { column: 'created_at', order: 'desc' }
+        }),
+      supabaseAdmin.storage
+        .from('images')
+        .list('article-images', {
+          limit: 1000,
+          sortBy: { column: 'created_at', order: 'desc' }
+        })
+    ]);
 
-    if (error) {
-      console.error('Error fetching image files:', error);
-      return res.status(500).json({ message: 'Failed to fetch image files', error: error.message });
+    if (podcastThumbnails.error && articleImages.error) {
+      console.error('Error fetching image files:', podcastThumbnails.error, articleImages.error);
+      return res.status(500).json({ message: 'Failed to fetch image files' });
     }
 
-
+    // Combine files from both folders
+    const allFiles = [
+      ...(podcastThumbnails.data || []).map(file => ({ ...file, folder: 'podcast-thumbnails' })),
+      ...(articleImages.data || []).map(file => ({ ...file, folder: 'article-images' }))
+    ];
 
     // Filter out folders and get only image files
-    const imageFilesData = data.filter(item => 
+    const imageFilesData = allFiles.filter(item => 
       item.name && 
       item.id && 
       item.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
@@ -33,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const imageFiles = imageFilesData.map(file => {
       const { data: { publicUrl } } = supabaseAdmin.storage
         .from('images')
-        .getPublicUrl(`podcast-thumbnails/${file.name}`);
+        .getPublicUrl(`${file.folder}/${file.name}`);
       
       // Create a display name from the filename
       const displayName = file.name
@@ -46,12 +58,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name: file.name,
         displayName,
         url: publicUrl,
-        path: `podcast-thumbnails/${file.name}`, // Full path for storage
+        path: `${file.folder}/${file.name}`, // Full path for storage
         size: file.metadata?.size || 0,
         created_at: file.created_at,
-        updated_at: file.updated_at
+        updated_at: file.updated_at,
+        folder: file.folder
       };
     });
+
+    // Sort by creation date (newest first)
+    imageFiles.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     return res.status(200).json({ files: imageFiles });
 
