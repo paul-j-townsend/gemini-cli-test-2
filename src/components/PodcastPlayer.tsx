@@ -7,7 +7,9 @@ interface Podcast {
   title: string;
   description: string;
   audioSrc: string;
+  fullAudioSrc?: string;
   thumbnail: string;
+  quizId?: string;
 }
 
 interface PodcastEpisode {
@@ -26,6 +28,13 @@ interface PodcastEpisode {
   category?: string;
   tags?: string[];
   full_audio_url?: string;
+  quiz_id?: string;
+  quiz?: {
+    id: string;
+    title: string;
+    description?: string;
+    total_questions: number;
+  } | null;
 }
 
 const PodcastPlayer = () => {
@@ -52,37 +61,38 @@ const PodcastPlayer = () => {
       setLoading(true);
       setError(null);
       
-      // Try to fetch with new fields first, fallback to basic fields if migration not applied
+      // Start with basic query, then try enhanced if it works
       let { data, error } = await supabase
         .from('vsk_podcast_episodes')
-        .select('id, title, description, audio_url, thumbnail_path, published_at, episode_number, season, duration, slug, published, featured, category, tags, full_audio_url')
-        .eq('published', true)
+        .select('id, title, description, audio_url, thumbnail_path, published_at, full_audio_url, quiz_id')
+        .not('published_at', 'is', null)
         .order('published_at', { ascending: false })
         .limit(4);
 
-      // If the query fails (likely due to missing published column), fallback to original query
-      if (error && (error.message.includes('column "published" does not exist') || error.message.includes('does not exist'))) {
-        console.log('Migration not applied yet, falling back to basic query');
-        const fallbackResult = await supabase
+      // If basic query fails, try even simpler
+      if (error) {
+        console.log('Basic query failed, trying minimal query:', error);
+        const minimalResult = await supabase
           .from('vsk_podcast_episodes')
           .select('id, title, description, audio_url, thumbnail_path, published_at')
           .not('published_at', 'is', null)
           .order('published_at', { ascending: false })
           .limit(4);
         
-        data = fallbackResult.data;
-        error = fallbackResult.error;
+        data = minimalResult.data as any;
+        error = minimalResult.error;
       }
 
       if (error) throw error;
 
-      const formattedPodcasts: Podcast[] = (data || []).map((episode: PodcastEpisode) => ({
+      const formattedPodcasts: Podcast[] = (data || []).map((episode: any) => ({
         id: episode.id,
-        title: episode.title,
-        description: episode.description || '',
+        title: episode.title || 'Untitled Episode',
+        description: episode.description || 'No description available',
         audioSrc: episode.audio_url || '', // Preview version
         fullAudioSrc: episode.full_audio_url || episode.audio_url || '', // Full version or fallback to preview
-        thumbnail: getThumbnailUrl(episode)
+        thumbnail: getThumbnailUrl(episode),
+        quizId: episode.quiz_id || undefined
       }));
 
       setPodcasts(formattedPodcasts);

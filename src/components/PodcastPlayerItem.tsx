@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Quiz from './Quiz';
+
+
 
 interface Podcast {
   id: string;
@@ -8,6 +11,7 @@ interface Podcast {
   audioSrc: string; // Preview audio
   fullAudioSrc?: string; // Full version audio
   thumbnail: string;
+  quizId?: string; // Add quiz ID
 }
 
 interface PodcastPlayerItemProps {
@@ -61,37 +65,45 @@ const SpeedIcon = () => (
   </svg>
 );
 
-const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
+const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(0.7);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFullVersion, setIsFullVersion] = useState(false);
   const [hasAccessedFull, setHasAccessedFull] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
+  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
+  const currentAudioSrc = isFullVersion && podcast.fullAudioSrc ? podcast.fullAudioSrc : podcast.audioSrc;
+
+  // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const setAudioData = () => {
+    const handleLoadedMetadata = () => {
       setDuration(audio.duration);
-      setCurrentTime(audio.currentTime);
       setIsLoading(false);
     };
 
-    const setAudioTime = () => {
+    const handleTimeUpdate = () => {
       if (!isScrubbing) {
         setCurrentTime(audio.currentTime);
       }
     };
 
-    const togglePlayPause = () => {
-      setIsPlaying(!audio.paused);
+    const handleLoadStart = () => {
+      setIsLoading(true);
+    };
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
     };
 
     const handleEnded = () => {
@@ -99,102 +111,71 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
       setCurrentTime(0);
     };
 
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
-
-    audio.addEventListener('loadedmetadata', setAudioData);
-    audio.addEventListener('timeupdate', setAudioTime);
-    audio.addEventListener('play', togglePlayPause);
-    audio.addEventListener('pause', togglePlayPause);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('volumechange', () => setIsMuted(audio.muted));
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('ended', handleEnded);
+
+    // Set initial volume and playback rate
+    audio.volume = volume;
+    audio.playbackRate = playbackRate;
 
     return () => {
-      audio.removeEventListener('loadedmetadata', setAudioData);
-      audio.removeEventListener('timeupdate', setAudioTime);
-      audio.removeEventListener('play', togglePlayPause);
-      audio.removeEventListener('pause', togglePlayPause);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('volumechange', () => setIsMuted(audio.muted));
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, [isScrubbing]);
+  }, [currentAudioSrc, isScrubbing, volume, playbackRate]);
 
-  const handlePlayPause = () => {
+  // Update audio source when switching between preview and full version
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      const wasPlaying = isPlaying;
+      const currentTimePos = currentTime;
+      
+      audio.src = currentAudioSrc;
+      audio.load();
+      
+      if (wasPlaying) {
+        audio.currentTime = currentTimePos;
+        audio.play().catch(console.error);
+      }
+    }
+  }, [currentAudioSrc]);
+
+  // Play/Pause handler
+  const handlePlayPause = async () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      // Set loading state if audio hasn't loaded yet
-      if (audio.readyState < 2) {
-        setIsLoading(true);
+    try {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        await audio.play();
+        setIsPlaying(true);
       }
-      
-      // Pause all other players before playing this one
-      document.querySelectorAll('audio').forEach(otherAudio => {
-        if (otherAudio !== audio) otherAudio.pause();
-      });
-      
-      audio.play().catch(error => {
-        console.error('Error playing audio:', error);
-        setIsLoading(false);
-      });
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsLoading(false);
     }
   };
 
-  const handleSkipBack = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 15);
-    }
-  };
-
-  const handleSkipForward = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 15);
-    }
-  };
-
-  const handleVolumeToggle = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setIsMuted(audioRef.current.muted);
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-      if (newVolume === 0) {
-        setIsMuted(true);
-      } else if (isMuted) {
-        setIsMuted(false);
-        audioRef.current.muted = false;
-      }
-    }
-  };
-
-  const handleSpeedChange = () => {
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const currentIndex = speeds.indexOf(playbackRate);
-    const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
-    setPlaybackRate(nextSpeed);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = nextSpeed;
-    }
-  };
-
+  // Scrubber handlers
   const handleScrubberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
     const newTime = parseFloat(e.target.value);
     setCurrentTime(newTime);
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
+    
+    if (!isScrubbing) {
+      audio.currentTime = newTime;
     }
   };
 
@@ -202,27 +183,83 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
     setIsScrubbing(true);
   };
 
-  const handleScrubberMouseUp = () => {
+  const handleScrubberMouseUp = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
     setIsScrubbing(false);
+    const target = e.target as HTMLInputElement;
+    const newTime = parseFloat(target.value);
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
   };
 
+  // Skip handlers
+  const handleSkipBack = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const newTime = Math.max(0, currentTime - 15);
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleSkipForward = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const newTime = Math.min(duration, currentTime + 15);
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  // Volume handlers
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    audio.volume = newVolume;
+    
+    if (newVolume > 0 && isMuted) {
+      setIsMuted(false);
+    }
+  };
+
+  const handleVolumeToggle = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isMuted) {
+      setIsMuted(false);
+      audio.volume = volume;
+    } else {
+      setIsMuted(true);
+      audio.volume = 0;
+    }
+  };
+
+  // Speed handler
+  const handleSpeedChange = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    const currentIndex = speeds.indexOf(playbackRate);
+    const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
+    
+    setPlaybackRate(nextSpeed);
+    audio.playbackRate = nextSpeed;
+  };
+
+  // Full version handler
   const handleListenToFull = () => {
     if (podcast.fullAudioSrc) {
       setIsFullVersion(true);
       setHasAccessedFull(true);
-      setIsPlaying(false);
-      setCurrentTime(0);
-      
-      // Update audio source
-      if (audioRef.current) {
-        audioRef.current.src = podcast.fullAudioSrc;
-        audioRef.current.load();
-      }
     }
   };
-
-  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
-  const currentAudioSrc = isFullVersion && podcast.fullAudioSrc ? podcast.fullAudioSrc : podcast.audioSrc;
 
   return (
     <div className="card-glow p-6 animate-fade-in-up hover-lift group">
@@ -400,12 +437,30 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
         ) : (
           /* Show Quiz and Certificate buttons after accessing full version */
           <>
-            <button className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-              </svg>
-              Take Quiz
-            </button>
+            {showQuiz ? (
+              <button 
+                onClick={() => setShowQuiz(false)}
+                className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+                </svg>
+                Close Quiz
+              </button>
+            ) : (
+              <button 
+                onClick={() => setShowQuiz(true)}
+                disabled={!podcast.quizId}
+                className={`btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2 ${
+                  !podcast.quizId ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+                </svg>
+                {podcast.quizId ? 'Take Quiz' : 'No Quiz Available'}
+              </button>
+            )}
             <button className="btn-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
                 <path d="M9.25 12.25a.75.75 0 0 0 1.5 0V4.57l2.053 2.053a.75.75 0 0 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06L9.25 4.57v7.68ZM2 14.25a.75.75 0 0 0 0 1.5h16a.75.75 0 0 0 0-1.5H2Z" />
@@ -415,6 +470,13 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
           </>
         )}
       </div>
+
+      {/* Quiz Component */}
+      {showQuiz && podcast.quizId && (
+        <div className="mt-6 pt-6 border-t border-neutral-200/80">
+          <Quiz quizId={podcast.quizId} />
+        </div>
+      )}
     </div>
   );
 };

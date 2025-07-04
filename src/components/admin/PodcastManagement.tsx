@@ -3,6 +3,12 @@ import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import FileUpload from '../FileUpload';
 
+interface QuizQuestion {
+  id: string;
+  title: string;
+  question_number?: number;
+}
+
 interface Episode {
   id: string;
   title: string;
@@ -28,6 +34,8 @@ interface Episode {
   meta_title?: string;
   meta_description?: string;
   full_audio_url?: string;
+  quiz_id?: string;
+  quiz_questions?: QuizQuestion;
 }
 
 interface EpisodeFormData {
@@ -40,7 +48,7 @@ interface EpisodeFormData {
   // Enhanced fields
   episode_number: number | '';
   season: number;
-  duration: number | ''; // in seconds
+  duration: number | string; // in seconds or time string
   slug: string;
   published: boolean;
   featured: boolean;
@@ -51,15 +59,18 @@ interface EpisodeFormData {
   meta_title: string;
   meta_description: string;
   full_audio_url: string;
+  quiz_id: string;
 }
 
 export default function PodcastManagement() {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | React.ReactNode | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null);
   const [saving, setSaving] = useState(false);
+  const [migrating, setMigrating] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<EpisodeFormData>({
@@ -82,11 +93,13 @@ export default function PodcastManagement() {
     transcript: '',
     meta_title: '',
     meta_description: '',
-    full_audio_url: ''
+    full_audio_url: '',
+    quiz_id: ''
   });
 
   useEffect(() => {
     fetchEpisodes();
+    fetchQuizzes();
   }, []);
 
   const generateSlug = (title: string) => {
@@ -138,6 +151,31 @@ export default function PodcastManagement() {
     }
   };
 
+  const fetchQuizzes = async () => {
+    try {
+      // Use the working admin API that we just verified
+      const response = await fetch('/api/admin/quizzes');
+      if (!response.ok) {
+        throw new Error('Failed to fetch quizzes');
+      }
+
+      const data = await response.json();
+      
+      // Transform the quiz data to match the expected format for the dropdown
+      const quizOptions = data.map((quiz: any) => ({
+        id: quiz.id,
+        title: `${quiz.title} (${quiz.quiz_questions?.length || 0} questions)`,
+        question_number: null
+      }));
+      
+      setQuizzes(quizOptions);
+    } catch (err) {
+      console.error('Failed to load quizzes:', err);
+      // Set empty array as fallback
+      setQuizzes([]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -172,13 +210,24 @@ export default function PodcastManagement() {
         },
         body: JSON.stringify(episodeData),
       });
-
+      
       if (!response.ok) {
-        throw new Error('Failed to save episode');
+        const errorText = await response.text();
+        throw new Error(`Failed to save episode: ${response.status} ${errorText}`);
       }
 
+      const result = await response.json();
+
+      // Show success message
+      setError(`✅ Episode ${editingEpisode ? 'updated' : 'created'} successfully!`);
+      
+      // Refresh the episodes list
       await fetchEpisodes();
-      handleCancel();
+      
+      // Close the form after a brief delay to show success message
+      setTimeout(() => {
+        handleCancel();
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save episode');
     } finally {
@@ -210,7 +259,8 @@ export default function PodcastManagement() {
       transcript: episode.transcript || '',
       meta_title: episode.meta_title || '',
       meta_description: episode.meta_description || '',
-      full_audio_url: episode.full_audio_url || ''
+      full_audio_url: episode.full_audio_url || '',
+      quiz_id: episode.quiz_id || ''
     });
     setShowForm(true);
     setError(null);
@@ -259,7 +309,8 @@ export default function PodcastManagement() {
       transcript: '',
       meta_title: '',
       meta_description: '',
-      full_audio_url: ''
+      full_audio_url: '',
+      quiz_id: ''
     });
     setError(null);
   };
@@ -286,10 +337,60 @@ export default function PodcastManagement() {
       transcript: '',
       meta_title: '',
       meta_description: '',
-      full_audio_url: ''
+      full_audio_url: '',
+      quiz_id: ''
     });
     setShowForm(true);
     setError(null);
+  };
+
+  const handleMigration = async () => {
+    setMigrating(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/add-quiz-column', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setError(`✅ ${result.message}`);
+        await fetchEpisodes();
+      } else {
+        // Show detailed migration instructions
+        setError(
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="font-semibold text-yellow-800 mb-2">Manual Migration Required</h3>
+            <p className="text-yellow-700 mb-3">{result.instruction}</p>
+            <div className="bg-gray-900 text-green-400 p-3 rounded text-sm font-mono whitespace-pre-wrap mb-3">
+              {result.sql}
+            </div>
+            <ol className="text-yellow-700 text-sm space-y-1">
+              {result.steps?.map((step: string, index: number) => (
+                <li key={index}>{step}</li>
+              ))}
+            </ol>
+            {result.supabaseUrl && (
+              <a 
+                href={result.supabaseUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+              >
+                Open Supabase SQL Editor
+              </a>
+            )}
+          </div>
+        );
+      }
+    } catch (err: any) {
+      setError(`Migration check failed: ${err.message}`);
+    } finally {
+      setMigrating(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -359,30 +460,65 @@ export default function PodcastManagement() {
           <h2 className="text-2xl font-bold text-gray-900">Podcast Management</h2>
           <p className="text-gray-600 mt-1">Manage your podcast episodes</p>
         </div>
-        {!showForm && (
-          <button
-            onClick={handleCreateNew}
-            className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            Create New Episode
-          </button>
-        )}
+        <div className="flex space-x-3">
+          {error && typeof error === 'string' && error.includes('Failed to fetch episodes') && (
+            <button
+              onClick={handleMigration}
+              disabled={migrating}
+              className="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              {migrating ? 'Migrating...' : 'Add Quiz Support'}
+            </button>
+          )}
+          {!showForm && (
+            <button
+              onClick={handleCreateNew}
+              className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Create New Episode
+            </button>
+          )}
+        </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 rounded-lg p-4">
+        <div className={`border-l-4 rounded-lg p-4 ${
+          typeof error === 'string' && error.includes('✅') 
+            ? 'bg-green-50 border-green-400' 
+            : 'bg-red-50 border-red-400'
+        }`}>
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg className={`w-5 h-5 ${
+                typeof error === 'string' && error.includes('✅') 
+                  ? 'text-green-400' 
+                  : 'text-red-400'
+              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {typeof error === 'string' && error.includes('✅') ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                )}
               </svg>
             </div>
             <div className="ml-3 flex-1">
-              <h3 className="text-sm font-medium text-red-800">
-                {error.includes('upload') ? 'Upload Error' : 'Operation Error'}
+              <h3 className={`text-sm font-medium ${
+                typeof error === 'string' && error.includes('✅') 
+                  ? 'text-green-800' 
+                  : 'text-red-800'
+              }`}>
+                {typeof error === 'string' && error.includes('✅') 
+                  ? 'Success!' 
+                  : typeof error === 'string' && error.includes('upload') 
+                    ? 'Upload Error' 
+                    : 'Operation Error'}
               </h3>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
-              {error.includes('upload') && (
+              <div className={`text-sm mt-1 ${
+                typeof error === 'string' && error.includes('✅') 
+                  ? 'text-green-700' 
+                  : 'text-red-700'
+              }`}>{error}</div>
+              {typeof error === 'string' && error.includes('upload') && !error.includes('✅') && (
                 <p className="text-xs text-red-600 mt-2">
                   💡 Try: {error.includes('Audio') ? 'Check audio file format (MP3, WAV, M4A) and size (under 100MB)' : 'Check image format (PNG, JPG, WebP) and size (under 5MB)'}
                 </p>
@@ -391,7 +527,11 @@ export default function PodcastManagement() {
             <div className="ml-4 flex-shrink-0">
               <button
                 onClick={() => setError('')}
-                className="inline-flex rounded-md p-1.5 text-red-400 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                className={`inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  typeof error === 'string' && error.includes('✅') 
+                    ? 'text-green-400 hover:bg-green-100 focus:ring-green-600' 
+                    : 'text-red-400 hover:bg-red-100 focus:ring-red-600'
+                }`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -526,8 +666,8 @@ export default function PodcastManagement() {
               </label>
             </div>
 
-            {/* Category and Tags */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Category, Tags, and Quiz */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
                   Category
@@ -540,6 +680,25 @@ export default function PodcastManagement() {
                   placeholder="e.g., Education, Interview, News"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="quiz_id" className="block text-sm font-medium text-gray-700 mb-1">
+                  Associated Quiz
+                </label>
+                <select
+                  id="quiz_id"
+                  value={formData.quiz_id}
+                  onChange={(e) => setFormData({ ...formData, quiz_id: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="">No Quiz</option>
+                  {quizzes.map((quiz) => (
+                    <option key={quiz.id} value={quiz.id}>
+                      {quiz.question_number ? `Q${quiz.question_number}: ` : ''}{quiz.title}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -736,6 +895,9 @@ export default function PodcastManagement() {
                       Duration
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Quiz
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -795,6 +957,15 @@ export default function PodcastManagement() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {episode.duration ? formatDuration(episode.duration) : 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {episode.quiz_questions ? (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                            Q{episode.quiz_questions.question_number}: {episode.quiz_questions.title}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">No Quiz</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col space-y-1">

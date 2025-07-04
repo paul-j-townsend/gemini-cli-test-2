@@ -42,7 +42,8 @@ async function updateEpisode(req: NextApiRequest, res: NextApiResponse, id: stri
     transcript,
     meta_title,
     meta_description,
-    full_audio_url
+    full_audio_url,
+    quiz_id
   } = req.body;
 
   if (!title) {
@@ -70,6 +71,7 @@ async function updateEpisode(req: NextApiRequest, res: NextApiResponse, id: stri
       meta_title,
       meta_description,
       full_audio_url,
+      quiz_id: quiz_id || null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

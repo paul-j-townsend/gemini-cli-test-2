@@ -18,17 +18,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
-  const { data: episodes, error } = await supabaseAdmin
-    .from('vsk_podcast_episodes')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    // First try with quiz relationship - use quizzes table instead of quiz_questions
+    const { data: episodes, error } = await supabaseAdmin
+      .from('vsk_podcast_episodes')
+      .select(`
+        *,
+        quizzes (
+          id,
+          title,
+          total_questions
+        )
+      `)
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching episodes:', error);
+    if (error) {
+      // If join fails (likely quiz_id column doesn't exist), try without quiz relationship
+      console.log('Quiz relationship query failed, trying without quiz data:', error);
+      
+      const { data: episodesWithoutQuiz, error: fallbackError } = await supabaseAdmin
+        .from('vsk_podcast_episodes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (fallbackError) {
+        console.error('Error fetching episodes (fallback):', fallbackError);
+        return res.status(500).json({ message: 'Failed to fetch episodes' });
+      }
+
+      return res.status(200).json({ episodes: episodesWithoutQuiz || [] });
+    }
+
+    return res.status(200).json({ episodes: episodes || [] });
+  } catch (err) {
+    console.error('Unexpected error fetching episodes:', err);
     return res.status(500).json({ message: 'Failed to fetch episodes' });
   }
-
-  return res.status(200).json({ episodes });
 }
 
 async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
@@ -50,7 +75,8 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
     transcript,
     meta_title,
     meta_description,
-    full_audio_url
+    full_audio_url,
+    quiz_id
   } = req.body;
 
   if (!title) {
@@ -78,7 +104,8 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
         transcript,
         meta_title,
         meta_description,
-        full_audio_url
+        full_audio_url,
+        quiz_id: quiz_id || null
       },
     ])
     .select()

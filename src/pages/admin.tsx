@@ -3,9 +3,10 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import ArticlesManagement from '../components/admin/ArticlesManagement';
 import PodcastManagement from '../components/admin/PodcastManagement';
+import QuizManagement from '../components/admin/QuizManagement';
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState('podcasts');
+  const [activeTab, setActiveTab] = useState('quizzes');
 
   return (
     <Layout>
@@ -38,12 +39,23 @@ const AdminPage = () => {
               >
                 Articles Management
               </button>
+              <button
+                onClick={() => setActiveTab('quizzes')}
+                className={`${
+                  activeTab === 'quizzes'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              >
+                Quiz Management
+              </button>
 
             </nav>
           </div>
           <div className="pt-10">
             {activeTab === 'podcasts' && <PodcastManagement />}
             {activeTab === 'articles' && <ArticlesManagement />}
+            {activeTab === 'quizzes' && <QuizManagement />}
           </div>
         </div>
       </div>
