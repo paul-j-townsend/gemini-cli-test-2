@@ -5,7 +5,8 @@ interface Podcast {
   id: string;
   title: string;
   description: string;
-  audioSrc: string;
+  audioSrc: string; // Preview audio
+  fullAudioSrc?: string; // Full version audio
   thumbnail: string;
 }
 
@@ -70,6 +71,8 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFullVersion, setIsFullVersion] = useState(false);
+  const [hasAccessedFull, setHasAccessedFull] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -203,11 +206,27 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
     setIsScrubbing(false);
   };
 
+  const handleListenToFull = () => {
+    if (podcast.fullAudioSrc) {
+      setIsFullVersion(true);
+      setHasAccessedFull(true);
+      setIsPlaying(false);
+      setCurrentTime(0);
+      
+      // Update audio source
+      if (audioRef.current) {
+        audioRef.current.src = podcast.fullAudioSrc;
+        audioRef.current.load();
+      }
+    }
+  };
+
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
+  const currentAudioSrc = isFullVersion && podcast.fullAudioSrc ? podcast.fullAudioSrc : podcast.audioSrc;
 
   return (
     <div className="card-glow p-6 animate-fade-in-up hover-lift group">
-      <audio ref={audioRef} src={podcast.audioSrc} preload="metadata" />
+      <audio ref={audioRef} src={currentAudioSrc} preload="metadata" />
       
       {/* Header Section */}
       <div className="flex items-start gap-4 mb-6">
@@ -366,18 +385,35 @@ const PodcastPlayerItem = ({ podcast }: PodcastPlayerItemProps) => {
 
       {/* Action Buttons */}
       <div className="mt-6 pt-6 border-t border-neutral-200/80 flex flex-col sm:flex-row gap-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-        <button className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-            <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-          </svg>
-          Take Quiz
-        </button>
-        <button className="btn-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-            <path d="M9.25 12.25a.75.75 0 0 0 1.5 0V4.57l2.053 2.053a.75.75 0 0 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06L9.25 4.57v7.68ZM2 14.25a.75.75 0 0 0 0 1.5h16a.75.75 0 0 0 0-1.5H2Z" />
-          </svg>
-          Get Certificate
-        </button>
+        {!hasAccessedFull ? (
+          /* Show Listen to Full Version button initially */
+          <button 
+            onClick={handleListenToFull}
+            className="btn-primary w-full flex items-center justify-center gap-2"
+            disabled={!podcast.fullAudioSrc}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+            </svg>
+            Listen to Full Version
+          </button>
+        ) : (
+          /* Show Quiz and Certificate buttons after accessing full version */
+          <>
+            <button className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+              </svg>
+              Take Quiz
+            </button>
+            <button className="btn-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <path d="M9.25 12.25a.75.75 0 0 0 1.5 0V4.57l2.053 2.053a.75.75 0 0 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06L9.25 4.57v7.68ZM2 14.25a.75.75 0 0 0 0 1.5h16a.75.75 0 0 0 0-1.5H2Z" />
+              </svg>
+              Get Certificate
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

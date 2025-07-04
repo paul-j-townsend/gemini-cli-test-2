@@ -17,6 +17,15 @@ interface PodcastEpisode {
   audio_url: string;
   thumbnail_path: string;
   published_at: string;
+  episode_number?: number;
+  season?: number;
+  duration?: number;
+  slug?: string;
+  published?: boolean;
+  featured?: boolean;
+  category?: string;
+  tags?: string[];
+  full_audio_url?: string;
 }
 
 const PodcastPlayer = () => {
@@ -43,11 +52,27 @@ const PodcastPlayer = () => {
       setLoading(true);
       setError(null);
       
-      const { data, error } = await supabase
+      // Try to fetch with new fields first, fallback to basic fields if migration not applied
+      let { data, error } = await supabase
         .from('vsk_podcast_episodes')
-        .select('id, title, description, audio_url, thumbnail_path, published_at')
+        .select('id, title, description, audio_url, thumbnail_path, published_at, episode_number, season, duration, slug, published, featured, category, tags, full_audio_url')
+        .eq('published', true)
         .order('published_at', { ascending: false })
         .limit(4);
+
+      // If the query fails (likely due to missing published column), fallback to original query
+      if (error && (error.message.includes('column "published" does not exist') || error.message.includes('does not exist'))) {
+        console.log('Migration not applied yet, falling back to basic query');
+        const fallbackResult = await supabase
+          .from('vsk_podcast_episodes')
+          .select('id, title, description, audio_url, thumbnail_path, published_at')
+          .not('published_at', 'is', null)
+          .order('published_at', { ascending: false })
+          .limit(4);
+        
+        data = fallbackResult.data;
+        error = fallbackResult.error;
+      }
 
       if (error) throw error;
 
@@ -55,7 +80,8 @@ const PodcastPlayer = () => {
         id: episode.id,
         title: episode.title,
         description: episode.description || '',
-        audioSrc: episode.audio_url || '',
+        audioSrc: episode.audio_url || '', // Preview version
+        fullAudioSrc: episode.full_audio_url || episode.audio_url || '', // Full version or fallback to preview
         thumbnail: getThumbnailUrl(episode)
       }));
 

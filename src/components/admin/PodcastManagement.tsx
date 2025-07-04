@@ -13,6 +13,21 @@ interface Episode {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  // Enhanced fields
+  episode_number?: number;
+  season?: number;
+  duration?: number; // in seconds
+  slug?: string;
+  published?: boolean;
+  featured?: boolean;
+  category?: string;
+  tags?: string[];
+  show_notes?: string;
+  transcript?: string;
+  file_size?: number;
+  meta_title?: string;
+  meta_description?: string;
+  full_audio_url?: string;
 }
 
 interface EpisodeFormData {
@@ -22,6 +37,20 @@ interface EpisodeFormData {
   thumbnail_path: string;
   image_url?: string;
   published_at: string;
+  // Enhanced fields
+  episode_number: number | '';
+  season: number;
+  duration: number | ''; // in seconds
+  slug: string;
+  published: boolean;
+  featured: boolean;
+  category: string;
+  tags: string[];
+  show_notes: string;
+  transcript: string;
+  meta_title: string;
+  meta_description: string;
+  full_audio_url: string;
 }
 
 export default function PodcastManagement() {
@@ -39,12 +68,56 @@ export default function PodcastManagement() {
     audio_url: '',
     thumbnail_path: '',
     image_url: '',
-    published_at: new Date().toISOString().slice(0, 16)
+    published_at: new Date().toISOString().slice(0, 16),
+    // Enhanced fields
+    episode_number: '',
+    season: 1,
+    duration: '',
+    slug: '',
+    published: false,
+    featured: false,
+    category: '',
+    tags: [],
+    show_notes: '',
+    transcript: '',
+    meta_title: '',
+    meta_description: '',
+    full_audio_url: ''
   });
 
   useEffect(() => {
     fetchEpisodes();
   }, []);
+
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9 -]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const parseDuration = (timeString: string): number => {
+    const parts = timeString.split(':').map(Number);
+    if (parts.length === 2) {
+      return parts[0] * 60 + parts[1]; // MM:SS
+    } else if (parts.length === 3) {
+      return parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS
+    }
+    return 0;
+  };
 
   const fetchEpisodes = async () => {
     try {
@@ -77,6 +150,15 @@ export default function PodcastManagement() {
       setSaving(true);
       setError(null);
 
+      const slug = formData.slug || generateSlug(formData.title);
+      const episodeData = {
+        ...formData,
+        slug,
+        episode_number: formData.episode_number === '' ? null : formData.episode_number,
+        duration: formData.duration === '' ? null : formData.duration,
+        tags: formData.tags.filter(tag => tag.trim() !== '')
+      };
+
       const url = editingEpisode 
         ? `/api/podcast-admin/episodes/${editingEpisode.id}`
         : '/api/podcast-admin/episodes';
@@ -88,7 +170,7 @@ export default function PodcastManagement() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(episodeData),
       });
 
       if (!response.ok) {
@@ -114,7 +196,21 @@ export default function PodcastManagement() {
       image_url: episode.image_url || '',
       published_at: episode.published_at 
         ? new Date(episode.published_at).toISOString().slice(0, 16)
-        : new Date().toISOString().slice(0, 16)
+        : new Date().toISOString().slice(0, 16),
+      // Enhanced fields
+      episode_number: episode.episode_number || '',
+      season: episode.season || 1,
+      duration: episode.duration || '',
+      slug: episode.slug || '',
+      published: episode.published || false,
+      featured: episode.featured || false,
+      category: episode.category || '',
+      tags: episode.tags || [],
+      show_notes: episode.show_notes || '',
+      transcript: episode.transcript || '',
+      meta_title: episode.meta_title || '',
+      meta_description: episode.meta_description || '',
+      full_audio_url: episode.full_audio_url || ''
     });
     setShowForm(true);
     setError(null);
@@ -149,7 +245,21 @@ export default function PodcastManagement() {
       audio_url: '',
       thumbnail_path: '',
       image_url: '',
-      published_at: new Date().toISOString().slice(0, 16)
+      published_at: new Date().toISOString().slice(0, 16),
+      // Enhanced fields
+      episode_number: '',
+      season: 1,
+      duration: '',
+      slug: '',
+      published: false,
+      featured: false,
+      category: '',
+      tags: [],
+      show_notes: '',
+      transcript: '',
+      meta_title: '',
+      meta_description: '',
+      full_audio_url: ''
     });
     setError(null);
   };
@@ -162,7 +272,21 @@ export default function PodcastManagement() {
       audio_url: '',
       thumbnail_path: '',
       image_url: '',
-      published_at: new Date().toISOString().slice(0, 16)
+      published_at: new Date().toISOString().slice(0, 16),
+      // Enhanced fields
+      episode_number: '',
+      season: 1,
+      duration: '',
+      slug: '',
+      published: false,
+      featured: false,
+      category: '',
+      tags: [],
+      show_notes: '',
+      transcript: '',
+      meta_title: '',
+      meta_description: '',
+      full_audio_url: ''
     });
     setShowForm(true);
     setError(null);
@@ -312,12 +436,185 @@ export default function PodcastManagement() {
               />
             </div>
 
+            {/* Episode Organization */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="episode_number" className="block text-sm font-medium text-gray-700 mb-1">
+                  Episode Number
+                </label>
+                <input
+                  type="number"
+                  id="episode_number"
+                  min="1"
+                  value={formData.episode_number}
+                  onChange={(e) => setFormData({ ...formData, episode_number: e.target.value === '' ? '' : parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="season" className="block text-sm font-medium text-gray-700 mb-1">
+                  Season
+                </label>
+                <input
+                  type="number"
+                  id="season"
+                  min="1"
+                  value={formData.season}
+                  onChange={(e) => setFormData({ ...formData, season: parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+                  Duration (MM:SS or HH:MM:SS)
+                </label>
+                <input
+                  type="text"
+                  id="duration"
+                  placeholder="5:30 or 1:05:30"
+                  value={formData.duration === '' ? '' : (typeof formData.duration === 'string' ? formData.duration : formatDuration(formData.duration))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.match(/^\d{1,2}:\d{2}(:\d{2})?$/)) {
+                      setFormData({ ...formData, duration: parseDuration(value) });
+                    } else {
+                      setFormData({ ...formData, duration: value });
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* SEO & URL */}
             <div>
+              <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
+                URL Slug
+              </label>
+              <input
+                type="text"
+                id="slug"
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                placeholder="Auto-generated from title"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <p className="text-xs text-gray-500 mt-1">Leave empty to auto-generate from title</p>
+            </div>
+
+            {/* Publishing Options */}
+            <div className="flex items-center space-x-6">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.published}
+                  onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                  className="mr-2 rounded"
+                />
+                Published
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.featured}
+                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                  className="mr-2 rounded"
+                />
+                Featured
+              </label>
+            </div>
+
+            {/* Category and Tags */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                  Category
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g., Education, Interview, News"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+                  Tags (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  id="tags"
+                  value={formData.tags.join(', ')}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
+                  })}
+                  placeholder="e.g., veterinary, surgery, tips"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.tags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {formData.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              tags: formData.tags.filter((_, i) => i !== index),
+                            })
+                          }
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preview Audio (Short version for initial play)
+              </label>
               <FileUpload
                 type="audio"
                 onUploadSuccess={handleAudioUpload}
                 onUploadError={handleAudioUploadError}
                 currentValue={formData.audio_url}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full Audio (Complete episode for full access)
+              </label>
+              <FileUpload
+                type="audio"
+                onUploadSuccess={(url: string, path: string) => {
+                  setFormData({ ...formData, full_audio_url: url });
+                  setError(null);
+                }}
+                onUploadError={(error: string) => {
+                  setError(`Full audio upload failed: ${error}`);
+                  setTimeout(() => {
+                    if (error.includes('Full audio upload failed')) {
+                      setError(null);
+                    }
+                  }, 10000);
+                }}
+                currentValue={formData.full_audio_url}
               />
             </div>
 
@@ -328,6 +625,54 @@ export default function PodcastManagement() {
                 onUploadError={handleImageUploadError}
                 currentValue={formData.image_url || (formData.thumbnail_path ? getThumbnailUrl(formData.thumbnail_path) : '')}
               />
+            </div>
+
+            {/* Show Notes */}
+            <div>
+              <label htmlFor="show_notes" className="block text-sm font-medium text-gray-700 mb-1">
+                Show Notes
+              </label>
+              <textarea
+                id="show_notes"
+                rows={6}
+                value={formData.show_notes}
+                onChange={(e) => setFormData({ ...formData, show_notes: e.target.value })}
+                placeholder="Detailed episode content, links, and notes..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* SEO Metadata */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 mb-1">
+                  SEO Title
+                </label>
+                <input
+                  type="text"
+                  id="meta_title"
+                  value={formData.meta_title}
+                  onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                  placeholder="Custom title for search engines"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="meta_description" className="block text-sm font-medium text-gray-700 mb-1">
+                  SEO Description
+                </label>
+                <textarea
+                  id="meta_description"
+                  rows={3}
+                  value={formData.meta_description}
+                  onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                  placeholder="Brief description for search engines (160 chars max)"
+                  maxLength={160}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">{formData.meta_description.length}/160 characters</p>
+              </div>
             </div>
 
             <div>
@@ -382,16 +727,16 @@ export default function PodcastManagement() {
                       Image
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Episode
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Title
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Duration
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Audio
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Published
@@ -424,6 +769,18 @@ export default function PodcastManagement() {
                           )}
                         </div>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm">
+                          <div className="text-gray-900 font-medium">
+                            S{episode.season || 1}E{episode.episode_number || '?'}
+                          </div>
+                          {episode.featured && (
+                            <span className="inline-flex px-1 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-800 mt-1">
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4">
                         <div className="max-w-xs">
                           <div className="font-medium text-gray-900 truncate" title={episode.title}>
@@ -436,26 +793,24 @@ export default function PodcastManagement() {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          episode.published_at 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {episode.published_at ? 'Published' : 'Draft'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          episode.audio_url 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {episode.audio_url ? 'Has Audio' : 'No Audio'}
-                        </span>
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(episode.created_at)}
+                        {episode.duration ? formatDuration(episode.duration) : 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col space-y-1">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full w-fit ${
+                            episode.published 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {episode.published ? 'Published' : 'Draft'}
+                          </span>
+                          {episode.audio_url && (
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 w-fit">
+                              Audio
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {episode.published_at ? formatDate(episode.published_at) : 'Not published'}

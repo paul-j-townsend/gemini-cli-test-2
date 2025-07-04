@@ -32,7 +32,26 @@ async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
-  const { title, description, audio_url, thumbnail_path, published_at } = req.body;
+  const { 
+    title, 
+    description, 
+    audio_url, 
+    thumbnail_path, 
+    published_at,
+    episode_number,
+    season,
+    duration,
+    slug,
+    published,
+    featured,
+    category,
+    tags,
+    show_notes,
+    transcript,
+    meta_title,
+    meta_description,
+    full_audio_url
+  } = req.body;
 
   if (!title) {
     return res.status(400).json({ message: 'Title is required' });
@@ -47,6 +66,19 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
         audio_url,
         thumbnail_path,
         published_at,
+        episode_number,
+        season,
+        duration,
+        slug,
+        published,
+        featured,
+        category,
+        tags,
+        show_notes,
+        transcript,
+        meta_title,
+        meta_description,
+        full_audio_url
       },
     ])
     .select()
