@@ -22,11 +22,15 @@ interface ArticleFormData {
   content: string;
   excerpt: string;
   author: string;
-  category: string;
+  category: string[];
   published: boolean;
   featured: boolean;
   slug: string;
   image_url: string;
+}
+
+interface KeywordOption {
+  value: string;
 }
 
 const ArticlesManagement = () => {
@@ -36,13 +40,14 @@ const ArticlesManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [saving, setSaving] = useState(false);
+  const [keywords, setKeywords] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<ArticleFormData>({
     title: '',
     content: '',
     excerpt: '',
     author: '',
-    category: '',
+    category: [],
     published: false,
     featured: false,
     slug: '',
@@ -93,7 +98,11 @@ const ArticlesManagement = () => {
 
     try {
       const slug = formData.slug || generateSlug(formData.title);
-      const articleData = { ...formData, slug };
+      const articleData = { 
+        ...formData, 
+        slug,
+        category: formData.category.join(', ')
+      };
 
       if (editingArticle) {
         const { error } = await supabase
@@ -115,7 +124,7 @@ const ArticlesManagement = () => {
         content: '',
         excerpt: '',
         author: '',
-        category: '',
+        category: [],
         published: false,
         featured: false,
         slug: '',
@@ -138,7 +147,7 @@ const ArticlesManagement = () => {
       content: article.content,
       excerpt: article.excerpt,
       author: article.author,
-      category: article.category,
+      category: article.category ? article.category.split(',').map((c) => c.trim()) : [],
       published: article.published,
       featured: article.featured,
       slug: article.slug,
@@ -173,7 +182,7 @@ const ArticlesManagement = () => {
       content: '',
       excerpt: '',
       author: '',
-      category: '',
+      category: [],
       published: false,
       featured: false,
       slug: '',
@@ -211,8 +220,27 @@ const ArticlesManagement = () => {
     });
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const opts = Array.from(e.target.selectedOptions).map((o:any)=>o.value);
+    setFormData({ ...formData, category: opts });
+  };
+
   useEffect(() => {
     fetchArticles();
+  }, []);
+
+  useEffect(() => {
+    const fetchKeywords = async () => {
+      try {
+        const res = await fetch('/api/keywords');
+        if (!res.ok) throw new Error('Failed to load keywords');
+        const data = await res.json();
+        setKeywords(data.keywords || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchKeywords();
   }, []);
 
   return (
@@ -300,15 +328,48 @@ const ArticlesManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
                   Category
                 </label>
-                <input
-                  type="text"
+                <select
+                  id="category"
+                  multiple
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                  onChange={handleCategoryChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+                >
+                  <option disabled>Select categories</option>
+                  {keywords.map((kw) => (
+                    <option key={kw} value={kw}>
+                      {kw}
+                    </option>
+                  ))}
+                </select>
+
+                {formData.category.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {formData.category.map((kw) => (
+                      <span
+                        key={kw}
+                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
+                      >
+                        {kw}
+                        <button
+                          type="button"
+                          className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              category: formData.category.filter((c) => c !== kw),
+                            })
+                          }
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -478,7 +539,20 @@ const ArticlesManagement = () => {
                       {article.author || 'Unknown'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      {article.category || 'Uncategorized'}
+                      {article.category ? (
+                        <div className="flex flex-wrap gap-1">
+                          {article.category.split(',').map((kw) => (
+                            <span
+                              key={kw}
+                              className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
+                            >
+                              {kw.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">Uncategorized</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col space-y-1">

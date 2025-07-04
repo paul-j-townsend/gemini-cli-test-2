@@ -195,9 +195,14 @@ const Articles = () => {
                   )}
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-teal-600 uppercase tracking-wide">
-                        {article.category}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {article.category?.split(',').map((cat, index) => (
+                          <span key={index} className="text-xs font-medium text-teal-600 uppercase tracking-wide">
+                            {cat.trim()}
+                            {index < article.category.split(',').length - 1 && ', '}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
                       {article.title}

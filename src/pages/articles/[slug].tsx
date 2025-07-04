@@ -97,16 +97,27 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
               </Link>
             </li>
             <li className="text-gray-400">/</li>
-            <li className="text-gray-900 font-medium">{article.category}</li>
+            <li className="text-gray-900 font-medium">
+              {article.category?.split(',').map((cat, index) => (
+                <span key={index}>
+                  {cat.trim()}
+                  {index < article.category.split(',').length - 1 && ', '}
+                </span>
+              ))}
+            </li>
           </ol>
         </nav>
 
         {/* Article Header */}
         <header className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <span className="inline-block px-3 py-1 text-xs font-medium text-teal-700 bg-teal-100 rounded-full">
-              {article.category}
-            </span>
+            <div className="flex flex-wrap gap-2">
+              {article.category?.split(',').map((cat, index) => (
+                <span key={index} className="inline-block px-3 py-1 text-xs font-medium text-teal-700 bg-teal-100 rounded-full">
+                  {cat.trim()}
+                </span>
+              ))}
+            </div>
             {article.featured && (
               <span className="inline-block px-3 py-1 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
                 Featured

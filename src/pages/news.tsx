@@ -129,9 +129,13 @@ export default function News() {
               />
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(article.category)}`}>
-                    {article.category}
-                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {article.category?.split(',').map((cat, index) => (
+                      <span key={index} className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(cat.trim())}`}>
+                        {cat.trim()}
+                      </span>
+                    ))}
+                  </div>
                   <span className="text-gray-500 text-sm">{article.readTime}</span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
