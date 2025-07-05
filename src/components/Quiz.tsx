@@ -1,4 +1,8 @@
+import PadlockIcon from './PadlockIcon';
 import React, { useState, useEffect } from 'react';
+import { useQuizCompletion } from '../hooks/useQuizCompletion';
+import { useAuth } from '../hooks/useAuth';
+import { QuizAnswer } from '../types/database';
 
 interface McqAnswer {
   id: string;
@@ -32,10 +36,21 @@ interface QuizAttempt {
 
 interface QuizProps {
   quizId?: string;
+  podcastId?: string;
   category?: string;
 }
 
-const Quiz: React.FC<QuizProps> = ({ quizId }) => {
+const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
+  const { user } = useAuth();
+  const { 
+    submitQuizCompletion, 
+    isQuizCompleted, 
+    isQuizPassed, 
+    getQuizScore,
+    getQuizPercentage,
+    isLoading: completionLoading 
+  } = useQuizCompletion();
+  
   const [quiz, setQuiz] = useState<QuizData | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
@@ -44,10 +59,14 @@ const Quiz: React.FC<QuizProps> = ({ quizId }) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number>(Date.now());
+  
+  const [sessionId] = useState(() => Math.random().toString(36).substring(2, 15));
 
   useEffect(() => {
     if (quizId) {
       fetchQuiz(quizId);
+      setStartTime(Date.now());
     }
   }, [quizId]);
 
@@ -65,6 +84,29 @@ const Quiz: React.FC<QuizProps> = ({ quizId }) => {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  
+
+  const recordCompletion = async (quizId: string, scorePercentage: number, passed: boolean) => {
+    try {
+      const response = await fetch('/api/quiz-completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          quiz_id: quizId,
+          session_id: sessionId,
+          score_percentage: scorePercentage,
+          passed,
+        }),
+      });
+
+      
+    } catch (err) {
+      console.error('Error recording completion:', err);
     }
   };
 
@@ -109,13 +151,40 @@ const Quiz: React.FC<QuizProps> = ({ quizId }) => {
     setShowExplanation(true);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (quiz && currentQuestionIndex + 1 < quiz.questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswers([]);
       setShowExplanation(false);
     } else {
       setIsCompleted(true);
+      
+      // Record completion when quiz finishes
+      if (quiz && quizId && user) {
+        const score = calculateScore();
+        const timeSpent = Math.round((Date.now() - startTime) / 1000); // Convert to seconds
+        
+        // Create QuizAnswer array for tracking
+        const quizAnswers: QuizAnswer[] = attempts.map(attempt => ({
+          questionId: attempt.question_id,
+          selectedAnswers: attempt.selected_answer_ids,
+          isCorrect: attempt.is_correct,
+          points: attempt.is_correct ? Math.round(100 / quiz.questions.length) : 0 // Equal points per question
+        }));
+
+        // Submit to our completion tracking system
+        await submitQuizCompletion(
+          quizId,
+          quizAnswers,
+          score.percentage, // Use percentage as score
+          100, // Max score is always 100%
+          timeSpent,
+          podcastId
+        );
+        
+        // Also record to existing API for backward compatibility
+        await recordCompletion(quizId, score.percentage, score.passed);
+      }
     }
   };
 
@@ -125,6 +194,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId }) => {
     setAttempts([]);
     setShowExplanation(false);
     setIsCompleted(false);
+    setStartTime(Date.now()); // Reset start time
   };
 
   const calculateScore = () => {
@@ -225,14 +295,13 @@ const Quiz: React.FC<QuizProps> = ({ quizId }) => {
             </svg>
             Retake Quiz
           </button>
-          {score.passed && (
-            <button className="btn-primary">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Get Certificate
-            </button>
-          )}
+          <button
+            disabled={!score.passed}
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          >
+            <PadlockIcon isLocked={!score.passed} />
+            <span className="ml-2">Get Certificate</span>
+          </button>
         </div>
       </div>
     );
@@ -246,7 +315,36 @@ const Quiz: React.FC<QuizProps> = ({ quizId }) => {
     <div className="quiz-container animate-fade-in-up">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 mb-2">{quiz.title}</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">{quiz.title}</h2>
+          {quizId && user && (
+            <div className="flex items-center gap-2">
+              {isQuizCompleted(quizId) && (
+                <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  isQuizPassed(quizId) 
+                    ? 'bg-success-100 text-success-800' 
+                    : 'bg-warning-100 text-warning-800'
+                }`}>
+                  {isQuizPassed(quizId) ? (
+                    <>
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Passed ({getQuizPercentage(quizId)}%)
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Completed ({getQuizPercentage(quizId)}%)
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         {quiz.description && (
           <p className="text-neutral-600 mb-4">{quiz.description}</p>
         )}
