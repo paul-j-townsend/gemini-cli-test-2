@@ -46,7 +46,7 @@ interface EpisodeFormData {
   image_url?: string;
   published_at: string;
   // Enhanced fields
-  episode_number: number | '';
+  episode_number: number;
   season: number;
   duration: number | string; // in seconds or time string
   slug: string;
@@ -81,7 +81,7 @@ export default function PodcastManagement() {
     image_url: '',
     published_at: new Date().toISOString().slice(0, 16),
     // Enhanced fields
-    episode_number: '',
+    episode_number: 1,
     season: 1,
     duration: '',
     slug: '',
@@ -109,6 +109,12 @@ export default function PodcastManagement() {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
+  };
+
+  const getNextEpisodeNumber = () => {
+    if (episodes.length === 0) return 1;
+    const maxEpisodeNumber = Math.max(...episodes.map(ep => ep.episode_number || 0));
+    return maxEpisodeNumber + 1;
   };
 
   const formatDuration = (seconds: number) => {
@@ -192,7 +198,7 @@ export default function PodcastManagement() {
       const episodeData = {
         ...formData,
         slug,
-        episode_number: formData.episode_number === '' ? null : formData.episode_number,
+        episode_number: formData.episode_number || 1,
         duration: formData.duration === '' ? null : formData.duration,
         tags: formData.tags.filter(tag => tag.trim() !== '')
       };
@@ -247,7 +253,7 @@ export default function PodcastManagement() {
         ? new Date(episode.published_at).toISOString().slice(0, 16)
         : new Date().toISOString().slice(0, 16),
       // Enhanced fields
-      episode_number: episode.episode_number || '',
+      episode_number: episode.episode_number || 1,
       season: episode.season || 1,
       duration: episode.duration || '',
       slug: episode.slug || '',
@@ -297,7 +303,7 @@ export default function PodcastManagement() {
       image_url: '',
       published_at: new Date().toISOString().slice(0, 16),
       // Enhanced fields
-      episode_number: '',
+      episode_number: 1,
       season: 1,
       duration: '',
       slug: '',
@@ -317,6 +323,7 @@ export default function PodcastManagement() {
 
   const handleCreateNew = () => {
     setEditingEpisode(null);
+    const nextEpisodeNumber = getNextEpisodeNumber();
     setFormData({
       title: '',
       description: '',
@@ -325,7 +332,7 @@ export default function PodcastManagement() {
       image_url: '',
       published_at: new Date().toISOString().slice(0, 16),
       // Enhanced fields
-      episode_number: '',
+      episode_number: nextEpisodeNumber,
       season: 1,
       duration: '',
       slug: '',
@@ -587,9 +594,14 @@ export default function PodcastManagement() {
                   id="episode_number"
                   min="1"
                   value={formData.episode_number}
-                  onChange={(e) => setFormData({ ...formData, episode_number: e.target.value === '' ? '' : parseInt(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, episode_number: e.target.value === '' ? 1 : parseInt(e.target.value) || 1 })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
+                {!editingEpisode && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Next available: {getNextEpisodeNumber()}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -934,7 +946,7 @@ export default function PodcastManagement() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm">
                           <div className="text-gray-900 font-medium">
-                            S{episode.season || 1}E{episode.episode_number || '?'}
+                            S{episode.season || 1}E{episode.episode_number || 1}
                           </div>
                           {episode.featured && (
                             <span className="inline-flex px-1 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-800 mt-1">
