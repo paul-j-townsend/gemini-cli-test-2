@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -21,15 +21,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function getQuestions(req: NextApiRequest, res: NextApiResponse) {
   const { quiz_id } = req.query;
 
-  let query = supabase.from('questions').select(`
+  let query = supabaseAdmin.from('quiz_questions').select(`
     id,
+    quiz_id,
+    question_number,
     question_text,
-    learning_outcome,
-    rationale,
-    category,
-    difficulty,
-    mcq_answers (
+    explanation,
+    points,
+    question_answers (
       id,
+      answer_letter,
       answer_text,
       is_correct
     )
@@ -39,7 +40,7 @@ async function getQuestions(req: NextApiRequest, res: NextApiResponse) {
     query = query.eq('quiz_id', quiz_id);
   }
 
-  const { data: questions, error } = await query;
+  const { data: questions, error } = await query.order('question_number', { ascending: true });
 
   if (error) {
     console.error('Error fetching questions:', error);
@@ -50,22 +51,38 @@ async function getQuestions(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createQuestion(req: NextApiRequest, res: NextApiResponse) {
-  const { quiz_id, question_text, learning_outcome, rationale, category, difficulty, answers } = req.body;
+  const { quiz_id, question_text, explanation, points, answers } = req.body;
 
   if (!quiz_id || !question_text || !answers || !Array.isArray(answers) || answers.length === 0) {
     return res.status(400).json({ message: 'Quiz ID, question text, and at least one answer are required' });
   }
 
+  // Get the next question number
+  const { data: existingQuestions, error: countError } = await supabaseAdmin
+    .from('quiz_questions')
+    .select('question_number')
+    .eq('quiz_id', quiz_id)
+    .order('question_number', { ascending: false })
+    .limit(1);
+
+  if (countError) {
+    console.error('Error counting questions:', countError);
+    return res.status(500).json({ message: 'Failed to determine question number' });
+  }
+
+  const nextQuestionNumber = existingQuestions && existingQuestions.length > 0 
+    ? existingQuestions[0].question_number + 1 
+    : 1;
+
   // 1. Create the question
-  const { data: question, error: questionError } = await supabase
-    .from('questions')
+  const { data: question, error: questionError } = await supabaseAdmin
+    .from('quiz_questions')
     .insert([{
       quiz_id,
+      question_number: nextQuestionNumber,
       question_text,
-      learning_outcome,
-      rationale,
-      category,
-      difficulty,
+      explanation,
+      points: points || 1,
     }])
     .select()
     .single();
@@ -78,29 +95,35 @@ async function createQuestion(req: NextApiRequest, res: NextApiResponse) {
   // 2. Create the answers
   const answersToInsert = answers.map((ans: any) => ({
     question_id: question.id,
+    answer_letter: ans.answer_letter,
     answer_text: ans.answer_text,
     is_correct: ans.is_correct,
   }));
 
-  const { error: answersError } = await supabase
-    .from('mcq_answers')
+  const { error: answersError } = await supabaseAdmin
+    .from('question_answers')
     .insert(answersToInsert);
 
   if (answersError) {
     console.error('Error creating answers:', answersError);
     // Simple cleanup: delete the question if answers fail
-    await supabase.from('questions').delete().eq('id', question.id);
+    await supabaseAdmin.from('quiz_questions').delete().eq('id', question.id);
     return res.status(500).json({ message: 'Failed to create answers' });
   }
 
   // Refetch the question with its answers
-  const { data: finalQuestion, error: finalQuestionError } = await supabase
-    .from('questions')
+  const { data: finalQuestion, error: finalQuestionError } = await supabaseAdmin
+    .from('quiz_questions')
     .select(`
       id,
+      quiz_id,
+      question_number,
       question_text,
-      mcq_answers (
+      explanation,
+      points,
+      question_answers (
         id,
+        answer_letter,
         answer_text,
         is_correct
       )

@@ -24,9 +24,9 @@ interface Quiz {
   title: string;
   description?: string;
   category?: string;
-  difficulty?: string;
-  total_questions?: number;
   pass_percentage?: number;
+  total_questions?: number;
+  is_active?: boolean;
   quiz_questions?: QuizQuestion[];
 }
 
@@ -49,7 +49,17 @@ const QuizManagement = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
-      setQuizzes(data);
+      
+      // Transform the data to match our component's expected structure
+      const transformedQuizzes = data.map((quiz: any) => ({
+        ...quiz,
+        quiz_questions: quiz.quiz_questions?.map((q: any) => ({
+          ...q,
+          answers: q.question_answers || [] // Map question_answers to answers
+        }))
+      }));
+      
+      setQuizzes(transformedQuizzes);
       setError(null);
     } catch (err) {
       setError(`Failed to fetch quizzes: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -59,7 +69,15 @@ const QuizManagement = () => {
   };
 
   const handleEditQuiz = (quiz: Quiz) => {
-    setEditingQuiz(quiz);
+    // Ensure the quiz has the correct structure when editing
+    const editableQuiz = {
+      ...quiz,
+      quiz_questions: quiz.quiz_questions?.map(q => ({
+        ...q,
+        answers: q.answers || [] // Ensure answers array exists
+      }))
+    };
+    setEditingQuiz(editableQuiz);
   };
 
   const handleDeleteQuiz = async (quizId: string) => {
@@ -84,6 +102,30 @@ const QuizManagement = () => {
     try {
       setSaving(true);
       
+      // Transform the quiz data back to API format
+      const apiQuizData = {
+        id: quiz.id,
+        title: quiz.title,
+        description: quiz.description,
+        category: quiz.category,
+        pass_percentage: quiz.pass_percentage,
+        quiz_questions: quiz.quiz_questions?.map(q => ({
+          id: q.id,
+          quiz_id: q.quiz_id,
+          question_number: q.question_number,
+          question_text: q.question_text,
+          explanation: q.explanation,
+          points: q.points,
+          question_answers: q.answers?.map(a => ({
+            id: a.id,
+            question_id: a.question_id,
+            answer_letter: a.answer_letter,
+            answer_text: a.answer_text,
+            is_correct: a.is_correct
+          })) || []
+        })) || []
+      };
+      
       if (quiz.id === 'new-quiz') {
         // Create new quiz
         const response = await fetch('/api/admin/quizzes', {
@@ -91,17 +133,7 @@ const QuizManagement = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            title: quiz.title,
-            description: quiz.description,
-            category: quiz.category,
-            difficulty: quiz.difficulty,
-            pass_percentage: quiz.pass_percentage,
-            quiz_questions: quiz.quiz_questions?.map(q => ({
-              ...q,
-              answers: q.answers?.map(a => ({ ...a }))
-            }))
-          })
+          body: JSON.stringify(apiQuizData)
         });
 
         if (!response.ok) {
@@ -114,18 +146,7 @@ const QuizManagement = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            id: quiz.id,
-            title: quiz.title,
-            description: quiz.description,
-            category: quiz.category,
-            difficulty: quiz.difficulty,
-            pass_percentage: quiz.pass_percentage,
-            quiz_questions: quiz.quiz_questions?.map(q => ({
-              ...q,
-              answers: q.answers?.map(a => ({ ...a }))
-            }))
-          })
+          body: JSON.stringify(apiQuizData)
         });
 
         if (!response.ok) {
@@ -152,8 +173,8 @@ const QuizManagement = () => {
       title: 'New Quiz',
       description: 'A new quiz',
       category: '',
-      difficulty: 'beginner',
       pass_percentage: 70,
+      total_questions: 0,
       quiz_questions: [{
         question_number: 1,
         question_text: '',
@@ -258,7 +279,13 @@ const QuizForm: React.FC<QuizFormProps> = ({ quiz, onSave, onCancel }) => {
   const handleAddQuestion = () => {
     const newQuestion: QuizQuestion = {
       question_number: (formData.quiz_questions?.length || 0) + 1,
-      question_text: ''
+      question_text: '',
+      answers: [
+        { answer_letter: 'A', answer_text: '', is_correct: false },
+        { answer_letter: 'B', answer_text: '', is_correct: false },
+        { answer_letter: 'C', answer_text: '', is_correct: false },
+        { answer_letter: 'D', answer_text: '', is_correct: false },
+      ]
     };
     setFormData(prev => ({ 
       ...prev, 
@@ -343,20 +370,6 @@ const QuizForm: React.FC<QuizFormProps> = ({ quiz, onSave, onCancel }) => {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-          <select 
-            name="difficulty" 
-            value={formData.difficulty || 'beginner'} 
-            onChange={handleQuizChange} 
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
-        
-        <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Pass Percentage</label>
           <input 
             name="pass_percentage" 
@@ -364,6 +377,17 @@ const QuizForm: React.FC<QuizFormProps> = ({ quiz, onSave, onCancel }) => {
             min="0" 
             max="100" 
             value={formData.pass_percentage || 70} 
+            onChange={handleQuizChange} 
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Total Questions</label>
+          <input 
+            name="total_questions" 
+            type="number" 
+            value={formData.total_questions || 0} 
             onChange={handleQuizChange} 
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
           />

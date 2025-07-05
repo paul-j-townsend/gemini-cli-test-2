@@ -23,17 +23,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
-  const { data, error } = await supabaseAdmin
+  const { data: quizzes, error } = await supabaseAdmin
     .from('quizzes')
     .select(`
       id,
       title,
       description,
       category,
-      difficulty,
-      total_questions,
       pass_percentage,
+      total_questions,
+      is_active,
       created_at,
+      updated_at,
       quiz_questions (
         id,
         question_number,
@@ -48,35 +49,36 @@ async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
         )
       )
     `)
-    .order('created_at', { ascending: false })
-    .order('question_number', { foreignTable: 'quiz_questions', ascending: true });
+    .order('created_at', { ascending: false });
   
   if (error) {
     console.error('Error fetching quizzes:', error);
     return res.status(500).json({ message: 'Failed to fetch quizzes' });
   }
 
-  return res.status(200).json(data || []);
+  return res.status(200).json(quizzes || []);
 }
 
 async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
-  const { title, description, category, difficulty, pass_percentage, quiz_questions } = req.body;
+  const { title, description, category, pass_percentage, quiz_questions } = req.body;
 
   if (!title) {
     return res.status(400).json({ message: 'Title is required' });
   }
 
-  // Create the quiz
-  const { data: newQuiz, error: quizError } = await supabaseAdmin
+  console.log('Creating quiz with data:', { title, quiz_questions });
+
+  // Create the quiz first
+  const { data: quiz, error: quizError } = await supabaseAdmin
     .from('quizzes')
-    .insert([{
+    .insert({
       title,
       description,
-      category: category || '',
-      difficulty: difficulty || 'beginner',
+      category,
+      pass_percentage: pass_percentage || 70,
       total_questions: quiz_questions?.length || 0,
-      pass_percentage: pass_percentage || 70
-    }])
+      is_active: true
+    })
     .select()
     .single();
 
@@ -88,10 +90,12 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
   // Create questions and answers if provided
   if (quiz_questions && quiz_questions.length > 0) {
     for (const q of quiz_questions) {
+      console.log('Creating question:', q);
+      
       const { data: newQuestion, error: questionError } = await supabaseAdmin
         .from('quiz_questions')
         .insert([{
-          quiz_id: newQuiz.id,
+          quiz_id: quiz.id,
           question_number: q.question_number,
           question_text: q.question_text,
           explanation: q.explanation,
@@ -102,12 +106,16 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 
       if (questionError) {
         console.error('Error creating question:', questionError);
-        await supabaseAdmin.from('quizzes').delete().eq('id', newQuiz.id);
+        await supabaseAdmin.from('quizzes').delete().eq('id', quiz.id);
         return res.status(500).json({ message: 'Failed to create question' });
       }
 
-      if (q.answers && q.answers.length > 0) {
-        const answersToInsert = q.answers.map((a: any) => ({
+      // Process answers - check for both 'answers' and 'question_answers' fields
+      const answersArray = q.question_answers || q.answers || [];
+      console.log('Creating answers for question:', newQuestion.id, answersArray);
+
+      if (answersArray && answersArray.length > 0) {
+        const answersToInsert = answersArray.map((a: any) => ({
           question_id: newQuestion.id,
           answer_letter: a.answer_letter,
           answer_text: a.answer_text,
@@ -120,7 +128,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 
         if (answersError) {
           console.error('Error creating answers:', answersError);
-          await supabaseAdmin.from('quizzes').delete().eq('id', newQuiz.id);
+          await supabaseAdmin.from('quizzes').delete().eq('id', quiz.id);
           return res.status(500).json({ message: 'Failed to create answers' });
         }
       }
@@ -135,38 +143,38 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
       title,
       description,
       category,
-      difficulty,
-      total_questions,
       pass_percentage,
+      total_questions,
       quiz_questions (
         id,
         question_number,
         question_text
       )
     `)
-    .eq('id', newQuiz.id)
+    .eq('id', quiz.id)
     .single();
 
   return res.status(201).json(completeQuiz);
 }
 
 async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
-  const { id, title, description, category, difficulty, pass_percentage, quiz_questions } = req.body;
+  const { id, title, description, category, pass_percentage, quiz_questions } = req.body;
 
   if (!id || !title) {
     return res.status(400).json({ message: 'ID and title are required' });
   }
 
-  // Update quiz
+  console.log('Updating quiz with data:', { id, title, quiz_questions });
+
+  // Update the quiz
   const { error: quizError } = await supabaseAdmin
     .from('quizzes')
     .update({
       title,
       description,
       category,
-      difficulty,
-      total_questions: quiz_questions?.length || 0,
-      pass_percentage
+      pass_percentage,
+      total_questions: quiz_questions?.length || 0
     })
     .eq('id', id);
 
@@ -176,16 +184,32 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
   }
 
   // Delete existing questions and answers for this quiz
-  const { error: deleteAnswersError } = await supabaseAdmin
-    .from('question_answers')
-    .delete()
-    .in('question_id', quiz_questions.map((q: any) => q.id).filter(Boolean)); // Only delete existing ones
+  // First, get all existing question IDs for this quiz
+  const { data: existingQuestions, error: fetchError } = await supabaseAdmin
+    .from('quiz_questions')
+    .select('id')
+    .eq('quiz_id', id);
 
-  if (deleteAnswersError) {
-    console.error('Error deleting old answers:', deleteAnswersError);
-    return res.status(500).json({ message: 'Failed to update quiz (delete old answers)' });
+  if (fetchError) {
+    console.error('Error fetching existing questions:', fetchError);
+    return res.status(500).json({ message: 'Failed to update quiz (fetch existing questions)' });
   }
 
+  // Delete all existing answers for this quiz's questions
+  if (existingQuestions && existingQuestions.length > 0) {
+    const existingQuestionIds = existingQuestions.map(q => q.id);
+    const { error: deleteAnswersError } = await supabaseAdmin
+      .from('question_answers')
+      .delete()
+      .in('question_id', existingQuestionIds);
+
+    if (deleteAnswersError) {
+      console.error('Error deleting old answers:', deleteAnswersError);
+      return res.status(500).json({ message: 'Failed to update quiz (delete old answers)' });
+    }
+  }
+
+  // Delete all existing questions for this quiz
   const { error: deleteQuestionsError } = await supabaseAdmin
     .from('quiz_questions')
     .delete()
@@ -199,6 +223,8 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
   // Insert new/updated questions and answers
   if (quiz_questions && quiz_questions.length > 0) {
     for (const q of quiz_questions) {
+      console.log('Processing question:', q);
+      
       const { data: newQuestion, error: questionError } = await supabaseAdmin
         .from('quiz_questions')
         .insert([{
@@ -216,8 +242,12 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
         return res.status(500).json({ message: 'Failed to update quiz (insert new question)' });
       }
 
-      if (q.answers && q.answers.length > 0) {
-        const answersToInsert = q.answers.map((a: any) => ({
+      // Process answers - check for both 'answers' and 'question_answers' fields
+      const answersArray = q.question_answers || q.answers || [];
+      console.log('Processing answers for question:', newQuestion.id, answersArray);
+
+      if (answersArray && answersArray.length > 0) {
+        const answersToInsert = answersArray.map((a: any) => ({
           question_id: newQuestion.id,
           answer_letter: a.answer_letter,
           answer_text: a.answer_text,

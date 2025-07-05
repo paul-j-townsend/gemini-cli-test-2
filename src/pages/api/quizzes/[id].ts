@@ -25,7 +25,18 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
   const { data: quiz, error } = await supabaseAdmin
     .from('quizzes')
     .select(`
-      *,
+      id,
+      title,
+      description,
+      category,
+      time_limit_minutes,
+      pass_percentage,
+      total_questions,
+      is_active,
+      podcast_episode_id,
+      created_at,
+      updated_at,
+      created_by,
       quiz_questions (
         id,
         question_number,
@@ -54,21 +65,15 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
   // Transform the quiz data to match the expected format
   const transformedQuiz = {
     ...quiz,
-    questions: quiz.quiz_questions?.map((question: any) => ({
-      id: question.id,
-      question_text: question.question_text,
-      learning_outcome: question.explanation,
-      rationale: question.explanation,
+    questions: quiz.quiz_questions?.map(q => ({
+      id: q.id,
+      question_text: q.question_text,
+      learning_outcome: q.explanation,
+      rationale: q.explanation,
       category: quiz.category,
-      difficulty: quiz.difficulty,
-      points: question.points,
-      mcq_answers: question.question_answers?.map((answer: any) => ({
-        id: answer.id,
-        answer_text: answer.answer_text,
-        is_correct: answer.is_correct,
-        answer_letter: answer.answer_letter,
-      })).sort((a: any, b: any) => a.answer_letter.localeCompare(b.answer_letter))
-    })).sort((a: any, b: any) => (a.question_number || 0) - (b.question_number || 0))
+      points: q.points,
+      mcq_answers: q.question_answers?.sort((a, b) => a.answer_letter.localeCompare(b.answer_letter)) || []
+    })) || []
   };
 
   return res.status(200).json(transformedQuiz);
