@@ -42,7 +42,8 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
         question_number,
         question_text,
         explanation,
-        points,
+        rationale,
+        learning_outcome,
         question_answers (
           id,
           answer_letter,
@@ -68,10 +69,9 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
     questions: quiz.quiz_questions?.map(q => ({
       id: q.id,
       question_text: q.question_text,
-      learning_outcome: q.explanation,
-      rationale: q.explanation,
+      learning_outcome: q.learning_outcome || null,
+      rationale: q.rationale,
       category: quiz.category,
-      points: q.points,
       mcq_answers: q.question_answers?.sort((a, b) => a.answer_letter.localeCompare(b.answer_letter)) || []
     })) || []
   };

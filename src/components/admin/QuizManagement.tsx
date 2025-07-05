@@ -15,7 +15,8 @@ interface QuizQuestion {
   question_number: number;
   question_text: string;
   explanation?: string;
-  points?: number;
+  rationale?: string;
+  learning_outcome?: string;
   answers?: QuestionAnswer[];
 }
 
@@ -115,6 +116,8 @@ const QuizManagement = () => {
           question_number: q.question_number,
           question_text: q.question_text,
           explanation: q.explanation,
+          rationale: q.rationale,
+          learning_outcome: q.learning_outcome,
           points: q.points,
           question_answers: q.answers?.map(a => ({
             id: a.id,
@@ -437,6 +440,26 @@ const QuizForm: React.FC<QuizFormProps> = ({ quiz, onSave, onCancel }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter your question here..."
             />
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Learning Outcome</label>
+              <textarea
+                value={question.learning_outcome || ''}
+                onChange={(e) => handleQuestionChange(index, { ...question, learning_outcome: e.target.value })}
+                rows={3}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="What the student should learn from this question. This will be shown after the user answers."
+              />
+            </div>
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rationale (Explanation for correct answer)</label>
+              <textarea
+                value={question.rationale || ''}
+                onChange={(e) => handleQuestionChange(index, { ...question, rationale: e.target.value })}
+                rows={3}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Explain why the correct answer is correct. This will be shown after the user answers."
+              />
+            </div>
             <div className="mt-4">
               <h6 className="text-md font-medium text-gray-700 mb-2">Answers</h6>
               {question.answers?.map((answer, ansIndex) => (

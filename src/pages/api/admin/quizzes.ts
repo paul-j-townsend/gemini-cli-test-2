@@ -40,7 +40,8 @@ async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
         question_number,
         question_text,
         explanation,
-        points,
+        rationale,
+        learning_outcome,
         question_answers (
           id,
           answer_letter,
@@ -99,7 +100,8 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
           question_number: q.question_number,
           question_text: q.question_text,
           explanation: q.explanation,
-          points: q.points
+          rationale: q.rationale,
+          learning_outcome: q.learning_outcome
         }])
         .select()
         .single();
@@ -232,7 +234,8 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
           question_number: q.question_number,
           question_text: q.question_text,
           explanation: q.explanation,
-          points: q.points
+          rationale: q.rationale,
+          learning_outcome: q.learning_outcome
         }])
         .select()
         .single();

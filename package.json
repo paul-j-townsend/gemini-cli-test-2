@@ -14,6 +14,7 @@
     "@types/lodash.debounce": "^4.0.9",
     "@types/pg": "^8.15.4",
     "canvas": "^3.1.2",
+    "dotenv": "^17.0.1",
     "formidable": "^3.5.4",
     "lodash.debounce": "^4.0.8",
     "next": "^14",
