@@ -461,7 +461,29 @@ export default function PodcastManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <style jsx>{`
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: auto !important;
+          opacity: 1 !important;
+        }
+        
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: auto;
+          opacity: 1;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: auto;
+          opacity: 1;
+        }
+      `}</style>
+      <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Podcast Management</h2>
@@ -585,26 +607,8 @@ export default function PodcastManagement() {
 
             {/* Episode Organization */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="episode_number" className="block text-sm font-medium text-gray-700 mb-1">
-                  Episode Number
-                </label>
-                <input
-                  type="number"
-                  id="episode_number"
-                  min="1"
-                  value={formData.episode_number}
-                  onChange={(e) => setFormData({ ...formData, episode_number: e.target.value === '' ? 1 : parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                {!editingEpisode && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Next available: {getNextEpisodeNumber()}
-                  </p>
-                )}
-              </div>
 
-              <div>
+            <div>
                 <label htmlFor="season" className="block text-sm font-medium text-gray-700 mb-1">
                   Season
                 </label>
@@ -617,6 +621,20 @@ export default function PodcastManagement() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
+              <div>
+                <label htmlFor="episode_number" className="block text-sm font-medium text-gray-700 mb-1">
+                  Episode Number
+                </label>
+                <input
+                  type="number"
+                  id="episode_number"
+                  min="1"
+                  value={formData.episode_number}
+                  onChange={(e) => setFormData({ ...formData, episode_number: e.target.value === '' ? 1 : parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
 
               <div>
                 <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
@@ -1022,6 +1040,7 @@ export default function PodcastManagement() {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 } 

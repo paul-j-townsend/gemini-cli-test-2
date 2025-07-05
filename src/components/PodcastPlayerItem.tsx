@@ -78,6 +78,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   const [isFullVersion, setIsFullVersion] = useState(false);
   const [hasAccessedFull, setHasAccessedFull] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const currentAudioSrc = isFullVersion && podcast.fullAudioSrc ? podcast.fullAudioSrc : podcast.audioSrc;
@@ -87,23 +88,34 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
+    // Validate audio source
+    if (!currentAudioSrc || currentAudioSrc.trim() === '') {
+      console.error('Invalid audio source:', currentAudioSrc);
       setIsLoading(false);
+      setError('Invalid audio source');
+      return;
+    }
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration || 0);
+      setIsLoading(false);
+      setError(null);
     };
 
     const handleTimeUpdate = () => {
       if (!isScrubbing) {
-        setCurrentTime(audio.currentTime);
+        setCurrentTime(audio.currentTime || 0);
       }
     };
 
     const handleLoadStart = () => {
       setIsLoading(true);
+      setError(null);
     };
 
     const handleCanPlay = () => {
       setIsLoading(false);
+      setError(null);
     };
 
     const handleEnded = () => {
@@ -111,24 +123,64 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       setCurrentTime(0);
     };
 
+    const handleError = (event: Event) => {
+      console.error('Audio loading error for:', currentAudioSrc, event);
+      setIsLoading(false);
+      setIsPlaying(false);
+      setError('Failed to load audio');
+    };
+
+    const handleStalled = () => {
+      console.warn('Audio stalled for:', currentAudioSrc);
+      setIsLoading(false);
+      setError('Audio playback stalled');
+    };
+
+    const handleWaiting = () => {
+      setIsLoading(true);
+    };
+
+    const handleSuspend = () => {
+      setIsLoading(false);
+    };
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('stalled', handleStalled);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('suspend', handleSuspend);
 
     // Set initial volume and playback rate
     audio.volume = volume;
     audio.playbackRate = playbackRate;
 
+    // Add timeout to prevent indefinite loading
+    const loadTimeout = setTimeout(() => {
+      if (isLoading) {
+        console.warn('Audio load timeout for:', currentAudioSrc);
+        setIsLoading(false);
+        setIsPlaying(false);
+        setError('Audio loading timeout');
+      }
+    }, 5000); // 5 second timeout
+
     return () => {
+      clearTimeout(loadTimeout);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('stalled', handleStalled);
+      audio.removeEventListener('waiting', handleWaiting);
+      audio.removeEventListener('suspend', handleSuspend);
     };
-  }, [currentAudioSrc, isScrubbing, volume, playbackRate]);
+  }, [currentAudioSrc, isScrubbing, volume, playbackRate, isLoading]);
 
   // Update audio source when switching between preview and full version
   useEffect(() => {
@@ -152,17 +204,26 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     const audio = audioRef.current;
     if (!audio) return;
 
+    // Check for invalid audio source
+    if (!currentAudioSrc || currentAudioSrc.trim() === '') {
+      setError('No audio available');
+      return;
+    }
+
     try {
       if (isPlaying) {
         audio.pause();
         setIsPlaying(false);
       } else {
+        setError(null);
         await audio.play();
         setIsPlaying(true);
       }
     } catch (error) {
       console.error('Error playing audio:', error);
       setIsLoading(false);
+      setIsPlaying(false);
+      setError('Unable to play audio');
     }
   };
 
@@ -255,9 +316,12 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
 
   // Full version handler
   const handleListenToFull = () => {
-    if (podcast.fullAudioSrc) {
+    if (podcast.fullAudioSrc && podcast.fullAudioSrc.trim() !== '') {
+      setError(null);
       setIsFullVersion(true);
       setHasAccessedFull(true);
+    } else {
+      setError('Full version not available');
     }
   };
 
@@ -323,6 +387,18 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             </div>
           )}
         </div>
+        
+        {/* Error Message */}
+        {error && (
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600 flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {error}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Controls */}
@@ -332,7 +408,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handleSkipBack}
             className="audio-control w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading}
+            disabled={isLoading || !!error}
             aria-label="Skip back 15 seconds"
           >
             <SkipBackIcon />
@@ -341,7 +417,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handlePlayPause}
             className="audio-control w-12 h-12 flex items-center justify-center text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 rounded-xl shadow-soft hover:shadow-medium focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading}
+            disabled={isLoading || !!error}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isLoading ? (
@@ -356,7 +432,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handleSkipForward}
             className="audio-control w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading}
+            disabled={isLoading || !!error}
             aria-label="Skip forward 15 seconds"
           >
             <SkipForwardIcon />

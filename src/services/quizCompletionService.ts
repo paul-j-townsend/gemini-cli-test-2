@@ -6,13 +6,54 @@ class QuizCompletionService {
     {
       id: '1',
       userId: '1',
-      quizId: 'quiz-1',
+      quizId: 'fed2a63e-196d-43ff-9ebc-674db34e72a7',
       podcastId: 'podcast-1',
+      score: 100,
+      maxScore: 100,
+      percentage: 100,
+      timeSpent: 10*60, // 10 minutes
+      completedAt: '2025-07-05T10:30:00Z',
+      answers: [
+        { questionId: 'q1', selectedAnswers: ['option1'], isCorrect: true, points: 20 },
+        { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 20 },
+        { questionId: 'q3', selectedAnswers: ['option1'], isCorrect: true, points: 20 },
+        { questionId: 'q4', selectedAnswers: ['option3'], isCorrect: true, points: 20 },
+        { questionId: 'q5', selectedAnswers: ['option2'], isCorrect: true, points: 20 }
+      ],
+      passed: true,
+      attempts: 1
+    },
+    {
+      id: '2',
+      userId: '1',
+      quizId: 'fed2a63e-196d-43ff-9ebc-674db34e72a7',
+      podcastId: 'podcast-1',
+      score: 67,
+      maxScore: 100,
+      percentage: 67,
+      timeSpent: 12*60, // 12 minutes
+      completedAt: '2025-07-05T14:20:00Z',
+      answers: [
+        { questionId: 'q1', selectedAnswers: ['option2'], isCorrect: false, points: 0 },
+        { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 20 },
+        { questionId: 'q3', selectedAnswers: ['option1'], isCorrect: false, points: 0 },
+        { questionId: 'q4', selectedAnswers: ['option3'], isCorrect: true, points: 20 },
+        { questionId: 'q5', selectedAnswers: ['option2'], isCorrect: true, points: 20 },
+        { questionId: 'q6', selectedAnswers: ['option1'], isCorrect: true, points: 7 }
+      ],
+      passed: true,
+      attempts: 2
+    },
+    {
+      id: '3',
+      userId: '1',
+      quizId: 'quiz-1',
+      podcastId: 'podcast-2',
       score: 85,
       maxScore: 100,
       percentage: 85,
-      timeSpent: 240,
-      completedAt: '2024-01-15T10:30:00Z',
+      timeSpent: 4*60, // 4 minutes
+      completedAt: '2024-01-15T09:00:00Z',
       answers: [
         { questionId: 'q1', selectedAnswers: ['option1'], isCorrect: true, points: 20 },
         { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 25 },
@@ -22,56 +63,44 @@ class QuizCompletionService {
       ],
       passed: true,
       attempts: 1
-    },
-    {
-      id: '2',
-      userId: '2',
-      quizId: 'quiz-1',
-      podcastId: 'podcast-1',
-      score: 60,
-      maxScore: 100,
-      percentage: 60,
-      timeSpent: 180,
-      completedAt: '2024-01-14T14:20:00Z',
-      answers: [
-        { questionId: 'q1', selectedAnswers: ['option2'], isCorrect: false, points: 0 },
-        { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 25 },
-        { questionId: 'q3', selectedAnswers: ['option1'], isCorrect: false, points: 0 },
-        { questionId: 'q4', selectedAnswers: ['option3'], isCorrect: true, points: 20 },
-        { questionId: 'q5', selectedAnswers: ['option2'], isCorrect: true, points: 15 }
-      ],
-      passed: false,
-      attempts: 2
     }
   ];
 
   private userProgress: UserProgress[] = [
     {
       userId: '1',
-      totalQuizzesCompleted: 5,
-      totalQuizzesPassed: 4,
-      totalScore: 420,
-      totalMaxScore: 500,
+      totalQuizzesCompleted: 3,
+      totalQuizzesPassed: 3,
+      totalScore: 252,
+      totalMaxScore: 300,
       averageScore: 84,
-      totalTimeSpent: 1200,
-      completionRate: 80,
-      lastActivityAt: '2024-01-15T10:30:00Z',
-      streakDays: 7,
+      totalTimeSpent: 26*60, // 26 minutes
+      completionRate: 67,
+      lastActivityAt: '2025-07-05T14:20:00Z',
+      streakDays: 1,
       badges: [
         {
-          id: 'first-quiz',
-          name: 'First Quiz',
+          id: 'first-steps',
+          name: 'First Steps',
           description: 'Completed your first quiz',
           icon: '🎯',
-          earnedAt: '2024-01-10T09:00:00Z',
+          earnedAt: '2024-01-15T09:00:00Z',
           category: 'completion'
         },
         {
-          id: 'high-scorer',
-          name: 'High Scorer',
-          description: 'Scored 80% or higher on 5 quizzes',
+          id: 'perfectionist',
+          name: 'Perfectionist',
+          description: 'Scored 100% on a quiz',
+          icon: '💎',
+          earnedAt: '2025-07-05T10:30:00Z',
+          category: 'score'
+        },
+        {
+          id: 'high-achiever',
+          name: 'High Achiever',
+          description: 'Maintained 80%+ average score',
           icon: '🏆',
-          earnedAt: '2024-01-15T10:30:00Z',
+          earnedAt: '2025-07-05T14:20:00Z',
           category: 'score'
         }
       ]

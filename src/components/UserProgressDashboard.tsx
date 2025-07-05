@@ -2,18 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useAuth } from '../hooks/useAuth';
 import { calculateUserProgress, formatDuration, calculateUserLevel } from '../utils/progressUtils';
+import { quizService } from '../services/quizService';
 import type { ProgressSummary, Achievement } from '../utils/progressUtils';
 
 export const UserProgressDashboard: React.FC = () => {
   const { user } = useAuth();
   const { completions, userProgress, isLoading } = useQuizCompletion();
   const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
+  const [quizTitles, setQuizTitles] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (completions.length > 0) {
       const summary = calculateUserProgress(completions);
       setProgressSummary(summary);
     }
+  }, [completions]);
+
+  // Load quiz titles for all completions
+  useEffect(() => {
+    const loadQuizTitles = async () => {
+      if (completions.length > 0) {
+        const titles: Record<string, string> = {};
+        const uniqueQuizIds = [...new Set(completions.map(c => c.quizId))];
+        
+        await Promise.all(
+          uniqueQuizIds.map(async (quizId) => {
+            titles[quizId] = await quizService.getQuizTitle(quizId);
+          })
+        );
+        
+        setQuizTitles(titles);
+      }
+    };
+
+    loadQuizTitles();
   }, [completions]);
 
   if (isLoading) {
@@ -148,7 +170,9 @@ export const UserProgressDashboard: React.FC = () => {
                       )}
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-neutral-900">Quiz #{completion.quizId}</p>
+                      <p className="text-sm font-medium text-neutral-900">
+                        {quizTitles[completion.quizId] || `Quiz #${completion.quizId.slice(0, 8)}...`}
+                      </p>
                       <p className="text-xs text-neutral-500">
                         {formatDuration(completion.timeSpent)} • {new Date(completion.completedAt).toLocaleDateString()}
                       </p>

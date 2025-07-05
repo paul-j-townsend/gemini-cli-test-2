@@ -85,15 +85,28 @@ const PodcastPlayer = () => {
 
       if (error) throw error;
 
-      const formattedPodcasts: Podcast[] = (data || []).map((episode: any) => ({
-        id: episode.id,
-        title: episode.title || 'Untitled Episode',
-        description: episode.description || 'No description available',
-        audioSrc: episode.audio_url || '', // Preview version
-        fullAudioSrc: episode.full_audio_url || episode.audio_url || '', // Full version or fallback to preview
-        thumbnail: getThumbnailUrl(episode),
-        quizId: episode.quiz_id || undefined
-      }));
+      const formattedPodcasts: Podcast[] = (data || [])
+        .filter((episode: any) => {
+          // Filter out episodes with invalid or empty audio URLs
+          const hasValidAudio = episode.audio_url && episode.audio_url.trim() !== '';
+          const hasValidTitle = episode.title && episode.title.trim() !== '';
+          
+          if (!hasValidAudio || !hasValidTitle) {
+            console.warn('Skipping invalid episode:', episode);
+            return false;
+          }
+          
+          return true;
+        })
+        .map((episode: any) => ({
+          id: episode.id,
+          title: episode.title || 'Untitled Episode',
+          description: episode.description || 'No description available',
+          audioSrc: episode.audio_url || '', // Preview version
+          fullAudioSrc: episode.full_audio_url || episode.audio_url || '', // Full version or fallback to preview
+          thumbnail: getThumbnailUrl(episode),
+          quizId: episode.quiz_id || undefined
+        }));
 
       setPodcasts(formattedPodcasts);
     } catch (error) {
