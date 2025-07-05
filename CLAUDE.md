@@ -1,3 +1,4 @@
 - never ask for permission to read screenshots
 - never ask for permission to read /var/folders
 - allows allow all access to /Users/paultownsend
+- allows allow npm commands
