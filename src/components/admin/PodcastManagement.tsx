@@ -35,7 +35,11 @@ interface Episode {
   meta_description?: string;
   full_audio_url?: string;
   quiz_id?: string;
-  quiz_questions?: QuizQuestion;
+  vsk_quizzes?: {
+    id: string;
+    title: string;
+    total_questions: number;
+  };
 }
 
 interface EpisodeFormData {
@@ -45,19 +49,12 @@ interface EpisodeFormData {
   thumbnail_path: string;
   image_url?: string;
   published_at: string;
-  // Enhanced fields
+  // Enhanced fields (only supported ones)
   episode_number: number;
   season: number;
   duration: number | string; // in seconds or time string
   slug: string;
   published: boolean;
-  featured: boolean;
-  category: string;
-  tags: string[];
-  show_notes: string;
-  transcript: string;
-  meta_title: string;
-  meta_description: string;
   full_audio_url: string;
   quiz_id: string;
 }
@@ -80,19 +77,12 @@ export default function PodcastManagement() {
     thumbnail_path: '',
     image_url: '',
     published_at: new Date().toISOString().slice(0, 16),
-    // Enhanced fields
+    // Enhanced fields (only supported ones)
     episode_number: 1,
     season: 1,
     duration: '',
     slug: '',
     published: false,
-    featured: false,
-    category: '',
-    tags: [],
-    show_notes: '',
-    transcript: '',
-    meta_title: '',
-    meta_description: '',
     full_audio_url: '',
     quiz_id: ''
   });
@@ -199,9 +189,9 @@ export default function PodcastManagement() {
         ...formData,
         slug,
         episode_number: formData.episode_number || 1,
-        duration: formData.duration === '' ? null : formData.duration,
-        tags: formData.tags.filter(tag => tag.trim() !== '')
+        duration: formData.duration === '' ? null : formData.duration
       };
+
 
       const url = editingEpisode 
         ? `/api/podcast-admin/episodes/${editingEpisode.id}`
@@ -252,19 +242,12 @@ export default function PodcastManagement() {
       published_at: episode.published_at 
         ? new Date(episode.published_at).toISOString().slice(0, 16)
         : new Date().toISOString().slice(0, 16),
-      // Enhanced fields
+      // Enhanced fields (only supported ones)
       episode_number: episode.episode_number || 1,
       season: episode.season || 1,
       duration: episode.duration || '',
       slug: episode.slug || '',
       published: episode.published || false,
-      featured: episode.featured || false,
-      category: episode.category || '',
-      tags: episode.tags || [],
-      show_notes: episode.show_notes || '',
-      transcript: episode.transcript || '',
-      meta_title: episode.meta_title || '',
-      meta_description: episode.meta_description || '',
       full_audio_url: episode.full_audio_url || '',
       quiz_id: episode.quiz_id || ''
     });
@@ -277,6 +260,8 @@ export default function PodcastManagement() {
       return;
     }
 
+    console.log('Deleting episode with ID:', id);
+
     try {
       const response = await fetch(`/api/podcast-admin/episodes/${id}`, {
         method: 'DELETE',
@@ -286,6 +271,7 @@ export default function PodcastManagement() {
         throw new Error('Failed to delete episode');
       }
 
+      setError('✅ Episode deleted successfully!');
       await fetchEpisodes();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete episode');
@@ -302,19 +288,12 @@ export default function PodcastManagement() {
       thumbnail_path: '',
       image_url: '',
       published_at: new Date().toISOString().slice(0, 16),
-      // Enhanced fields
+      // Enhanced fields (only supported ones)
       episode_number: 1,
       season: 1,
       duration: '',
       slug: '',
       published: false,
-      featured: false,
-      category: '',
-      tags: [],
-      show_notes: '',
-      transcript: '',
-      meta_title: '',
-      meta_description: '',
       full_audio_url: '',
       quiz_id: ''
     });
@@ -331,19 +310,12 @@ export default function PodcastManagement() {
       thumbnail_path: '',
       image_url: '',
       published_at: new Date().toISOString().slice(0, 16),
-      // Enhanced fields
+      // Enhanced fields (only supported ones)
       episode_number: nextEpisodeNumber,
       season: 1,
       duration: '',
       slug: '',
       published: false,
-      featured: false,
-      category: '',
-      tags: [],
-      show_notes: '',
-      transcript: '',
-      meta_title: '',
-      meta_description: '',
       full_audio_url: '',
       quiz_id: ''
     });
@@ -685,92 +657,26 @@ export default function PodcastManagement() {
                 />
                 Published
               </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.featured}
-                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="mr-2 rounded"
-                />
-                Featured
-              </label>
             </div>
 
-            {/* Category, Tags, and Quiz */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="e.g., Education, Interview, News"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="quiz_id" className="block text-sm font-medium text-gray-700 mb-1">
-                  Associated Quiz
-                </label>
-                <select
-                  id="quiz_id"
-                  value={formData.quiz_id}
-                  onChange={(e) => setFormData({ ...formData, quiz_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">No Quiz</option>
-                  {quizzes.map((quiz) => (
-                    <option key={quiz.id} value={quiz.id}>
-                      {quiz.question_number ? `Q${quiz.question_number}: ` : ''}{quiz.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
-                  Tags (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  id="tags"
-                  value={formData.tags.join(', ')}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
-                  })}
-                  placeholder="e.g., veterinary, surgery, tips"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                {formData.tags.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {formData.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
-                      >
-                        {tag}
-                        <button
-                          type="button"
-                          className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              tags: formData.tags.filter((_, i) => i !== index),
-                            })
-                          }
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+            {/* Quiz Selection */}
+            <div>
+              <label htmlFor="quiz_id" className="block text-sm font-medium text-gray-700 mb-1">
+                Associated Quiz
+              </label>
+              <select
+                id="quiz_id"
+                value={formData.quiz_id}
+                onChange={(e) => setFormData({ ...formData, quiz_id: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="">No Quiz</option>
+                {quizzes.map((quiz) => (
+                  <option key={quiz.id} value={quiz.id}>
+                    {quiz.question_number ? `Q${quiz.question_number}: ` : ''}{quiz.title}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -816,53 +722,6 @@ export default function PodcastManagement() {
               />
             </div>
 
-            {/* Show Notes */}
-            <div>
-              <label htmlFor="show_notes" className="block text-sm font-medium text-gray-700 mb-1">
-                Show Notes
-              </label>
-              <textarea
-                id="show_notes"
-                rows={6}
-                value={formData.show_notes}
-                onChange={(e) => setFormData({ ...formData, show_notes: e.target.value })}
-                placeholder="Detailed episode content, links, and notes..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* SEO Metadata */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 mb-1">
-                  SEO Title
-                </label>
-                <input
-                  type="text"
-                  id="meta_title"
-                  value={formData.meta_title}
-                  onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
-                  placeholder="Custom title for search engines"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="meta_description" className="block text-sm font-medium text-gray-700 mb-1">
-                  SEO Description
-                </label>
-                <textarea
-                  id="meta_description"
-                  rows={3}
-                  value={formData.meta_description}
-                  onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
-                  placeholder="Brief description for search engines (160 chars max)"
-                  maxLength={160}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">{formData.meta_description.length}/160 characters</p>
-              </div>
-            </div>
 
             <div>
               <label htmlFor="published_at" className="block text-sm font-medium text-gray-700 mb-1">
@@ -942,18 +801,28 @@ export default function PodcastManagement() {
                   {episodes.map((episode) => (
                     <tr key={episode.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="w-12 h-12">
+                        <div className="w-12 h-12 relative">
                           {episode.thumbnail_path ? (
-                            <Image
-                              src={(episode.image_url ?? getThumbnailUrl(episode.thumbnail_path)) || ''}
-                              alt={episode.title}
-                              width={48}
-                              height={48}
-                              className="rounded-lg object-cover"
-                              onError={(e: any) => {
-                                e.target.src = 'https://placehold.co/64';
-                              }}
-                            />
+                            <>
+                              <Image
+                                src={(episode.image_url ?? getThumbnailUrl(episode.thumbnail_path)) || ''}
+                                alt={episode.title}
+                                width={48}
+                                height={48}
+                                className="rounded-lg object-cover"
+                                onError={(e: any) => {
+                                  // Hide the broken image and show fallback
+                                  e.target.style.display = 'none';
+                                  const fallback = e.target.parentElement.querySelector('.fallback-image');
+                                  if (fallback) {
+                                    fallback.style.display = 'flex';
+                                  }
+                                }}
+                              />
+                              <div className="fallback-image w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center absolute inset-0" style={{display: 'none'}}>
+                                <span className="text-gray-400 text-xs">No Image</span>
+                              </div>
+                            </>
                           ) : (
                             <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                               <span className="text-gray-400 text-xs">No Image</span>
@@ -989,9 +858,9 @@ export default function PodcastManagement() {
                         {episode.duration ? formatDuration(episode.duration) : 'Unknown'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {episode.quiz_questions ? (
+                        {episode.vsk_quizzes ? (
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                            Q{episode.quiz_questions.question_number}: {episode.quiz_questions.title}
+                            {episode.vsk_quizzes.title}
                           </span>
                         ) : (
                           <span className="text-gray-400">No Quiz</span>

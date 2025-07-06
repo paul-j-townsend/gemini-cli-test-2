@@ -24,7 +24,7 @@ async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
       .from('vsk_podcast_episodes')
       .select(`
         *,
-        quizzes (
+        vsk_quizzes (
           id,
           title,
           total_questions
@@ -46,10 +46,26 @@ async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
         return res.status(500).json({ message: 'Failed to fetch episodes' });
       }
 
-      return res.status(200).json({ episodes: episodesWithoutQuiz || [] });
+      // Map database fields to frontend-expected fields for fallback too
+      const mappedFallbackEpisodes = episodesWithoutQuiz?.map(episode => ({
+        ...episode,
+        audio_url: episode.audio_src,
+        full_audio_url: episode.full_audio_src,
+        published: episode.is_published
+      })) || [];
+
+      return res.status(200).json({ episodes: mappedFallbackEpisodes });
     }
 
-    return res.status(200).json({ episodes: episodes || [] });
+    // Map database fields to frontend-expected fields
+    const mappedEpisodes = episodes?.map(episode => ({
+      ...episode,
+      audio_url: episode.audio_src,
+      full_audio_url: episode.full_audio_src,
+      published: episode.is_published
+    })) || [];
+
+    return res.status(200).json({ episodes: mappedEpisodes });
   } catch (err) {
     console.error('Unexpected error fetching episodes:', err);
     return res.status(500).json({ message: 'Failed to fetch episodes' });
@@ -57,64 +73,88 @@ async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
-  const { 
-    title, 
-    description, 
-    audio_url, 
-    thumbnail_path, 
-    published_at,
-    episode_number,
-    season,
-    duration,
-    slug,
-    published,
-    featured,
-    category,
-    tags,
-    show_notes,
-    transcript,
-    meta_title,
-    meta_description,
-    full_audio_url,
-    quiz_id
-  } = req.body;
+  try {
+    const { 
+      title, 
+      description, 
+      audio_url, 
+      thumbnail_path, 
+      published_at,
+      episode_number,
+      season,
+      duration,
+      slug,
+      published,
+      featured,
+      category,
+      tags,
+      show_notes,
+      transcript,
+      meta_title,
+      meta_description,
+      full_audio_url,
+      image_url,
+      quiz_id
+    } = req.body;
 
-  if (!title) {
-    return res.status(400).json({ message: 'Title is required' });
+    if (!title) {
+      return res.status(400).json({ message: 'Title is required' });
+    }
+
+    // Validate quiz_id exists if provided
+    let validQuizId = null;
+    if (quiz_id && quiz_id.trim() !== '') {
+      const { data: quizExists } = await supabaseAdmin
+        .from('vsk_quizzes')
+        .select('id')
+        .eq('id', quiz_id)
+        .single();
+      
+      if (quizExists) {
+        validQuizId = quiz_id;
+      } else {
+        console.log(`Quiz ID ${quiz_id} not found, setting to null`);
+      }
+    }
+
+    // Only insert columns that exist in the database
+    const insertData: any = {
+      title,
+      description,
+      audio_src: audio_url, // Map to correct column name
+      full_audio_src: full_audio_url, // Map to correct column name
+      image_url: image_url || thumbnail_path, // Map to correct column name
+      thumbnail_path,
+      published_at,
+      episode_number,
+      season,
+      duration,
+      slug,
+      quiz_id: validQuizId,
+      is_published: published || false // Map to correct column name
+    };
+
+    const { data: episode, error } = await supabaseAdmin
+      .from('vsk_podcast_episodes')
+      .insert([insertData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating episode:', error);
+      return res.status(500).json({ 
+        message: 'Failed to create episode',
+        error: error.message,
+        details: error.details
+      });
+    }
+
+    return res.status(201).json({ episode });
+  } catch (err) {
+    console.error('Unexpected error in createEpisode:', err);
+    return res.status(500).json({ 
+      message: 'Internal server error',
+      error: err instanceof Error ? err.message : 'Unknown error'
+    });
   }
-
-  const { data: episode, error } = await supabaseAdmin
-    .from('vsk_podcast_episodes')
-    .insert([
-      {
-        title,
-        description,
-        audio_url,
-        thumbnail_path,
-        published_at,
-        episode_number,
-        season,
-        duration,
-        slug,
-        published,
-        featured,
-        category,
-        tags,
-        show_notes,
-        transcript,
-        meta_title,
-        meta_description,
-        full_audio_url,
-        quiz_id: quiz_id || null
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error creating episode:', error);
-    return res.status(500).json({ message: 'Failed to create episode' });
-  }
-
-  return res.status(201).json({ episode });
 } 
