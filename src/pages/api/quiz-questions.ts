@@ -21,14 +21,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function getQuestions(req: NextApiRequest, res: NextApiResponse) {
   const { quiz_id } = req.query;
 
-  let query = supabaseAdmin.from('quiz_questions').select(`
+  let query = supabaseAdmin.from('vsk_quiz_questions').select(`
     id,
     quiz_id,
     question_number,
     question_text,
     explanation,
     points,
-    question_answers (
+    vsk_question_answers (
       id,
       answer_letter,
       answer_text,
@@ -59,7 +59,7 @@ async function createQuestion(req: NextApiRequest, res: NextApiResponse) {
 
   // Get the next question number
   const { data: existingQuestions, error: countError } = await supabaseAdmin
-    .from('quiz_questions')
+    .from('vsk_quiz_questions')
     .select('question_number')
     .eq('quiz_id', quiz_id)
     .order('question_number', { ascending: false })
@@ -76,7 +76,7 @@ async function createQuestion(req: NextApiRequest, res: NextApiResponse) {
 
   // 1. Create the question
   const { data: question, error: questionError } = await supabaseAdmin
-    .from('quiz_questions')
+    .from('vsk_quiz_questions')
     .insert([{
       quiz_id,
       question_number: nextQuestionNumber,
@@ -101,19 +101,19 @@ async function createQuestion(req: NextApiRequest, res: NextApiResponse) {
   }));
 
   const { error: answersError } = await supabaseAdmin
-    .from('question_answers')
+    .from('vsk_question_answers')
     .insert(answersToInsert);
 
   if (answersError) {
     console.error('Error creating answers:', answersError);
     // Simple cleanup: delete the question if answers fail
-    await supabaseAdmin.from('quiz_questions').delete().eq('id', question.id);
+    await supabaseAdmin.from('vsk_quiz_questions').delete().eq('id', question.id);
     return res.status(500).json({ message: 'Failed to create answers' });
   }
 
   // Refetch the question with its answers
   const { data: finalQuestion, error: finalQuestionError } = await supabaseAdmin
-    .from('quiz_questions')
+    .from('vsk_quiz_questions')
     .select(`
       id,
       quiz_id,
@@ -121,7 +121,7 @@ async function createQuestion(req: NextApiRequest, res: NextApiResponse) {
       question_text,
       explanation,
       points,
-      question_answers (
+      vsk_question_answers (
         id,
         answer_letter,
         answer_text,

@@ -1,278 +1,302 @@
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { QuizCompletion, QuizAnswer, UserProgress, Badge } from '../types/database';
 
-// Mock database for quiz completions
 class QuizCompletionService {
-  private completions: QuizCompletion[] = [
-    {
-      id: '1',
-      userId: '1',
-      quizId: 'fed2a63e-196d-43ff-9ebc-674db34e72a7',
-      podcastId: 'podcast-1',
-      score: 100,
-      maxScore: 100,
-      percentage: 100,
-      timeSpent: 10*60, // 10 minutes
-      completedAt: '2025-07-05T10:30:00Z',
-      answers: [
-        { questionId: 'q1', selectedAnswers: ['option1'], isCorrect: true, points: 20 },
-        { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 20 },
-        { questionId: 'q3', selectedAnswers: ['option1'], isCorrect: true, points: 20 },
-        { questionId: 'q4', selectedAnswers: ['option3'], isCorrect: true, points: 20 },
-        { questionId: 'q5', selectedAnswers: ['option2'], isCorrect: true, points: 20 }
-      ],
-      passed: true,
-      attempts: 1
-    },
-    {
-      id: '2',
-      userId: '1',
-      quizId: 'fed2a63e-196d-43ff-9ebc-674db34e72a7',
-      podcastId: 'podcast-1',
-      score: 67,
-      maxScore: 100,
-      percentage: 67,
-      timeSpent: 12*60, // 12 minutes
-      completedAt: '2025-07-05T14:20:00Z',
-      answers: [
-        { questionId: 'q1', selectedAnswers: ['option2'], isCorrect: false, points: 0 },
-        { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 20 },
-        { questionId: 'q3', selectedAnswers: ['option1'], isCorrect: false, points: 0 },
-        { questionId: 'q4', selectedAnswers: ['option3'], isCorrect: true, points: 20 },
-        { questionId: 'q5', selectedAnswers: ['option2'], isCorrect: true, points: 20 },
-        { questionId: 'q6', selectedAnswers: ['option1'], isCorrect: true, points: 7 }
-      ],
-      passed: true,
-      attempts: 2
-    },
-    {
-      id: '3',
-      userId: '1',
-      quizId: 'quiz-1',
-      podcastId: 'podcast-2',
-      score: 85,
-      maxScore: 100,
-      percentage: 85,
-      timeSpent: 4*60, // 4 minutes
-      completedAt: '2024-01-15T09:00:00Z',
-      answers: [
-        { questionId: 'q1', selectedAnswers: ['option1'], isCorrect: true, points: 20 },
-        { questionId: 'q2', selectedAnswers: ['option2'], isCorrect: true, points: 25 },
-        { questionId: 'q3', selectedAnswers: ['option1'], isCorrect: false, points: 0 },
-        { questionId: 'q4', selectedAnswers: ['option3'], isCorrect: true, points: 20 },
-        { questionId: 'q5', selectedAnswers: ['option2'], isCorrect: true, points: 20 }
-      ],
-      passed: true,
-      attempts: 1
-    }
-  ];
-
-  private userProgress: UserProgress[] = [
-    {
-      userId: '1',
-      totalQuizzesCompleted: 3,
-      totalQuizzesPassed: 3,
-      totalScore: 252,
-      totalMaxScore: 300,
-      averageScore: 84,
-      totalTimeSpent: 26*60, // 26 minutes
-      completionRate: 67,
-      lastActivityAt: '2025-07-05T14:20:00Z',
-      streakDays: 1,
-      badges: [
-        {
-          id: 'first-steps',
-          name: 'First Steps',
-          description: 'Completed your first quiz',
-          icon: '🎯',
-          earnedAt: '2024-01-15T09:00:00Z',
-          category: 'completion'
-        },
-        {
-          id: 'perfectionist',
-          name: 'Perfectionist',
-          description: 'Scored 100% on a quiz',
-          icon: '💎',
-          earnedAt: '2025-07-05T10:30:00Z',
-          category: 'score'
-        },
-        {
-          id: 'high-achiever',
-          name: 'High Achiever',
-          description: 'Maintained 80%+ average score',
-          icon: '🏆',
-          earnedAt: '2025-07-05T14:20:00Z',
-          category: 'score'
-        }
-      ]
-    },
-    {
-      userId: '2',
-      totalQuizzesCompleted: 3,
-      totalQuizzesPassed: 1,
-      totalScore: 180,
-      totalMaxScore: 300,
-      averageScore: 60,
-      totalTimeSpent: 540,
-      completionRate: 33,
-      lastActivityAt: '2024-01-14T14:20:00Z',
-      streakDays: 2,
-      badges: [
-        {
-          id: 'first-quiz',
-          name: 'First Quiz',
-          description: 'Completed your first quiz',
-          icon: '🎯',
-          earnedAt: '2024-01-12T11:00:00Z',
-          category: 'completion'
-        }
-      ]
-    }
-  ];
-
-  // Quiz completion operations
   async createCompletion(completion: Omit<QuizCompletion, 'id'>): Promise<QuizCompletion> {
-    await this.simulateDelay();
-    const newCompletion: QuizCompletion = {
-      ...completion,
-      id: (this.completions.length + 1).toString()
-    };
-    this.completions.push(newCompletion);
-    
-    // Update user progress
-    await this.updateUserProgress(completion.userId, newCompletion);
-    
-    return newCompletion;
-  }
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .insert({
+        user_id: completion.user_id,
+        quiz_id: completion.quiz_id,
+        podcast_id: completion.podcast_id,
+        score: completion.score,
+        max_score: completion.max_score,
+        percentage: completion.percentage,
+        time_spent: completion.time_spent,
+        completed_at: completion.completed_at,
+        answers: completion.answers,
+        passed: completion.passed,
+        attempts: completion.attempts,
+      })
+      .select()
+      .single();
 
-  async findCompletionById(id: string): Promise<QuizCompletion | null> {
-    await this.simulateDelay();
-    return this.completions.find(c => c.id === id) || null;
+    if (error) {
+      console.error('Error creating completion:', error);
+      throw new Error('Failed to create quiz completion');
+    }
+
+    await this.updateUserProgress(completion.user_id, data as QuizCompletion);
+    return data as QuizCompletion;
   }
 
   async findCompletionsByUserId(userId: string): Promise<QuizCompletion[]> {
-    await this.simulateDelay();
-    return this.completions.filter(c => c.userId === userId);
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error fetching completions by user ID:', error);
+      throw new Error('Failed to fetch quiz completions');
+    }
+    return data as QuizCompletion[];
   }
 
-  async findCompletionsByQuizId(quizId: string): Promise<QuizCompletion[]> {
-    await this.simulateDelay();
-    return this.completions.filter(c => c.quizId === quizId);
+  async findCompletionById(id: string): Promise<QuizCompletion | null> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+      console.error('Error fetching completion by ID:', error);
+      throw new Error('Failed to fetch quiz completion');
+    }
+    return data as QuizCompletion | null;
   }
 
-  async findCompletionsByPodcastId(podcastId: string): Promise<QuizCompletion[]> {
-    await this.simulateDelay();
-    return this.completions.filter(c => c.podcastId === podcastId);
+  async findCompletionsByQuizId(quiz_id: string): Promise<QuizCompletion[]> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('quiz_id', quiz_id);
+
+    if (error) {
+      console.error('Error fetching completions by quiz ID:', error);
+      throw new Error('Failed to fetch quiz completions');
+    }
+    return data as QuizCompletion[];
   }
 
-  async hasUserCompletedQuiz(userId: string, quizId: string): Promise<boolean> {
-    await this.simulateDelay();
-    return this.completions.some(c => c.userId === userId && c.quizId === quizId);
+  async findCompletionsByPodcastId(podcast_id: string): Promise<QuizCompletion[]> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('podcast_id', podcast_id);
+
+    if (error) {
+      console.error('Error fetching completions by podcast ID:', error);
+      throw new Error('Failed to fetch quiz completions');
+    }
+    return data as QuizCompletion[];
   }
 
-  async hasUserPassedQuiz(userId: string, quizId: string): Promise<boolean> {
-    await this.simulateDelay();
-    return this.completions.some(c => c.userId === userId && c.quizId === quizId && c.passed);
+  async hasUserCompletedQuiz(user_id: string, quiz_id: string): Promise<boolean> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('quiz_id', quiz_id)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking quiz completion:', error);
+      throw new Error('Failed to check quiz completion');
+    }
+    return data.length > 0;
   }
 
-  async getUserQuizAttempts(userId: string, quizId: string): Promise<number> {
-    await this.simulateDelay();
-    const userCompletions = this.completions.filter(c => c.userId === userId && c.quizId === quizId);
-    return Math.max(...userCompletions.map(c => c.attempts), 0);
+  async hasUserPassedQuiz(user_id: string, quiz_id: string): Promise<boolean> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('quiz_id', quiz_id)
+      .eq('passed', true)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking quiz pass:', error);
+      throw new Error('Failed to check quiz pass');
+    }
+    return data.length > 0;
   }
 
-  async getUserBestScore(userId: string, quizId: string): Promise<QuizCompletion | null> {
-    await this.simulateDelay();
-    const userCompletions = this.completions.filter(c => c.userId === userId && c.quizId === quizId);
-    if (userCompletions.length === 0) return null;
-    
-    return userCompletions.reduce((best, current) => 
-      current.score > best.score ? current : best
-    );
+  async getUserQuizAttempts(user_id: string, quiz_id: string): Promise<number> {
+    const { count, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('id', { count: 'exact' })
+      .eq('user_id', user_id)
+      .eq('quiz_id', quiz_id);
+
+    if (error) {
+      console.error('Error getting quiz attempts:', error);
+      throw new Error('Failed to get quiz attempts');
+    }
+    return count || 0;
+  }
+
+  async getUserBestScore(user_id: string, quiz_id: string): Promise<QuizCompletion | null> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('quiz_id', quiz_id)
+      .order('percentage', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error getting best score:', error);
+      throw new Error('Failed to get best score');
+    }
+    return data as QuizCompletion | null;
   }
 
   async getRecentCompletions(limit: number = 10): Promise<QuizCompletion[]> {
-    await this.simulateDelay();
-    return this.completions
-      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
-      .slice(0, limit);
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .order('completed_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error getting recent completions:', error);
+      throw new Error('Failed to get recent completions');
+    }
+    return data as QuizCompletion[];
   }
 
-  async getUserRecentCompletions(userId: string, limit: number = 10): Promise<QuizCompletion[]> {
-    await this.simulateDelay();
-    return this.completions
-      .filter(c => c.userId === userId)
-      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
-      .slice(0, limit);
+  async getUserRecentCompletions(user_id: string, limit: number = 10): Promise<QuizCompletion[]> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('completed_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error getting user recent completions:', error);
+      throw new Error('Failed to get user recent completions');
+    }
+    return data as QuizCompletion[];
   }
 
-  // User progress operations
-  async getUserProgress(userId: string): Promise<UserProgress | null> {
-    await this.simulateDelay();
-    return this.userProgress.find(p => p.userId === userId) || null;
+  async deleteCompletion(id: string): Promise<boolean> {
+    const { error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting completion:', error);
+      return false;
+    }
+
+    return true;
   }
 
-  async updateUserProgress(userId: string, completion: QuizCompletion): Promise<UserProgress> {
-    await this.simulateDelay();
-    
-    let progress = this.userProgress.find(p => p.userId === userId);
+  
+
+  async getUserProgress(user_id: string): Promise<UserProgress | null> {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_user_progress')
+      .select('*')
+      .eq('user_id', user_id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+      console.error('Error fetching user progress:', error);
+      throw new Error('Failed to fetch user progress');
+    }
+    return data as UserProgress | null;
+  }
+
+  async updateUserProgress(user_id: string, completion: QuizCompletion): Promise<UserProgress> {
+    let { data: progress, error: fetchError } = await supabaseAdmin
+      .from('vsk_user_progress')
+      .select('*')
+      .eq('user_id', user_id)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error fetching user progress for update:', fetchError);
+      throw new Error('Failed to fetch user progress for update');
+    }
+
     if (!progress) {
-      progress = {
-        userId,
-        totalQuizzesCompleted: 0,
-        totalQuizzesPassed: 0,
-        totalScore: 0,
-        totalMaxScore: 0,
-        averageScore: 0,
-        totalTimeSpent: 0,
-        completionRate: 0,
-        lastActivityAt: completion.completedAt,
-        streakDays: 0,
+      // If no progress exists, create a new entry
+      const newProgress = {
+        user_id: user_id,
+        total_quizzes_completed: 0,
+        total_quizzes_passed: 0,
+        total_score: 0,
+        total_max_score: 0,
+        average_score: 0,
+        total_time_spent: 0,
+        completion_rate: 0,
+        last_activity_at: completion.completed_at,
+        streak_days: 0,
         badges: []
       };
-      this.userProgress.push(progress);
+      const { data: insertedProgress, error: insertError } = await supabaseAdmin
+        .from('vsk_user_progress')
+        .insert(newProgress)
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error inserting new user progress:', insertError);
+        throw new Error('Failed to insert new user progress');
+      }
+      progress = insertedProgress as UserProgress;
     }
 
     // Update progress stats
-    progress.totalQuizzesCompleted += 1;
+    progress.total_quizzes_completed += 1;
     if (completion.passed) {
-      progress.totalQuizzesPassed += 1;
+      progress.total_quizzes_passed += 1;
     }
-    progress.totalScore += completion.score;
-    progress.totalMaxScore += completion.maxScore;
-    progress.averageScore = Math.round((progress.totalScore / progress.totalMaxScore) * 100);
-    progress.totalTimeSpent += completion.timeSpent;
-    progress.completionRate = Math.round((progress.totalQuizzesPassed / progress.totalQuizzesCompleted) * 100);
-    progress.lastActivityAt = completion.completedAt;
+    progress.total_score += completion.score;
+    progress.total_max_score += completion.max_score;
+    progress.average_score = Math.round((progress.total_score / progress.total_max_score) * 100);
+    progress.total_time_spent += completion.time_spent;
+    progress.completion_rate = Math.round((progress.total_quizzes_passed / progress.total_quizzes_completed) * 100);
+    progress.last_activity_at = completion.completed_at;
 
     // Award badges
-    await this.checkAndAwardBadges(userId, progress, completion);
+    await this.checkAndAwardBadges(user_id, progress, completion);
 
-    return progress;
+    // Save updated progress to DB
+    const { data: updatedProgress, error: updateError } = await supabaseAdmin
+      .from('vsk_user_progress')
+      .update(progress)
+      .eq('user_id', user_id)
+      .single();
+
+    if (updateError) {
+      console.error('Error updating user progress:', updateError);
+      throw new Error('Failed to update user progress');
+    }
+
+    return updatedProgress as UserProgress;
   }
 
-  private async checkAndAwardBadges(userId: string, progress: UserProgress, completion: QuizCompletion): Promise<void> {
+  private async checkAndAwardBadges(user_id: string, progress: UserProgress, completion: QuizCompletion): Promise<void> {
     const newBadges: Badge[] = [];
 
     // First quiz badge
-    if (progress.totalQuizzesCompleted === 1 && !progress.badges.some(b => b.id === 'first-quiz')) {
+    if (progress.total_quizzes_completed === 1 && !progress.badges.some(b => b.id === 'first-quiz')) {
       newBadges.push({
         id: 'first-quiz',
         name: 'First Quiz',
         description: 'Completed your first quiz',
         icon: '🎯',
-        earnedAt: completion.completedAt,
+        earned_at: completion.completed_at,
         category: 'completion'
       });
     }
 
     // High scorer badge
-    if (progress.averageScore >= 80 && progress.totalQuizzesCompleted >= 5 && !progress.badges.some(b => b.id === 'high-scorer')) {
+    if (progress.average_score >= 80 && progress.total_quizzes_completed >= 5 && !progress.badges.some(b => b.id === 'high-scorer')) {
       newBadges.push({
         id: 'high-scorer',
         name: 'High Scorer',
         description: 'Scored 80% or higher on 5 quizzes',
         icon: '🏆',
-        earnedAt: completion.completedAt,
+        earned_at: completion.completed_at,
         category: 'score'
       });
     }
@@ -284,19 +308,19 @@ class QuizCompletionService {
         name: 'Perfect Score',
         description: 'Scored 100% on a quiz',
         icon: '⭐',
-        earnedAt: completion.completedAt,
+        earned_at: completion.completed_at,
         category: 'score'
       });
     }
 
     // Quiz master badge
-    if (progress.totalQuizzesCompleted >= 10 && !progress.badges.some(b => b.id === 'quiz-master')) {
+    if (progress.total_quizzes_completed >= 10 && !progress.badges.some(b => b.id === 'quiz-master')) {
       newBadges.push({
         id: 'quiz-master',
         name: 'Quiz Master',
         description: 'Completed 10 quizzes',
         icon: '🎓',
-        earnedAt: completion.completedAt,
+        earned_at: completion.completed_at,
         category: 'completion'
       });
     }
@@ -305,23 +329,37 @@ class QuizCompletionService {
   }
 
   async getLeaderboard(limit: number = 10): Promise<UserProgress[]> {
-    await this.simulateDelay();
-    return this.userProgress
-      .sort((a, b) => b.averageScore - a.averageScore)
-      .slice(0, limit);
+    const { data, error } = await supabaseAdmin
+      .from('vsk_user_progress')
+      .select('*')
+      .order('average_score', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error getting leaderboard:', error);
+      throw new Error('Failed to get leaderboard');
+    }
+    return data as UserProgress[];
   }
 
-  async getQuizStats(quizId: string): Promise<{
+  async getQuizStats(quiz_id: string): Promise<{
     totalAttempts: number;
     totalPassed: number;
     averageScore: number;
     passRate: number;
     averageTimeSpent: number;
   }> {
-    await this.simulateDelay();
-    const quizCompletions = this.completions.filter(c => c.quizId === quizId);
-    
-    if (quizCompletions.length === 0) {
+    const { data, error } = await supabaseAdmin
+      .from('vsk_quiz_completions')
+      .select('*')
+      .eq('quiz_id', quiz_id);
+
+    if (error) {
+      console.error('Error getting quiz stats:', error);
+      throw new Error('Failed to get quiz stats');
+    }
+
+    if (data.length === 0) {
       return {
         totalAttempts: 0,
         totalPassed: 0,
@@ -331,29 +369,21 @@ class QuizCompletionService {
       };
     }
 
-    const totalPassed = quizCompletions.filter(c => c.passed).length;
-    const totalScore = quizCompletions.reduce((sum, c) => sum + c.score, 0);
-    const totalMaxScore = quizCompletions.reduce((sum, c) => sum + c.maxScore, 0);
-    const totalTimeSpent = quizCompletions.reduce((sum, c) => sum + c.timeSpent, 0);
+    const totalPassed = data.filter(c => c.passed).length;
+    const totalScore = data.reduce((sum, c) => sum + c.score, 0);
+    const totalMaxScore = data.reduce((sum, c) => sum + c.max_score, 0);
+    const totalTimeSpent = data.reduce((sum, c) => sum + c.time_spent, 0);
 
     return {
-      totalAttempts: quizCompletions.length,
+      totalAttempts: data.length,
       totalPassed,
       averageScore: Math.round((totalScore / totalMaxScore) * 100),
-      passRate: Math.round((totalPassed / quizCompletions.length) * 100),
-      averageTimeSpent: Math.round(totalTimeSpent / quizCompletions.length)
+      passRate: Math.round((totalPassed / data.length) * 100),
+      averageTimeSpent: Math.round(totalTimeSpent / data.length)
     };
   }
 
-  // Utility methods
-  private async simulateDelay(ms: number = 100): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  async reset(): Promise<void> {
-    this.completions = [];
-    this.userProgress = [];
-  }
+  
 }
 
 export const quizCompletionService = new QuizCompletionService();

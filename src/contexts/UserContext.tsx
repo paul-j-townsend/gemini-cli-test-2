@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types/database';
-import { db } from '../services/database';
+import { userService } from '../services/userService';
 import { hasPermission, hasResourcePermission, isAdmin, canManageUsers, canManageContent } from '../utils/permissions';
 import type { Permission, Resource } from '../utils/permissions';
 
@@ -34,10 +34,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     // Load default user from database on app start
     const loadDefaultUser = async () => {
       try {
-        const defaultUser = await db.findUserById('1'); // Super admin by default
+        const defaultUser = await userService.findUserById('fed2a63e-196d-43ff-9ebc-674db34e72a7'); // Super admin by default
         if (defaultUser) {
           setUser(defaultUser);
-          await db.updateLastLogin(defaultUser.id);
+          await userService.updateLastLogin(defaultUser.id);
         }
       } catch (error) {
         console.error('Failed to load default user:', error);
@@ -79,10 +79,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const login = async (email: string): Promise<User | null> => {
     setIsLoading(true);
     try {
-      const foundUser = await db.findUserByEmail(email);
+      const foundUser = await userService.findUserByEmail(email);
       if (foundUser && foundUser.status === 'active') {
         setUser(foundUser);
-        await db.updateLastLogin(foundUser.id);
+        await userService.updateLastLogin(foundUser.id);
         return foundUser;
       }
       return null;
@@ -103,7 +103,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     if (!user) return;
     
     try {
-      const refreshedUser = await db.findUserById(user.id);
+      const refreshedUser = await userService.findUserById(user.id);
       if (refreshedUser) {
         setUser(refreshedUser);
       }

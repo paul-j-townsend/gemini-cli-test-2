@@ -89,26 +89,6 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
 
   
 
-  const recordCompletion = async (quizId: string, scorePercentage: number, passed: boolean) => {
-    try {
-      const response = await fetch('/api/quiz-completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          quiz_id: quizId,
-          session_id: sessionId,
-          score_percentage: scorePercentage,
-          passed,
-        }),
-      });
-
-      
-    } catch (err) {
-      console.error('Error recording completion:', err);
-    }
-  };
 
   const hasMultipleCorrectAnswers = () => {
     if (!quiz) return false;
@@ -181,9 +161,6 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
           timeSpent,
           podcastId
         );
-        
-        // Also record to existing API for backward compatibility
-        await recordCompletion(quizId, score.percentage, score.passed);
       }
     }
   };

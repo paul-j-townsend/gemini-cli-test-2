@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function getQuizQuestion(req: NextApiRequest, res: NextApiResponse, id: string) {
   const { data: question, error } = await supabase
-    .from('quiz_questions')
+    .from('vsk_quiz_questions')
     .select('*')
     .eq('id', id)
     .single();

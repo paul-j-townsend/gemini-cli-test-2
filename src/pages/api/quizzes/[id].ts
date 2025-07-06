@@ -23,28 +23,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
   const { data: quiz, error } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .select(`
       id,
       title,
       description,
       category,
-      time_limit_minutes,
       pass_percentage,
       total_questions,
       is_active,
-      podcast_episode_id,
       created_at,
       updated_at,
-      created_by,
-      quiz_questions (
+      vsk_quiz_questions (
         id,
         question_number,
         question_text,
         explanation,
         rationale,
         learning_outcome,
-        question_answers (
+        vsk_question_answers (
           id,
           answer_letter,
           answer_text,
@@ -66,13 +63,13 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
   // Transform the quiz data to match the expected format
   const transformedQuiz = {
     ...quiz,
-    questions: quiz.quiz_questions?.map(q => ({
+    questions: quiz.vsk_quiz_questions?.map(q => ({
       id: q.id,
       question_text: q.question_text,
       learning_outcome: q.learning_outcome || null,
       rationale: q.rationale,
       category: quiz.category,
-      mcq_answers: q.question_answers?.sort((a, b) => a.answer_letter.localeCompare(b.answer_letter)) || []
+      mcq_answers: q.vsk_question_answers?.sort((a, b) => a.answer_letter.localeCompare(b.answer_letter)) || []
     })) || []
   };
 

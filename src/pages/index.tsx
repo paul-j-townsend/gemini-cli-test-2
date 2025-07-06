@@ -54,7 +54,7 @@ const Home = () => {
       name: 'Dr. Emily Chen',
       role: 'Veterinary Resident',
       content: 'As a resident, these resources are invaluable for my continuing education and professional development.',
-      avatar: 'https://placehold.co/64',
+      avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=64&h=64&fit=crop&crop=face',
     },
   ];
 

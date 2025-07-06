@@ -20,17 +20,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 // Get quiz completion status for a user/session
 async function getQuizCompletion(req: NextApiRequest, res: NextApiResponse) {
-  const { quiz_id, session_id } = req.query;
+  const { quiz_id, user_id } = req.query;
 
-  if (!quiz_id || !session_id) {
-    return res.status(400).json({ message: 'quiz_id and session_id are required' });
+  if (!quiz_id || !user_id) {
+    return res.status(400).json({ message: 'quiz_id and user_id are required' });
   }
 
   const { data: completion, error } = await supabaseAdmin
-    .from('quiz_completions')
+    .from('vsk_quiz_completions')
     .select('*')
     .eq('quiz_id', quiz_id)
-    .eq('user_session', session_id)
+    .eq('user_id', user_id)
     .single();
 
   if (error && error.code !== 'PGRST116') {
@@ -42,35 +42,42 @@ async function getQuizCompletion(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({
     completed: !!completion,
     passed: completion?.passed || false,
-    score_percentage: completion?.score_percentage || 0,
+    percentage: completion?.percentage || 0,
+    score: completion?.score || 0,
+    max_score: completion?.max_score || 0,
     completed_at: completion?.completed_at || null
   });
 }
 
 // Record a quiz completion
 async function recordQuizCompletion(req: NextApiRequest, res: NextApiResponse) {
-  const { quiz_id, session_id, score_percentage, passed } = req.body;
+  const { quiz_id, user_id, score, max_score, percentage, time_spent, answers, passed, attempts } = req.body;
 
-  if (!quiz_id || !session_id || score_percentage === undefined || passed === undefined) {
+  if (!quiz_id || !user_id || percentage === undefined || passed === undefined) {
     return res.status(400).json({ 
-      message: 'quiz_id, session_id, score_percentage, and passed are required' 
+      message: 'quiz_id, user_id, percentage, and passed are required' 
     });
   }
 
-  // Validate score_percentage
-  if (score_percentage < 0 || score_percentage > 100) {
-    return res.status(400).json({ message: 'score_percentage must be between 0 and 100' });
+  // Validate percentage
+  if (percentage < 0 || percentage > 100) {
+    return res.status(400).json({ message: 'percentage must be between 0 and 100' });
   }
 
   try {
     // Insert or update the completion record
     const { data: completion, error } = await supabaseAdmin
-      .from('quiz_completions')
+      .from('vsk_quiz_completions')
       .upsert({
         quiz_id,
-        user_session: session_id,
-        score_percentage,
+        user_id,
+        score: score || 0,
+        max_score: max_score || 100,
+        percentage,
+        time_spent: time_spent || 0,
+        answers: answers || [],
         passed,
+        attempts: attempts || 1,
         completed_at: new Date().toISOString()
       })
       .select()

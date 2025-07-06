@@ -28,7 +28,7 @@ const UserManagement: React.FC = () => {
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     try {
-      const updatedUser = await db.updateUserRole(userId, newRole);
+      const updatedUser = await db.updateUser(userId, { role: newRole });
       if (updatedUser) {
         setUsers(users.map(u => u.id === userId ? updatedUser : u));
       }
@@ -101,7 +101,7 @@ const UserManagement: React.FC = () => {
                     </td>
                     <td style={{ padding: '1rem', border: '1px solid #ddd' }}>{u.status}</td>
                     <td style={{ padding: '1rem', border: '1px solid #ddd' }}>
-                      {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : 'Never'}
+                      {u.last_login_at ? new Date(u.last_login_at).toLocaleDateString() : 'Never'}
                     </td>
                     <SuperAdminOnly>
                       <td style={{ padding: '1rem', border: '1px solid #ddd' }}>

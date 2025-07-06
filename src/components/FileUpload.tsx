@@ -310,14 +310,24 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
           {type === 'image' ? (
             <div className="flex items-center space-x-3">
-              <img
-                src={currentValue}
-                alt="Current image"
-                className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                onError={(e: any) => {
-                  e.target.src = 'https://placehold.co/64';
-                }}
-              />
+              <div className="w-16 h-16 relative">
+                <img
+                  src={currentValue}
+                  alt="Current image"
+                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                  onError={(e: any) => {
+                    // Hide the broken image and show fallback
+                    e.target.style.display = 'none';
+                    const fallback = e.target.parentElement.querySelector('.fallback-image');
+                    if (fallback) {
+                      fallback.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="fallback-image w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center absolute inset-0 border border-gray-200" style={{display: 'none'}}>
+                  <span className="text-gray-400 text-xs">No Image</span>
+                </div>
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-700">Current image:</p>
                 <p className="text-sm text-gray-500 truncate" title={currentValue}>

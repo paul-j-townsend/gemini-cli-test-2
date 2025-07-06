@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
   const { data: quizzes, error } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .select(`
       id,
       title,
@@ -64,7 +64,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 
   // 1. Create the quiz
   const { data: quiz, error: quizError } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .insert([{ 
       title, 
       description, 
@@ -85,7 +85,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i];
     const { data: question, error: questionError } = await supabaseAdmin
-      .from('quiz_questions')
+      .from('vsk_quiz_questions')
       .insert([{
         quiz_id: quiz.id,
         question_number: i + 1,
@@ -99,7 +99,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
     if (questionError) {
       console.error('Error creating question:', questionError);
       // Simple cleanup: delete the quiz if a question fails
-      await supabaseAdmin.from('quizzes').delete().eq('id', quiz.id);
+      await supabaseAdmin.from('vsk_quizzes').delete().eq('id', quiz.id);
       return res.status(500).json({ message: 'Failed to create questions' });
     }
 
@@ -112,20 +112,20 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
     }));
 
     const { error: answersError } = await supabaseAdmin
-      .from('question_answers')
+      .from('vsk_question_answers')
       .insert(answersToInsert);
 
     if (answersError) {
       console.error('Error creating answers:', answersError);
       // Simple cleanup
-      await supabaseAdmin.from('quizzes').delete().eq('id', quiz.id);
+      await supabaseAdmin.from('vsk_quizzes').delete().eq('id', quiz.id);
       return res.status(500).json({ message: 'Failed to create answers' });
     }
   }
 
   // Refetch the created quiz with all its nested data
   const { data: finalQuiz, error: finalQuizError } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .select(`
       id,
       title,
@@ -134,13 +134,13 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
       pass_percentage,
       total_questions,
       is_active,
-      quiz_questions (
+      vsk_quiz_questions (
         id,
         question_number,
         question_text,
         explanation,
         points,
-        question_answers (
+        vsk_question_answers (
           id,
           answer_letter,
           answer_text,

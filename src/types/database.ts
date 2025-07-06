@@ -9,10 +9,10 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   avatar?: string;
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt?: string;
-  emailVerified: boolean;
+  created_at: string;
+  updated_at: string;
+  last_login_at?: string;
+  email_verified: boolean;
   preferences?: UserPreferences;
 }
 
@@ -42,7 +42,7 @@ export interface RolePermission {
 
 export interface UserSession {
   id: string;
-  userId: string;
+  user_id: string;
   token: string;
   expiresAt: string;
   createdAt: string;
@@ -94,14 +94,14 @@ export interface RolePermissionsTable {
 // Quiz completion tracking
 export interface QuizCompletion {
   id: string;
-  userId: string;
-  quizId: string;
-  podcastId?: string;
+  user_id: string;
+  quiz_id: string;
+  podcast_id?: string;
   score: number;
-  maxScore: number;
+  max_score: number;
   percentage: number;
-  timeSpent: number; // in seconds
-  completedAt: string;
+  time_spent: number; // in seconds
+  completed_at: string;
   answers: QuizAnswer[];
   passed: boolean;
   attempts: number;
@@ -131,16 +131,16 @@ export interface QuizCompletionsTable {
 
 // User progress tracking
 export interface UserProgress {
-  userId: string;
-  totalQuizzesCompleted: number;
-  totalQuizzesPassed: number;
-  totalScore: number;
-  totalMaxScore: number;
-  averageScore: number;
-  totalTimeSpent: number;
-  completionRate: number;
-  lastActivityAt: string;
-  streakDays: number;
+  user_id: string;
+  total_quizzes_completed: number;
+  total_quizzes_passed: number;
+  total_score: number;
+  total_max_score: number;
+  average_score: number;
+  total_time_spent: number;
+  completion_rate: number;
+  last_activity_at: string;
+  streak_days: number;
   badges: Badge[];
 }
 
@@ -149,7 +149,7 @@ export interface Badge {
   name: string;
   description: string;
   icon: string;
-  earnedAt: string;
+  earned_at: string;
   category: 'completion' | 'score' | 'streak' | 'special';
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
-import { db } from '../services/database';
+import { userService } from '../services/userService';
 import { User } from '../types/database';
 import { getRoleDisplayName, getRoleColor } from '../utils/permissions';
 
@@ -12,7 +12,7 @@ export const UserSwitcher: React.FC = () => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const users = await db.findAllUsers();
+        const users = await userService.findAllUsers();
         setAvailableUsers(users);
       } catch (error) {
         console.error('Failed to load users:', error);
@@ -32,10 +32,10 @@ export const UserSwitcher: React.FC = () => {
     }
 
     try {
-      const selectedUser = await db.findUserById(selectedUserId);
+      const selectedUser = await userService.findUserById(selectedUserId);
       if (selectedUser) {
         setUser(selectedUser);
-        await db.updateLastLogin(selectedUser.id);
+        await userService.updateLastLogin(selectedUser.id);
       }
     } catch (error) {
       console.error('Failed to switch user:', error);
@@ -106,7 +106,7 @@ export const UserSwitcher: React.FC = () => {
             <strong>Status:</strong> {user.status}
           </div>
           <div>
-            <strong>Last Login:</strong> {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Never'}
+            <strong>Last Login:</strong> {user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never'}
           </div>
         </div>
       )}

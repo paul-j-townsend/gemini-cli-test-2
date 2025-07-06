@@ -35,7 +35,7 @@ const Articles = () => {
       let query = supabase
         .from('vsk_articles')
         .select('id, title, excerpt, author, category, slug, image_url')
-        .eq('published', true)
+        .eq('status', 'published')
         .order('id', { ascending: false })
 
       if (selectedCategory !== 'all') {

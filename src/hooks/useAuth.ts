@@ -62,7 +62,7 @@ export const useAuth = () => {
     getUserRole: () => user?.role || 'viewer',
     getUserStatus: () => user?.status || 'inactive',
     isUserActive: () => user?.status === 'active',
-    isUserVerified: () => user?.emailVerified || false,
+    isUserVerified: () => user?.email_verified || false,
   };
 };
 

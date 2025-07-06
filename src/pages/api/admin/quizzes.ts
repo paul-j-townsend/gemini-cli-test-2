@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
   const { data: quizzes, error } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .select(`
       id,
       title,
@@ -35,14 +35,14 @@ async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
       is_active,
       created_at,
       updated_at,
-      quiz_questions (
+      vsk_quiz_questions (
         id,
         question_number,
         question_text,
         explanation,
         rationale,
         learning_outcome,
-        question_answers (
+        vsk_question_answers (
           id,
           answer_letter,
           answer_text,
@@ -71,7 +71,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 
   // Create the quiz first
   const { data: quiz, error: quizError } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .insert({
       title,
       description,
@@ -94,7 +94,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
       console.log('Creating question:', q);
       
       const { data: newQuestion, error: questionError } = await supabaseAdmin
-        .from('quiz_questions')
+        .from('vsk_quiz_questions')
         .insert([{
           quiz_id: quiz.id,
           question_number: q.question_number,
@@ -108,7 +108,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 
       if (questionError) {
         console.error('Error creating question:', questionError);
-        await supabaseAdmin.from('quizzes').delete().eq('id', quiz.id);
+        await supabaseAdmin.from('vsk_quizzes').delete().eq('id', quiz.id);
         return res.status(500).json({ message: 'Failed to create question' });
       }
 
@@ -125,12 +125,12 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
         }));
 
         const { error: answersError } = await supabaseAdmin
-          .from('question_answers')
+          .from('vsk_question_answers')
           .insert(answersToInsert);
 
         if (answersError) {
           console.error('Error creating answers:', answersError);
-          await supabaseAdmin.from('quizzes').delete().eq('id', quiz.id);
+          await supabaseAdmin.from('vsk_quizzes').delete().eq('id', quiz.id);
           return res.status(500).json({ message: 'Failed to create answers' });
         }
       }
@@ -139,7 +139,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 
   // Return the complete quiz with questions
   const { data: completeQuiz } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .select(`
       id,
       title,
@@ -147,7 +147,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
       category,
       pass_percentage,
       total_questions,
-      quiz_questions (
+      vsk_quiz_questions (
         id,
         question_number,
         question_text
@@ -170,7 +170,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
 
   // Update the quiz
   const { error: quizError } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .update({
       title,
       description,
@@ -188,7 +188,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
   // Delete existing questions and answers for this quiz
   // First, get all existing question IDs for this quiz
   const { data: existingQuestions, error: fetchError } = await supabaseAdmin
-    .from('quiz_questions')
+    .from('vsk_quiz_questions')
     .select('id')
     .eq('quiz_id', id);
 
@@ -201,7 +201,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
   if (existingQuestions && existingQuestions.length > 0) {
     const existingQuestionIds = existingQuestions.map(q => q.id);
     const { error: deleteAnswersError } = await supabaseAdmin
-      .from('question_answers')
+      .from('vsk_question_answers')
       .delete()
       .in('question_id', existingQuestionIds);
 
@@ -213,7 +213,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
 
   // Delete all existing questions for this quiz
   const { error: deleteQuestionsError } = await supabaseAdmin
-    .from('quiz_questions')
+    .from('vsk_quiz_questions')
     .delete()
     .eq('quiz_id', id);
 
@@ -228,7 +228,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
       console.log('Processing question:', q);
       
       const { data: newQuestion, error: questionError } = await supabaseAdmin
-        .from('quiz_questions')
+        .from('vsk_quiz_questions')
         .insert([{
           quiz_id: id,
           question_number: q.question_number,
@@ -258,7 +258,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
         }));
 
         const { error: answersError } = await supabaseAdmin
-          .from('question_answers')
+          .from('vsk_question_answers')
           .insert(answersToInsert);
 
         if (answersError) {
@@ -280,7 +280,7 @@ async function deleteQuiz(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { error } = await supabaseAdmin
-    .from('quizzes')
+    .from('vsk_quizzes')
     .delete()
     .eq('id', id);
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Quiz from './Quiz';
+import { useQuizCompletion } from '../hooks/useQuizCompletion';
 
 
 
@@ -8,10 +9,10 @@ interface Podcast {
   id: string;
   title: string;
   description: string;
-  audioSrc: string; // Preview audio
-  fullAudioSrc?: string; // Full version audio
+  audio_src: string; // Preview audio
+  full_audio_src?: string; // Full version audio
   thumbnail: string;
-  quizId?: string; // Add quiz ID
+  quiz_id?: string; // Add quiz ID
 }
 
 interface PodcastPlayerItemProps {
@@ -79,9 +80,16 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   const [hasAccessedFull, setHasAccessedFull] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Quiz completion checking
+  const { isQuizCompleted, isQuizPassed, getQuizPercentage } = useQuizCompletion();
+  const quizCompleted = podcast.quiz_id ? isQuizCompleted(podcast.quiz_id) : false;
+  const quizPassed = podcast.quiz_id ? isQuizPassed(podcast.quiz_id) : false;
+  const quizPercentage = podcast.quiz_id ? getQuizPercentage(podcast.quiz_id) : 0;
+
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
-  const currentAudioSrc = isFullVersion && podcast.fullAudioSrc ? podcast.fullAudioSrc : podcast.audioSrc;
+  const currentAudioSrc = isFullVersion && podcast.full_audio_src ? podcast.full_audio_src : podcast.audio_src;
 
   // Audio event handlers
   useEffect(() => {
@@ -316,7 +324,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
 
   // Full version handler
   const handleListenToFull = () => {
-    if (podcast.fullAudioSrc && podcast.fullAudioSrc.trim() !== '') {
+    if (podcast.full_audio_src && podcast.full_audio_src.trim() !== '') {
       setError(null);
       setIsFullVersion(true);
       setHasAccessedFull(true);
@@ -349,12 +357,40 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
         </div>
         
         <div className="flex-grow min-w-0">
-          <h3 className="text-lg lg:text-xl font-semibold text-neutral-900 mb-1 line-clamp-2">
-            {podcast.title}
-          </h3>
-          <p className="text-sm text-neutral-600 line-clamp-2 leading-relaxed">
-            {podcast.description}
-          </p>
+          <div className="flex items-start justify-between">
+            <div className="flex-grow min-w-0">
+              <h3 className="text-lg lg:text-xl font-semibold text-neutral-900 mb-1 line-clamp-2">
+                {podcast.title}
+              </h3>
+              <p className="text-sm text-neutral-600 line-clamp-2 leading-relaxed">
+                {podcast.description}
+              </p>
+            </div>
+            
+            {/* Quiz Completion Indicator */}
+            {quizCompleted && (
+              <div className="flex-shrink-0 ml-3">
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                  quizPassed 
+                    ? 'bg-green-100 text-green-700 border border-green-200' 
+                    : 'bg-orange-100 text-orange-700 border border-orange-200'
+                }`}>
+                  {quizPassed ? (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  <span>
+                    {quizPassed ? `Passed (${quizPercentage}%)` : 'Completed'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -503,7 +539,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button 
             onClick={handleListenToFull}
             className="btn-primary w-full flex items-center justify-center gap-2"
-            disabled={!podcast.fullAudioSrc}
+            disabled={!podcast.full_audio_src}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
               <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
@@ -526,15 +562,15 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             ) : (
               <button 
                 onClick={() => setShowQuiz(true)}
-                disabled={!podcast.quizId}
+                disabled={!podcast.quiz_id}
                 className={`btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2 ${
-                  !podcast.quizId ? 'opacity-50 cursor-not-allowed' : ''
+                  !podcast.quiz_id ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
                   <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
                 </svg>
-                {podcast.quizId ? 'Take Quiz' : 'No Quiz Available'}
+                {podcast.quiz_id ? 'Take Quiz' : 'No Quiz Available'}
               </button>
             )}
             <button className="btn-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
@@ -548,9 +584,9 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       </div>
 
       {/* Quiz Component */}
-      {showQuiz && podcast.quizId && (
+      {showQuiz && podcast.quiz_id && (
         <div className="mt-6 pt-6 border-t border-neutral-200/80">
-          <Quiz quizId={podcast.quizId} />
+          <Quiz quizId={podcast.quiz_id} />
         </div>
       )}
     </div>

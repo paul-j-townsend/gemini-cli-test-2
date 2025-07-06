@@ -37,6 +37,7 @@ const QuizManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [saving, setSaving] = useState(false);
+  const [creatingSystemQuizzes, setCreatingSystemQuizzes] = useState(false);
 
   useEffect(() => {
     fetchQuizzes();
@@ -118,7 +119,6 @@ const QuizManagement = () => {
           explanation: q.explanation,
           rationale: q.rationale,
           learning_outcome: q.learning_outcome,
-          points: q.points,
           question_answers: q.answers?.map(a => ({
             id: a.id,
             question_id: a.question_id,
@@ -170,6 +170,33 @@ const QuizManagement = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
+  const handleCreateSystemQuizzes = async () => {
+    setCreatingSystemQuizzes(true);
+    try {
+      const response = await fetch('/api/create-sample-quizzes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('System quizzes created:', result);
+      
+      // Refresh the quiz list
+      fetchQuizzes();
+      setError(null);
+    } catch (err) {
+      setError(`Failed to create system quizzes: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.error('Create system quizzes error:', err);
+    }
+    setCreatingSystemQuizzes(false);
+  };
+
   const handleCreateQuiz = () => {
     const newQuiz: Quiz = {
       id: 'new-quiz',
@@ -197,12 +224,21 @@ const QuizManagement = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Quiz Management</h2>
         {!editingQuiz && (
-          <button 
-            onClick={handleCreateQuiz}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-          >
-            Add New Quiz
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={handleCreateSystemQuizzes}
+              disabled={creatingSystemQuizzes}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            >
+              {creatingSystemQuizzes ? 'Creating...' : 'Create System Quizzes'}
+            </button>
+            <button 
+              onClick={handleCreateQuiz}
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+            >
+              Add New Quiz
+            </button>
+          </div>
         )}
       </div>
       {editingQuiz ? (
