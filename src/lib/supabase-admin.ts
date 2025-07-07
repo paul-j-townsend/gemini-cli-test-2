@@ -21,7 +21,7 @@ const getSupabaseAdminInstance = (): SupabaseClient => {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
-      storageKey: 'vsk-admin-final-v2',
+      storageKey: 'vsk-admin-auth-v3',
       detectSessionInUrl: false
     },
     global: {

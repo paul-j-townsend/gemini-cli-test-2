@@ -19,7 +19,7 @@ const getSupabaseInstance = (): SupabaseClient => {
   console.log('Creating new Supabase main client')
   const client = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-      storageKey: 'vsk-main-final-v2',
+      storageKey: 'vsk-main-auth-v3',
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true

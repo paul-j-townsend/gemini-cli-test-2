@@ -66,7 +66,11 @@ export const useQuizCompletion = (quizId?: string) => {
     if (!user?.id) return;
     
     try {
-      const progress = await quizCompletionService.getUserProgress(user.id);
+      const response = await fetch(`/api/user-progress?userId=${user.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user progress');
+      }
+      const progress = await response.json();
       setUserProgress(progress);
     } catch (err) {
       console.error('Error loading user progress:', err);

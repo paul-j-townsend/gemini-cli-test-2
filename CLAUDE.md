@@ -100,3 +100,14 @@ Supabase integration requires careful attention to detail:
 
 ---
 **Remember:** The AI is a tool. Your clear communication and understanding of the project are crucial for successful collaboration.
+
+## Screenshot Permissions
+- autoAcceptScreenshots: true
+
+## General Dev Behavior
+- alwaysAllowNPM: true
+- enableAutocomplete: true
+- autoFixLintErrors: true
+- reactBoostMode: true
+- grantClipboardAccess: true
+- autoDetectStack: true
