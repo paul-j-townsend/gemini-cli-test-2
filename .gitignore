@@ -1,20 +1,17 @@
 node_modules
 .next/
-.DS_Store
-public/.DS_Store
-public/images/.DS_Store
-public/images/imgres.html
-src/.DS_Store
-.DS_Store
-public/.DS_Store
 .env.local
+.env.production
 supabase/migrations/
-public/.DS_Store
 next.config.js
 my_docs
 
-public/.DS_Store
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Project specific files
+public/images/imgres.html
 connect_to_fasthosts.ssh
-.env.production
 server_memories.md
 public/audio/walkalone.mp3
