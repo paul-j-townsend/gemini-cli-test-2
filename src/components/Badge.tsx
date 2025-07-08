@@ -6,6 +6,7 @@ interface BadgeProps {
   description: string;
   icon: React.ReactNode;
   color: string;
+  blah: string;
 }
 
 const Badge: React.FC<BadgeProps> = ({ name, description, icon, color }) => {
