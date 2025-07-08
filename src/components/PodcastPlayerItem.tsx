@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Quiz from './Quiz';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { 
@@ -13,7 +14,8 @@ import {
   Check,
   X,
   AlertCircle,
-  Download
+  Download,
+  ExternalLink
 } from 'lucide-react';
 
 
@@ -341,9 +343,16 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
               <h3 className="text-lg lg:text-xl font-semibold text-neutral-900 mb-1 line-clamp-2">
                 {podcast.title}
               </h3>
-              <p className="text-sm text-neutral-600 line-clamp-2 leading-relaxed">
+              <p className="text-sm text-neutral-600 line-clamp-2 leading-relaxed mb-2">
                 {podcast.description}
               </p>
+              <Link 
+                href={`/player?id=${podcast.id}`}
+                className="inline-flex items-center space-x-1 text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              >
+                <ExternalLink size={12} />
+                <span>Open in Full Player</span>
+              </Link>
             </div>
             
             {/* Quiz Completion Indicator */}

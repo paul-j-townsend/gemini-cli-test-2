@@ -73,7 +73,7 @@ const Podcasts = () => {
         </div>
       </section>
 
-      {/* Podcast Player Section */}
+      {/* Episodes List Section */}
       <section className="py-16 lg:py-24">
         <div className="container-wide">
           <div className="text-center mb-12 animate-fade-in-up">
