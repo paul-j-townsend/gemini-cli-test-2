@@ -135,6 +135,18 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
   };
 
   const handleNextQuestion = async () => {
+    // Check if the current question was answered correctly
+    const lastAttempt = attempts[attempts.length - 1];
+    const isCurrentQuestionCorrect = lastAttempt && lastAttempt.is_correct;
+    
+    // If incorrect, stay on current question and allow retry
+    if (!isCurrentQuestionCorrect) {
+      setSelectedAnswers([]);
+      setShowExplanation(false);
+      return;
+    }
+    
+    // If correct, proceed to next question or complete quiz
     if (quiz && currentQuestionIndex + 1 < quiz.questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswers([]);
@@ -147,8 +159,13 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
         const score = calculateScore();
         const timeSpent = Math.round((Date.now() - startTime) / 1000); // Convert to seconds
         
-        // Create QuizAnswer array for tracking
-        const quizAnswers: QuizAnswer[] = attempts.map(attempt => ({
+        // Create QuizAnswer array for tracking (only final attempt per question)
+        const finalAttempts = new Map();
+        attempts.forEach(attempt => {
+          finalAttempts.set(attempt.question_id, attempt);
+        });
+        
+        const quizAnswers: QuizAnswer[] = Array.from(finalAttempts.values()).map(attempt => ({
           questionId: attempt.question_id,
           selectedAnswers: attempt.selected_answer_ids,
           isCorrect: attempt.is_correct,
@@ -179,13 +196,31 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
   };
 
   const calculateScore = () => {
-    const correctAnswers = attempts.filter(attempt => attempt.is_correct).length;
-    const percentage = attempts.length > 0 ? Math.round((correctAnswers / attempts.length) * 100) : 0;
+    if (!quiz) return { correct: 0, total: 0, percentage: 0, passed: false };
+    
+    // Count correct answers per question (only final result matters since retries are allowed)
+    const questionsAnswered = new Set();
+    const correctQuestions = new Set();
+    
+    // Process attempts in chronological order to get final result for each question
+    attempts.forEach(attempt => {
+      questionsAnswered.add(attempt.question_id);
+      if (attempt.is_correct) {
+        correctQuestions.add(attempt.question_id);
+      } else {
+        // If incorrect, remove from correct set (in case there was a previous correct attempt)
+        correctQuestions.delete(attempt.question_id);
+      }
+    });
+    
+    const totalQuestions = quiz.questions.length;
+    const correctAnswers = correctQuestions.size;
+    const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
     const passed = percentage >= (quiz?.pass_percentage || 70);
     
     return {
       correct: correctAnswers,
-      total: attempts.length,
+      total: totalQuestions,
       percentage,
       passed
     };
@@ -455,19 +490,65 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
             )}
         </div>
 
-        {/* Explanation */}
-        {showExplanation && currentQuestion.rationale && (
-          <div className="bg-primary-50 border-l-4 border-primary-400 p-4 rounded-r-xl mb-6 animate-fade-in-up">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h4 className="font-semibold text-primary-900 mb-1">Rationale:</h4>
-                <p className="text-primary-800 leading-relaxed">{currentQuestion.rationale}</p>
+        {/* Feedback and Explanation */}
+        {showExplanation && (
+          <>
+            {/* Feedback Message */}
+            {(() => {
+              const lastAttempt = attempts[attempts.length - 1];
+              const isCurrentQuestionCorrect = lastAttempt && lastAttempt.is_correct;
+              
+              return (
+                <div className={`border-l-4 p-4 rounded-r-xl mb-4 animate-fade-in-up ${
+                  isCurrentQuestionCorrect 
+                    ? 'bg-success-50 border-success-400' 
+                    : 'bg-error-50 border-error-400'
+                }`}>
+                  <div className="flex items-start">
+                    {isCurrentQuestionCorrect ? (
+                      <svg className="w-5 h-5 text-success-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-error-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                    <div>
+                      <h4 className={`font-semibold mb-1 ${
+                        isCurrentQuestionCorrect ? 'text-success-900' : 'text-error-900'
+                      }`}>
+                        {isCurrentQuestionCorrect ? 'Correct!' : 'Incorrect'}
+                      </h4>
+                      <p className={`leading-relaxed ${
+                        isCurrentQuestionCorrect ? 'text-success-800' : 'text-error-800'
+                      }`}>
+                        {isCurrentQuestionCorrect 
+                          ? 'Well done! You can proceed to the next question.' 
+                          : 'Please review the explanation below and try again.'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+            
+            {/* Rationale */}
+            {currentQuestion.rationale && (
+              <div className="bg-primary-50 border-l-4 border-primary-400 p-4 rounded-r-xl mb-6 animate-fade-in-up">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <h4 className="font-semibold text-primary-900 mb-1">Rationale:</h4>
+                    <p className="text-primary-800 leading-relaxed">{currentQuestion.rationale}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
         {/* Action Buttons */}
@@ -489,21 +570,37 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
                 onClick={handleNextQuestion}
                 className="btn-primary"
               >
-                {currentQuestionIndex + 1 < quiz.questions.length ? (
-                  <>
-                    Next Question
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </>
-                ) : (
-                  <>
-                    Finish Quiz
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </>
-                )}
+                {(() => {
+                  const lastAttempt = attempts[attempts.length - 1];
+                  const isCurrentQuestionCorrect = lastAttempt && lastAttempt.is_correct;
+                  
+                  if (!isCurrentQuestionCorrect) {
+                    return (
+                      <>
+                        Try Again
+                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </>
+                    );
+                  }
+                  
+                  return currentQuestionIndex + 1 < quiz.questions.length ? (
+                    <>
+                      Next Question
+                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </>
+                  ) : (
+                    <>
+                      Finish Quiz
+                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </>
+                  );
+                })()}
               </button>
             )}
           </div>
