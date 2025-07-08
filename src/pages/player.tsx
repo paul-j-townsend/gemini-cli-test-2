@@ -59,7 +59,6 @@ const PodcastPlayer = () => {
   const [volume, setVolume] = useState(0.7);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isScrubbing, setIsScrubbing] = useState(false);
-  const [isFullVersion, setIsFullVersion] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   
@@ -71,7 +70,7 @@ const PodcastPlayer = () => {
   const quizPercentage = episode?.quiz_id ? getQuizPercentage(episode.quiz_id) : 0;
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
-  const currentAudioSrc = isFullVersion && episode?.full_audio_src ? episode.full_audio_src : episode?.audio_src;
+  const currentAudioSrc = episode?.full_audio_src || episode?.audio_src;
 
   // Fetch episode data
   useEffect(() => {
@@ -333,38 +332,29 @@ const PodcastPlayer = () => {
                         )}
                       </div>
 
-                      {/* Version Toggle */}
-                      <div className="flex items-center justify-center lg:justify-start gap-4 mb-8">
-                        <label className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={isFullVersion}
-                            onChange={(e) => setIsFullVersion(e.target.checked)}
-                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                          />
-                          <span className="text-sm font-medium text-gray-700">
-                            Full Version {!episode.full_audio_src && '(Preview Only)'}
-                          </span>
-                        </label>
-                      </div>
 
                       {/* Quiz Status */}
                       {episode.quiz_id && (
                         <div className="mb-8">
                           {quizCompleted ? (
-                            <div className="flex items-center justify-center lg:justify-start space-x-2 text-green-600">
-                              <Check size={20} />
-                              <span className="font-medium">
-                                Quiz Completed ({quizPercentage}%)
-                                {quizPassed && ' - Passed!'}
-                              </span>
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-center lg:justify-start space-x-3">
+                                <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                                  <Check size={20} className="text-green-600" />
+                                </div>
+                                <span className="text-lg font-semibold text-green-700">
+                                  {quizPassed ? 'Passed!' : `Quiz Completed (${quizPercentage}%)`}
+                                </span>
+                              </div>
                               {quizPassed && (
                                 <button
                                   onClick={downloadCertificate}
-                                  className="ml-4 flex items-center space-x-1 text-primary-600 hover:text-primary-700"
+                                  className="btn-secondary flex items-center space-x-2"
                                 >
-                                  <Download size={16} />
-                                  <span className="text-sm">Certificate</span>
+                                  <div className="flex items-center justify-center w-5 h-5">
+                                    <Download size={16} />
+                                  </div>
+                                  <span>Download Certificate</span>
                                 </button>
                               )}
                             </div>

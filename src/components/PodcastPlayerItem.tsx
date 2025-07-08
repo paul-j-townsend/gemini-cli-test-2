@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Quiz from './Quiz';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { 
@@ -42,6 +43,7 @@ const formatTime = (seconds: number) => {
 
 
 const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
+  const router = useRouter();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -295,7 +297,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2, 10];
     const currentIndex = speeds.indexOf(playbackRate);
     const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
     
@@ -306,9 +308,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   // Full version handler
   const handleListenToFull = () => {
     if (podcast.full_audio_src && podcast.full_audio_src.trim() !== '') {
-      setError(null);
-      setIsFullVersion(true);
-      setHasAccessedFull(true);
+      router.push(`/player?id=${podcast.id}`);
     } else {
       setError('Full version not available');
     }
