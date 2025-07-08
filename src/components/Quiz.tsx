@@ -180,7 +180,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
           100, // Max score is always 100%
           timeSpent,
           podcastId,
-          quiz?.pass_percentage // Pass the quiz-specific pass percentage
+          100 // All questions must be correct for pass
         );
       }
     }
@@ -216,7 +216,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
     const totalQuestions = quiz.questions.length;
     const correctAnswers = correctQuestions.size;
     const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-    const passed = percentage >= (quiz?.pass_percentage || 70);
+    const passed = percentage === 100; // Only 100% is a pass
     
     return {
       correct: correctAnswers,
@@ -274,30 +274,33 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
     const score = calculateScore();
     return (
       <div className="card p-8 text-center animate-fade-in-up">
-        <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${score.passed ? 'bg-success-50 ring-4 ring-success-100' : 'bg-warning-50 ring-4 ring-warning-100'}`}>
+        <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${score.passed ? 'bg-success-50 ring-4 ring-success-100' : 'bg-error-50 ring-4 ring-error-100'}`}>
           {score.passed ? (
             <svg className="w-14 h-14 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           ) : (
-            <svg className="w-14 h-14 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg className="w-14 h-14 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           )}
         </div>
         
         <h2 className="text-3xl font-bold text-neutral-900 mb-3">Quiz Complete!</h2>
-        <p className={`text-xl font-semibold mb-6 ${score.passed ? 'text-success-600' : 'text-warning-600'}`}>
-          {score.passed ? 'Congratulations! You passed!' : 'Keep studying and try again!'}
+        <p className={`text-xl font-semibold mb-6 ${score.passed ? 'text-success-600' : 'text-error-600'}`}>
+          {score.passed ? 'Congratulations! You passed!' : 'Not quite there yet!'}
         </p>
         
         <div className="bg-gradient-to-br from-neutral-50 to-neutral-100 rounded-2xl p-6 mb-8 border border-neutral-200">
-          <div className="text-5xl font-bold text-primary-600 mb-3">{score.percentage}%</div>
+          <div className={`text-5xl font-bold mb-3 ${score.passed ? 'text-success-600' : 'text-error-600'}`}>
+            {score.passed ? 'PASSED' : 'FAILED'}
+          </div>
+          <div className="text-3xl font-semibold text-neutral-700 mb-3">{score.percentage}%</div>
           <p className="text-neutral-700 mb-4 text-lg">
-            You got <span className="font-semibold text-success-600">{score.correct}</span> out of <span className="font-semibold text-neutral-900">{score.total}</span> questions correct
+            You got <span className={`font-semibold ${score.passed ? 'text-success-600' : 'text-error-600'}`}>{score.correct}</span> out of <span className="font-semibold text-neutral-900">{score.total}</span> questions correct
           </p>
           <div className="text-sm text-neutral-500 font-medium">
-            Pass requirement: {quiz.pass_percentage || 70}%
+            Pass requirement: 100% (All questions must be correct)
           </div>
         </div>
         
@@ -347,33 +350,6 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">{quiz.title}</h2>
-          {quizId && user && (
-            <div className="flex items-center gap-2">
-              {isQuizCompleted(quizId) && (
-                <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  isQuizPassed(quizId) && getQuizPercentage(quizId) >= (quiz?.pass_percentage || 70)
-                    ? 'bg-success-100 text-success-800' 
-                    : 'bg-warning-100 text-warning-800'
-                }`}>
-                  {isQuizPassed(quizId) && getQuizPercentage(quizId) >= (quiz?.pass_percentage || 70) ? (
-                    <>
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Passed ({getQuizPercentage(quizId)}%)
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Failed ({getQuizPercentage(quizId)}%)
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
         </div>
         {quiz.description && (
           <p className="text-neutral-600 mb-4">{quiz.description}</p>
@@ -524,8 +500,10 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
                         isCurrentQuestionCorrect ? 'text-success-800' : 'text-error-800'
                       }`}>
                         {isCurrentQuestionCorrect 
-                          ? 'Well done! You can proceed to the next question.' 
-                          : 'Please review the explanation below and try again.'
+                          ? (currentQuestionIndex + 1 < quiz.questions.length 
+                              ? 'You can proceed to the next question.' 
+                              : 'Question complete!')
+                          : 'That\'s not quite right. Please try again!'
                         }
                       </p>
                     </div>
@@ -534,20 +512,25 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
               );
             })()}
             
-            {/* Rationale */}
-            {currentQuestion.rationale && (
-              <div className="bg-primary-50 border-l-4 border-primary-400 p-4 rounded-r-xl mb-6 animate-fade-in-up">
-                <div className="flex items-start">
-                  <svg className="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <h4 className="font-semibold text-primary-900 mb-1">Rationale:</h4>
-                    <p className="text-primary-800 leading-relaxed">{currentQuestion.rationale}</p>
+            {/* Rationale - Only show when answer is correct */}
+            {(() => {
+              const lastAttempt = attempts[attempts.length - 1];
+              const isCurrentQuestionCorrect = lastAttempt && lastAttempt.is_correct;
+              
+              return currentQuestion.rationale && isCurrentQuestionCorrect && (
+                <div className="bg-primary-50 border-l-4 border-primary-400 p-4 rounded-r-xl mb-6 animate-fade-in-up">
+                  <div className="flex items-start">
+                    <svg className="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h4 className="font-semibold text-primary-900 mb-1">Rationale:</h4>
+                      <p className="text-primary-800 leading-relaxed">{currentQuestion.rationale}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </>
         )}
 
