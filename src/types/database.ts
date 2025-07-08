@@ -168,3 +168,49 @@ export interface UserProgressTable {
   badges: Badge[];
   updated_at: string;
 }
+
+// Quiz and Quiz Questions
+export interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  pass_percentage: number;
+  total_questions: number;
+  podcast_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QuizTable {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  pass_percentage: number;
+  total_questions: number;
+  podcast_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  question_text: string;
+  explanation: string;
+  rationale: string;
+  learning_outcome: string;
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QuestionAnswer {
+  id: string;
+  question_id: string;
+  answer_text: string;
+  is_correct: boolean;
+  answer_key: string; // 'A', 'B', 'C', 'D'
+  created_at: string;
+}

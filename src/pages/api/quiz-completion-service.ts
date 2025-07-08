@@ -70,7 +70,7 @@ async function createCompletion(req: NextApiRequest, res: NextApiResponse) {
       podcast_id: podcast_id || null,
       score,
       max_score,
-      percentage: percentage || Math.round((score / max_score) * 100),
+      percentage: percentage !== undefined ? percentage : Math.round((score / max_score) * 100),
       time_spent: time_spent || 0,
       completed_at: new Date().toISOString(),
       answers: answers || [],

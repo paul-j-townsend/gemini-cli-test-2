@@ -91,8 +91,9 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
 
 
   const hasMultipleCorrectAnswers = () => {
-    if (!quiz) return false;
+    if (!quiz || !quiz.questions || quiz.questions.length === 0) return false;
     const currentQuestion = quiz.questions[currentQuestionIndex];
+    if (!currentQuestion || !currentQuestion.mcq_answers) return false;
     return currentQuestion.mcq_answers.filter(answer => answer.is_correct).length > 1;
   };
 
@@ -114,6 +115,8 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
     if (selectedAnswers.length === 0 || !quiz) return;
 
     const currentQuestion = quiz.questions[currentQuestionIndex];
+    if (!currentQuestion || !currentQuestion.mcq_answers) return;
+    
     const correctAnswerIds = currentQuestion.mcq_answers
       .filter(answer => answer.is_correct)
       .map(answer => answer.id);
@@ -159,7 +162,8 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
           score.percentage, // Use percentage as score
           100, // Max score is always 100%
           timeSpent,
-          podcastId
+          podcastId,
+          quiz?.pass_percentage // Pass the quiz-specific pass percentage
         );
       }
     }
@@ -284,6 +288,20 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
     );
   }
 
+  // Ensure we have valid question data
+  if (!quiz.questions || quiz.questions.length === 0 || currentQuestionIndex >= quiz.questions.length) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-error-500 mb-4">
+          <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          No questions available for this quiz.
+        </div>
+      </div>
+    );
+  }
+
   const currentQuestion = quiz.questions[currentQuestionIndex];
   const progressPercentage = getProgressPercentage();
   const isMultipleChoice = hasMultipleCorrectAnswers();
@@ -298,11 +316,11 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
             <div className="flex items-center gap-2">
               {isQuizCompleted(quizId) && (
                 <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  isQuizPassed(quizId) 
+                  isQuizPassed(quizId) && getQuizPercentage(quizId) >= (quiz?.pass_percentage || 70)
                     ? 'bg-success-100 text-success-800' 
                     : 'bg-warning-100 text-warning-800'
                 }`}>
-                  {isQuizPassed(quizId) ? (
+                  {isQuizPassed(quizId) && getQuizPercentage(quizId) >= (quiz?.pass_percentage || 70) ? (
                     <>
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -314,7 +332,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Completed ({getQuizPercentage(quizId)}%)
+                      Failed ({getQuizPercentage(quizId)}%)
                     </>
                   )}
                 </div>
@@ -374,7 +392,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
         
         {/* Answer Options */}
         <div className="space-y-3 mb-6">
-          {currentQuestion.mcq_answers
+          {currentQuestion.mcq_answers && currentQuestion.mcq_answers.length > 0 ? currentQuestion.mcq_answers
             .sort((a, b) => a.answer_letter.localeCompare(b.answer_letter))
             .map(answer => {
               const isSelected = selectedAnswers.includes(answer.id);
@@ -430,7 +448,11 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
                   </div>
                 </label>
               );
-            })}
+            }) : (
+              <div className="text-center py-4 text-neutral-500">
+                No answer options available for this question.
+              </div>
+            )}
         </div>
 
         {/* Explanation */}

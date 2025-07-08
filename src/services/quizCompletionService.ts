@@ -3,6 +3,18 @@ import { QuizCompletion, QuizAnswer, UserProgress, Badge } from '../types/databa
 
 class QuizCompletionService {
   async createCompletion(completion: Omit<QuizCompletion, 'id'>): Promise<QuizCompletion> {
+    // Check if user has existing completions for this quiz
+    const existingBest = await this.getUserBestScore(completion.user_id, completion.quiz_id);
+    
+    // Only save if this is the first attempt or if the new score is higher
+    const shouldSave = !existingBest || completion.percentage > existingBest.percentage;
+    
+    if (!shouldSave) {
+      console.log(`Score ${completion.percentage}% is not higher than existing best ${existingBest!.percentage}%, not saving`);
+      // Return the existing best completion instead of creating a new one
+      return existingBest!;
+    }
+
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .insert({

@@ -112,7 +112,8 @@ export const useQuizCompletion = (quizId?: string) => {
     score: number,
     maxScore: number,
     timeSpent: number,
-    podcastId?: string
+    podcastId?: string,
+    passPercentage?: number
   ): Promise<QuizCompletion | null> => {
     if (!user?.id) {
       setError('User not authenticated');
@@ -126,7 +127,7 @@ export const useQuizCompletion = (quizId?: string) => {
       // Calculate attempts from existing completions
       const attempts = completions.filter(c => c.quiz_id === quizId).length;
       const percentage = Math.round((score / maxScore) * 100);
-      const passed = percentage >= 70; // 70% passing threshold
+      const passed = percentage >= (passPercentage || 70); // Use quiz-specific pass percentage or default to 70%
 
       const completionData = {
         user_id: user.id,
@@ -299,6 +300,10 @@ export const useQuizCompletion = (quizId?: string) => {
     deleteCompletion,
     loadUserCompletions,
     loadUserProgress,
+    refreshData: async () => {
+      await loadUserCompletions();
+      await loadUserProgress();
+    },
     
     // Queries
     hasCompletedQuiz,
@@ -318,7 +323,13 @@ export const useQuizCompletion = (quizId?: string) => {
     
     // Helper functions
     isQuizCompleted: (quiz_id: string) => completions.some(c => c.quiz_id === quiz_id),
-    isQuizPassed: (quiz_id: string) => completions.some(c => c.quiz_id === quiz_id && c.passed),
+    isQuizPassed: (quiz_id: string) => {
+      // More robust checking: validate both stored pass status AND actual percentage
+      // This handles cases where stale data might have passed=true but percentage=0
+      const completion = completions.find(c => c.quiz_id === quiz_id);
+      if (!completion) return false;
+      return completion.passed && completion.percentage >= 70; // Default 70% threshold
+    },
     getQuizScore: (quiz_id: string) => {
       const completion = completions.find(c => c.quiz_id === quiz_id);
       return completion ? completion.score : 0;
@@ -326,6 +337,12 @@ export const useQuizCompletion = (quizId?: string) => {
     getQuizPercentage: (quiz_id: string) => {
       const completion = completions.find(c => c.quiz_id === quiz_id);
       return completion ? completion.percentage : 0;
+    },
+    // New function to check if quiz is passed with custom pass percentage
+    isQuizPassedWithThreshold: (quiz_id: string, passPercentage: number = 70) => {
+      const completion = completions.find(c => c.quiz_id === quiz_id);
+      if (!completion) return false;
+      return completion.percentage >= passPercentage;
     }
   };
 };

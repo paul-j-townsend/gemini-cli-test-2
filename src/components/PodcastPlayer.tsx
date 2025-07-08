@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PodcastPlayerItem from './PodcastPlayerItem';
 import { supabase } from '@/lib/supabase';
+import { useQuizCompletion } from '@/hooks/useQuizCompletion';
 
 interface Podcast {
   id: string;
@@ -41,10 +42,13 @@ const PodcastPlayer = () => {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { refreshData } = useQuizCompletion();
 
   useEffect(() => {
     fetchPodcasts();
-  }, []);
+    // Refresh quiz completion data when episodes page loads
+    refreshData();
+  }, []); // Remove refreshData dependency to prevent infinite loop
 
   const getThumbnailUrl = (episode: PodcastEpisode): string => {
     if (!episode.thumbnail_path) {

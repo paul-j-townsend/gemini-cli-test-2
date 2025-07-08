@@ -2,6 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Quiz from './Quiz';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
+import { 
+  Play, 
+  Pause, 
+  SkipBack, 
+  SkipForward, 
+  Volume2, 
+  VolumeX, 
+  Settings,
+  Check,
+  X,
+  AlertCircle,
+  Download
+} from 'lucide-react';
 
 
 
@@ -25,46 +38,6 @@ const formatTime = (seconds: number) => {
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
-// Modern React SVG Components
-const PlayIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.742 1.295 2.545 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
-  </svg>
-);
-
-const PauseIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path fillRule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0a.75.75 0 0 1 .75-.75H16.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clipRule="evenodd" />
-  </svg>
-);
-
-const SkipBackIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z" />
-  </svg>
-);
-
-const SkipForwardIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.689ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 12.75 16.811V8.689Z" />
-  </svg>
-);
-
-const VolumeIcon = ({ isMuted }: { isMuted: boolean }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-    {isMuted ? (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-    ) : (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-    )}
-  </svg>
-);
-
-const SpeedIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-  </svg>
-);
 
 const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -82,10 +55,16 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   const [error, setError] = useState<string | null>(null);
   
   // Quiz completion checking
-  const { isQuizCompleted, isQuizPassed, getQuizPercentage } = useQuizCompletion();
+  const { isQuizCompleted, isQuizPassed, getQuizPercentage, isQuizPassedWithThreshold } = useQuizCompletion();
   const quizCompleted = podcast.quiz_id ? isQuizCompleted(podcast.quiz_id) : false;
-  const quizPassed = podcast.quiz_id ? isQuizPassed(podcast.quiz_id) : false;
   const quizPercentage = podcast.quiz_id ? getQuizPercentage(podcast.quiz_id) : 0;
+  
+  // Use the robust threshold-based checking instead of manual validation
+  // This properly validates percentage against the actual pass criteria
+  // TODO: Get actual quiz pass percentage from quiz data instead of defaulting to 70%
+  const quizPassed = podcast.quiz_id ? 
+    isQuizPassedWithThreshold(podcast.quiz_id, 70) : 
+    false;
 
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
@@ -376,16 +355,13 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                     : 'bg-orange-100 text-orange-700 border border-orange-200'
                 }`}>
                   {quizPassed ? (
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Check size={12} />
                   ) : (
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <AlertCircle size={12} />
                   )}
                   <span>
-                    {quizPassed ? `Passed (${quizPercentage}%)` : 'Completed'}
+                    {quizPassed ? `Passed (${quizPercentage}%)` : 
+                     quizCompleted ? `Failed (${quizPercentage}%)` : 'Not Completed'}
                   </span>
                 </div>
               </div>
@@ -428,9 +404,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
         {error && (
           <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600 flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <AlertCircle size={16} />
               {error}
             </p>
           </div>
@@ -447,7 +421,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             disabled={isLoading || !!error}
             aria-label="Skip back 15 seconds"
           >
-            <SkipBackIcon />
+            <SkipBack size={16} />
           </button>
           
           <button
@@ -459,9 +433,9 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : isPlaying ? (
-              <PauseIcon />
+              <Pause size={20} />
             ) : (
-              <PlayIcon />
+              <Play size={20} />
             )}
           </button>
           
@@ -471,7 +445,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             disabled={isLoading || !!error}
             aria-label="Skip forward 15 seconds"
           >
-            <SkipForwardIcon />
+            <SkipForward size={16} />
           </button>
         </div>
 
@@ -484,7 +458,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
               className="w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
-              <VolumeIcon isMuted={isMuted} />
+              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
             </button>
             <div className="transition-opacity duration-200">
               <input
@@ -508,7 +482,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             className="flex items-center space-x-1 px-2 py-1 text-xs font-medium text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
             aria-label={`Playback speed: ${playbackRate}x`}
           >
-            <SpeedIcon />
+            <Settings size={16} />
             <span>{playbackRate}x</span>
           </button>
         </div>
@@ -520,7 +494,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             className="w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
             aria-label={isMuted ? 'Unmute' : 'Mute'}
           >
-            <VolumeIcon isMuted={isMuted} />
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
           <button
             onClick={handleSpeedChange}
@@ -541,9 +515,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             className="btn-primary w-full flex items-center justify-center gap-2"
             disabled={!podcast.full_audio_src}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-            </svg>
+            <Play size={20} />
             Listen to Full Version
           </button>
         ) : (
@@ -554,9 +526,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                 onClick={() => setShowQuiz(false)}
                 className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                  <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
-                </svg>
+                <X size={20} />
                 Close Quiz
               </button>
             ) : (
@@ -567,17 +537,20 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                   !podcast.quiz_id ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                  <path fillRule="evenodd" d="M15.94 2.94a.75.75 0 0 1 0 1.06L6.31 12.69a.75.75 0 0 0 1.06 1.06L17 4.06a.75.75 0 0 1-1.06-1.06Zm-6.75 4.5a.75.75 0 0 1 0 1.06L4.56 13l4.63-4.63a.75.75 0 0 1 1.06 0ZM3.5 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-                </svg>
+                  <Settings size={20} />
                 {podcast.quiz_id ? 'Take Quiz' : 'No Quiz Available'}
               </button>
             )}
-            <button className="btn-primary w-full sm:w-auto flex-1 flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                <path d="M9.25 12.25a.75.75 0 0 0 1.5 0V4.57l2.053 2.053a.75.75 0 0 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06L9.25 4.57v7.68ZM2 14.25a.75.75 0 0 0 0 1.5h16a.75.75 0 0 0 0-1.5H2Z" />
-              </svg>
-              Get Certificate
+            <button 
+              disabled={!quizPassed}
+              className={`w-full sm:w-auto flex-1 flex items-center justify-center gap-2 ${
+                quizPassed 
+                  ? 'btn-primary' 
+                  : 'btn-secondary opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <Download size={20} />
+              {quizPassed ? 'Get Certificate' : 'Pass Quiz to Get Certificate'}
             </button>
           </>
         )}

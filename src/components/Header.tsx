@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import LogoSvg from './LogoSvg';
+import { Menu, X } from 'lucide-react';
 
 import { navigationItems } from '../config/navigation';
 
@@ -97,23 +98,11 @@ const Header = () => {
               onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
               onFocus={(e) => e.currentTarget.style.outline = 'none'}
             >
-              <div className="w-6 h-6 flex flex-col justify-center">
-                <span 
-                  className={`block h-0.5 w-6 bg-neutral-600 transition-all duration-300 ${
-                    isMobileMenuOpen ? 'rotate-45 translate-y-1' : ''
-                  }`}
-                />
-                <span 
-                  className={`block h-0.5 w-6 bg-neutral-600 mt-1 transition-all duration-300 ${
-                    isMobileMenuOpen ? 'opacity-0' : ''
-                  }`}
-                />
-                <span 
-                  className={`block h-0.5 w-6 bg-neutral-600 mt-1 transition-all duration-300 ${
-                    isMobileMenuOpen ? '-rotate-45 -translate-y-1' : ''
-                  }`}
-                />
-              </div>
+              {isMobileMenuOpen ? (
+                <X size={20} className="text-neutral-600" />
+              ) : (
+                <Menu size={20} className="text-neutral-600" />
+              )}
             </button>
           </div>
 
