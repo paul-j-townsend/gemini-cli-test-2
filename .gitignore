@@ -10,6 +10,21 @@ my_docs
 .DS_Store
 **/.DS_Store
 
+# Editor files
+*.swp
+*.swo
+*~
+
+# Temporary files
+.temp
+.tmp
+*.temp
+*.tmp
+
+# Log files
+*.log
+logs/
+
 # Project specific files
 public/images/imgres.html
 connect_to_fasthosts.ssh
