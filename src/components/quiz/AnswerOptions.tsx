@@ -41,7 +41,7 @@ export const AnswerOptions: React.FC<AnswerOptionsProps> = React.memo(({
           const isSelected = selectedAnswers.includes(answer.id);
           const isCorrect = answer.is_correct;
           const isWrong = showExplanation && isSelected && !isCorrect;
-          const showCorrect = showExplanation && isCorrect;
+          const showCorrect = showExplanation && isSelected && isCorrect;
           
           return (
             <label 

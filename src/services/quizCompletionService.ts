@@ -1,8 +1,20 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { QuizCompletion, QuizAnswer, UserProgress, Badge } from '../types/database';
+import { QuizCompletion, QuizAnswer, UserProgress, Badge, QuizContinuationStatus } from '../types/database';
+import { continuationService } from './continuationService';
 
 class QuizCompletionService {
   async createCompletion(completion: Omit<QuizCompletion, 'id'>): Promise<QuizCompletion> {
+    // Check attempt limits before creating completion
+    const continuationStatus = await continuationService.checkAttemptLimits(completion.user_id, completion.quiz_id);
+    
+    if (!continuationStatus.canAttempt) {
+      throw new Error(`Cannot create completion: ${continuationStatus.message}`);
+    }
+
+    // Get current attempt number
+    const currentAttempts = await this.getUserQuizAttempts(completion.user_id, completion.quiz_id);
+    const attemptNumber = currentAttempts + 1;
+
     // Check if user has existing completions for this quiz
     const existingBest = await this.getUserBestScore(completion.user_id, completion.quiz_id);
     
@@ -11,6 +23,8 @@ class QuizCompletionService {
     
     if (!shouldSave) {
       console.log(`Score ${completion.percentage}% is not higher than existing best ${existingBest!.percentage}%, not saving`);
+      // Still record the attempt for continuation tracking
+      await continuationService.recordAttempt(completion.user_id, completion.quiz_id, completion.passed);
       // Return the existing best completion instead of creating a new one
       return existingBest!;
     }
@@ -37,6 +51,9 @@ class QuizCompletionService {
       console.error('Error creating completion:', error);
       throw new Error('Failed to create quiz completion');
     }
+
+    // Record the attempt in continuation service
+    await continuationService.recordAttempt(completion.user_id, completion.quiz_id, completion.passed);
 
     await this.updateUserProgress(completion.user_id, data as QuizCompletion);
     return data as QuizCompletion;
@@ -393,6 +410,31 @@ class QuizCompletionService {
       passRate: Math.round((totalPassed / data.length) * 100),
       averageTimeSpent: Math.round(totalTimeSpent / data.length)
     };
+  }
+
+  // Continuation-related methods
+  async checkAttemptLimits(userId: string, quizId: string): Promise<QuizContinuationStatus> {
+    return await continuationService.checkAttemptLimits(userId, quizId);
+  }
+
+  async getRemainingAttempts(userId: string, quizId: string): Promise<number> {
+    return await continuationService.getRemainingAttempts(userId, quizId);
+  }
+
+  async getNextAttemptAvailableTime(userId: string, quizId: string): Promise<Date | null> {
+    return await continuationService.getNextAttemptAvailableTime(userId, quizId);
+  }
+
+  async resetUserAttempts(userId: string, quizId: string): Promise<void> {
+    return await continuationService.resetUserAttempts(userId, quizId);
+  }
+
+  async getContinuationStats(quizId: string): Promise<{
+    totalUsers: number;
+    averageAttemptsUsed: number;
+    completionRateByAttempt: { attempt: number; completionRate: number }[];
+  }> {
+    return await continuationService.getContinuationStats(quizId);
   }
 
   

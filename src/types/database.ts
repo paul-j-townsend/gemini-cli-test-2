@@ -105,6 +105,8 @@ export interface QuizCompletion {
   answers: QuizAnswer[];
   passed: boolean;
   attempts: number;
+  attempt_number?: number;
+  next_attempt_available_at?: string;
 }
 
 export interface QuizAnswer {
@@ -127,6 +129,8 @@ export interface QuizCompletionsTable {
   answers: QuizAnswer[];
   passed: boolean;
   attempts: number;
+  attempt_number: number;
+  next_attempt_available_at: string | null;
 }
 
 // User progress tracking
@@ -178,6 +182,9 @@ export interface Quiz {
   pass_percentage: number;
   total_questions: number;
   podcast_id?: string;
+  max_attempts?: number;
+  cooldown_period_hours?: number;
+  reset_period_days?: number;
   created_at: string;
   updated_at: string;
 }
@@ -190,6 +197,9 @@ export interface QuizTable {
   pass_percentage: number;
   total_questions: number;
   podcast_id: string | null;
+  max_attempts?: number;
+  cooldown_period_hours?: number;
+  reset_period_days?: number;
   created_at: string;
   updated_at: string;
 }
@@ -213,4 +223,43 @@ export interface QuestionAnswer {
   is_correct: boolean;
   answer_key: string; // 'A', 'B', 'C', 'D'
   created_at: string;
+}
+
+// Quiz continuation limits tracking
+export interface QuizContinuationLimits {
+  id: string;
+  user_id: string;
+  quiz_id: string;
+  attempts_used: number;
+  last_attempt_at: string | null;
+  blocked_until: string | null;
+  reset_at: string;
+  custom_max_attempts: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QuizContinuationLimitsTable {
+  id: string;
+  user_id: string;
+  quiz_id: string;
+  attempts_used: number;
+  last_attempt_at: string | null;
+  blocked_until: string | null;
+  reset_at: string;
+  custom_max_attempts: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Continuation status for frontend
+export interface QuizContinuationStatus {
+  canAttempt: boolean;
+  attemptsRemaining: number;
+  totalAttempts: number;
+  attemptsUsed: number;
+  nextAttemptAvailableAt: string | null;
+  resetAt: string;
+  blockedUntil: string | null;
+  message: string;
 }

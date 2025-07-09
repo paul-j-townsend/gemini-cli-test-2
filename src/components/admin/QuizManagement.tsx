@@ -86,13 +86,17 @@ const QuizManagement = () => {
       }
       const data = await response.json();
       
+      console.log('Raw quiz data from API:', data);
+      
       const transformedQuizzes = data.map((quiz: any) => ({
         ...quiz,
-        quiz_questions: quiz.quiz_questions?.map((q: any) => ({
+        quiz_questions: quiz.vsk_quiz_questions?.map((q: any) => ({
           ...q,
-          answers: q.question_answers || []
-        }))
+          answers: q.vsk_question_answers || []
+        })) || []
       }));
+      
+      console.log('Transformed quiz data:', transformedQuizzes);
       
       setQuizzes(transformedQuizzes);
       setError(null);
@@ -145,6 +149,8 @@ const QuizManagement = () => {
     try {
       setSaving(true);
       
+      console.log('Saving quiz with data:', data);
+      
       const apiQuizData = {
         id: editingQuiz?.id || 'new-quiz',
         title: data.title,
@@ -169,7 +175,11 @@ const QuizManagement = () => {
         })) || []
       };
       
+      console.log('API data being sent:', apiQuizData);
+      
       const isNew = !editingQuiz || editingQuiz.id === 'new-quiz';
+      console.log('Is new quiz:', isNew);
+      
       const response = await fetch('/api/admin/quizzes', {
         method: isNew ? 'POST' : 'PUT',
         headers: {
@@ -178,9 +188,17 @@ const QuizManagement = () => {
         body: JSON.stringify(apiQuizData)
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+
+      const result = await response.json();
+      console.log('Save result:', result);
 
       setEditingQuiz(null);
       await fetchQuizzes();
@@ -388,6 +406,11 @@ const QuizManagement = () => {
             >
               Add New Quiz
             </Button>
+          </div>
+        )}
+        {editingQuiz && (
+          <div className="text-sm text-gray-500">
+            Editing: {editingQuiz.title}
           </div>
         )}
       </div>
