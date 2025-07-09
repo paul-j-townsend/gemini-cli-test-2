@@ -250,30 +250,7 @@ export const usePodcastManagement = (): PodcastManagementHook => {
       } else {
         setState(prev => ({ 
           ...prev, 
-          error: (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="font-semibold text-yellow-800 mb-2">Manual Migration Required</h3>
-              <p className="text-yellow-700 mb-3">{result.instruction}</p>
-              <div className="bg-gray-900 text-green-400 p-3 rounded text-sm font-mono whitespace-pre-wrap mb-3">
-                {result.sql}
-              </div>
-              <ol className="text-yellow-700 text-sm space-y-1">
-                {result.steps?.map((step: string, index: number) => (
-                  <li key={index}>{step}</li>
-                ))}
-              </ol>
-              {result.supabaseUrl && (
-                <a 
-                  href={result.supabaseUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-                >
-                  Open Supabase SQL Editor
-                </a>
-              )}
-            </div>
-          )
+          error: `Manual Migration Required: ${result.instruction}. Please run the following SQL: ${result.sql}`
         }));
       }
     } catch (err: any) {

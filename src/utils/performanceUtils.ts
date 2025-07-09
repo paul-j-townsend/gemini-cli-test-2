@@ -298,7 +298,7 @@ export const profileComponent = <T extends Record<string, any>>(
     return Component;
   }
   
-  return React.memo((props: T) => {
+  const ProfiledComponent = (props: T) => {
     const renderStart = useRef<number>();
     
     useEffect(() => {
@@ -313,5 +313,7 @@ export const profileComponent = <T extends Record<string, any>>(
     });
     
     return React.createElement(Component, props);
-  });
+  };
+  
+  return React.memo(ProfiledComponent) as React.ComponentType<T>;
 };

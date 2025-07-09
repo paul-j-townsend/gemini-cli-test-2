@@ -241,7 +241,7 @@ export function parseFloatSafe(value: string | undefined, defaultValue: number =
 
 export function removeDuplicates<T>(array: T[], key?: keyof T): T[] {
   if (!key) {
-    return [...new Set(array)];
+    return Array.from(new Set(array));
   }
   
   const seen = new Set();
