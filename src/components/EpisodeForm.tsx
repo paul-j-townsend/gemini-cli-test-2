@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import Badge from './Badge';
+import { FaAward } from 'react-icons/fa';
 
 interface Episode {
   id?: string;
@@ -58,6 +60,12 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
     created_at: string;
   }>>([]);
   const [loadingImageFiles, setLoadingImageFiles] = useState(false);
+  const [badge, setBadge] = useState({
+    name: 'Test Badge',
+    description: 'This is a test badge',
+    icon: <FaAward />,
+    color: '#FFD700'
+  });
 
   useEffect(() => {
     if (audioInputType === 'url') {
@@ -715,6 +723,18 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             disabled={isLoading}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Badge
+          </label>
+          <Badge
+            name={badge.name}
+            description={badge.description}
+            icon={badge.icon}
+            color={badge.color}
           />
         </div>
 

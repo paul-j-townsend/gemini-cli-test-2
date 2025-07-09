@@ -1,35 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useAuth } from '../hooks/useAuth';
 import { calculateUserProgress, formatDuration, calculateUserLevel } from '../utils/progressUtils';
+import { useMemoizedProgressCalculations } from '../utils/performanceUtils';
 import { quizService } from '../services/quizService';
 import type { ProgressSummary, Achievement } from '../utils/progressUtils';
 
-export const UserProgressDashboard: React.FC = () => {
+export const UserProgressDashboard: React.FC = React.memo(() => {
   const { user } = useAuth();
   const { completions, userProgress, isLoading, deleteCompletion } = useQuizCompletion();
-  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
   const [quizTitles, setQuizTitles] = useState<Record<string, string>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    console.log('Completions updated in UserProgressDashboard:', completions);
-    if (completions.length > 0) {
-      const summary = calculateUserProgress(completions);
-      setProgressSummary(summary);
-      console.log('Progress summary updated:', summary);
-    } else {
-      setProgressSummary(null);
-      console.log('No completions, progress summary reset.');
-    }
-  }, [completions]);
+  const progressSummary = useMemoizedProgressCalculations(completions);
 
-  // Load quiz titles for all completions
+  const uniqueQuizIds = useMemo(() => 
+    Array.from(new Set(completions.map(c => c.quiz_id))), 
+    [completions]
+  );
+
   useEffect(() => {
     const loadQuizTitles = async () => {
-      if (completions.length > 0) {
+      if (uniqueQuizIds.length > 0) {
         const titles: Record<string, string> = {};
-        const uniqueQuizIds = Array.from(new Set(completions.map(c => c.quiz_id)));
         
         await Promise.all(
           uniqueQuizIds.map(async (quizId) => {
@@ -42,10 +35,9 @@ export const UserProgressDashboard: React.FC = () => {
     };
 
     loadQuizTitles();
-  }, [completions]);
+  }, [uniqueQuizIds]);
 
-  // Handle deletion of a completion
-  const handleDeleteCompletion = async (id: string) => {
+  const handleDeleteCompletion = useCallback(async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this quiz completion? This action cannot be undone.')) {
       return;
     }
@@ -69,7 +61,29 @@ export const UserProgressDashboard: React.FC = () => {
     } finally {
       setDeletingId(null);
     }
-  };
+  }, [deleteCompletion]);
+
+  const userLevel = useMemo(() => 
+    userProgress ? calculateUserLevel(userProgress.total_score) : { level: 1, progress: 0, nextLevelScore: 1000 },
+    [userProgress]
+  );
+
+  const overviewStats = useMemo(() => ({
+    totalQuizzes: progressSummary?.totalQuizzes || 0,
+    totalPassed: progressSummary?.totalPassed || 0,
+    averageScore: progressSummary?.averageScore || 0,
+    streakDays: progressSummary?.streakDays || 0
+  }), [progressSummary]);
+
+  const recentActivity = useMemo(() => 
+    progressSummary?.recentActivity || [],
+    [progressSummary]
+  );
+
+  const achievements = useMemo(() => 
+    progressSummary?.achievements || [],
+    [progressSummary]
+  );
 
   if (isLoading) {
     return (
@@ -88,7 +102,6 @@ export const UserProgressDashboard: React.FC = () => {
     );
   }
 
-  const userLevel = userProgress ? calculateUserLevel(userProgress.total_score) : { level: 1, progress: 0, nextLevelScore: 1000 };
 
   return (
     <div className="space-y-6">
@@ -126,28 +139,28 @@ export const UserProgressDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
           <div className="text-3xl font-bold text-primary-600 mb-2">
-            {progressSummary?.total_quizzes_completed || 0}
+            {progressSummary?.totalQuizzes || 0}
           </div>
           <p className="text-neutral-600">Quizzes Completed</p>
         </div>
         
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
           <div className="text-3xl font-bold text-green-600 mb-2">
-            {progressSummary?.total_quizzes_passed || 0}
+            {progressSummary?.totalPassed || 0}
           </div>
           <p className="text-neutral-600">Quizzes Passed</p>
         </div>
         
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
           <div className="text-3xl font-bold text-blue-600 mb-2">
-            {progressSummary?.average_score || 0}%
+            {progressSummary?.averageScore || 0}%
           </div>
           <p className="text-neutral-600">Average Score</p>
         </div>
         
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
           <div className="text-3xl font-bold text-purple-600 mb-2">
-            {progressSummary?.streak_days || 0}
+            {progressSummary?.streakDays || 0}
           </div>
           <p className="text-neutral-600">Day Streak</p>
         </div>
@@ -158,9 +171,9 @@ export const UserProgressDashboard: React.FC = () => {
         {/* Recent Activity */}
         <div className="bg-white rounded-xl p-6 border border-neutral-200">
           <h2 className="text-xl font-bold text-neutral-900 mb-4">Recent Activity</h2>
-          {progressSummary?.recent_activity && progressSummary.recent_activity.length > 0 ? (
+          {recentActivity.length > 0 ? (
             <div className="space-y-3">
-              {progressSummary.recent_activity.map((completion) => (
+              {recentActivity.map((completion) => (
                 <div key={completion.id} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg group hover:bg-neutral-100 transition-colors duration-200">
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -225,9 +238,9 @@ export const UserProgressDashboard: React.FC = () => {
         {/* Achievements */}
         <div className="bg-white rounded-xl p-6 border border-neutral-200">
           <h2 className="text-xl font-bold text-neutral-900 mb-4">Achievements</h2>
-          {progressSummary?.achievements && progressSummary.achievements.length > 0 ? (
+          {achievements.length > 0 ? (
             <div className="space-y-3">
-              {progressSummary.achievements.map((achievement) => (
+              {achievements.map((achievement) => (
                 <div key={achievement.id} className="flex items-center p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
                   <div className="text-2xl mr-3">{achievement.icon}</div>
                   <div>
@@ -258,14 +271,14 @@ export const UserProgressDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
             <div className="text-3xl font-bold text-primary-600 mb-2">
-              {formatDuration(progressSummary?.time_spent || 0)}
+              {formatDuration(progressSummary?.totalTimeSpent || 0)}
             </div>
             <p className="text-neutral-600">Total Study Time</p>
           </div>
           
           <div className="text-center">
             <div className="text-3xl font-bold text-green-600 mb-2">
-              {progressSummary?.total_quizzes_passed || 0}
+              {progressSummary?.totalPassed || 0}
             </div>
             <p className="text-neutral-600">Quizzes Passed</p>
           </div>
@@ -280,6 +293,8 @@ export const UserProgressDashboard: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+UserProgressDashboard.displayName = 'UserProgressDashboard';
 
 export default UserProgressDashboard;

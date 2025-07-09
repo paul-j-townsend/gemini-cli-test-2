@@ -1,5 +1,10 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { AdminDataTable, AdminForm, type TableColumn, type TableAction, type FormSection } from './shared';
+import { Button } from '@/components/ui/Button';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { useFormManagement } from '@/hooks/useFormManagement';
+import { quizValidationSchema } from '@/utils/validationUtils';
 
 interface QuestionAnswer {
   id?: string;
@@ -31,6 +36,15 @@ interface Quiz {
   quiz_questions?: QuizQuestion[];
 }
 
+interface QuizFormData {
+  title: string;
+  description: string;
+  category: string;
+  pass_percentage: number;
+  total_questions: number;
+  quiz_questions: QuizQuestion[];
+}
+
 const QuizManagement = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +52,26 @@ const QuizManagement = () => {
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [saving, setSaving] = useState(false);
   const [creatingSystemQuizzes, setCreatingSystemQuizzes] = useState(false);
+
+  const formHook = useFormManagement<QuizFormData>({
+    initialData: {
+      title: '',
+      description: '',
+      category: '',
+      pass_percentage: 70,
+      total_questions: 0,
+      quiz_questions: []
+    },
+    validationSchema: {
+      title: { required: true, minLength: 1 },
+      description: { required: false },
+      category: { required: false },
+      pass_percentage: { required: true, min: 0, max: 100 },
+      total_questions: { required: true, min: 0 }
+    },
+    validateOnChange: true,
+    validateOnBlur: true
+  });
 
   useEffect(() => {
     fetchQuizzes();
@@ -52,12 +86,11 @@ const QuizManagement = () => {
       }
       const data = await response.json();
       
-      // Transform the data to match our component's expected structure
       const transformedQuizzes = data.map((quiz: any) => ({
         ...quiz,
         quiz_questions: quiz.quiz_questions?.map((q: any) => ({
           ...q,
-          answers: q.question_answers || [] // Map question_answers to answers
+          answers: q.question_answers || []
         }))
       }));
       
@@ -71,15 +104,23 @@ const QuizManagement = () => {
   };
 
   const handleEditQuiz = (quiz: Quiz) => {
-    // Ensure the quiz has the correct structure when editing
     const editableQuiz = {
       ...quiz,
       quiz_questions: quiz.quiz_questions?.map(q => ({
         ...q,
-        answers: q.answers || [] // Ensure answers array exists
+        answers: q.answers || []
       }))
     };
     setEditingQuiz(editableQuiz);
+    
+    formHook.setData({
+      title: editableQuiz.title,
+      description: editableQuiz.description || '',
+      category: editableQuiz.category || '',
+      pass_percentage: editableQuiz.pass_percentage || 70,
+      total_questions: editableQuiz.total_questions || 0,
+      quiz_questions: editableQuiz.quiz_questions || []
+    });
   };
 
   const handleDeleteQuiz = async (quizId: string) => {
@@ -93,25 +134,24 @@ const QuizManagement = () => {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        fetchQuizzes();
+        await fetchQuizzes();
       } catch (error) {
         setError(`Failed to delete quiz: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
   };
 
-  const handleSaveQuiz = async (quiz: Quiz) => {
+  const handleSaveQuiz = async (data: QuizFormData) => {
     try {
       setSaving(true);
       
-      // Transform the quiz data back to API format
       const apiQuizData = {
-        id: quiz.id,
-        title: quiz.title,
-        description: quiz.description,
-        category: quiz.category,
-        pass_percentage: quiz.pass_percentage,
-        quiz_questions: quiz.quiz_questions?.map(q => ({
+        id: editingQuiz?.id || 'new-quiz',
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        pass_percentage: data.pass_percentage,
+        quiz_questions: data.quiz_questions?.map(q => ({
           id: q.id,
           quiz_id: q.quiz_id,
           question_number: q.question_number,
@@ -129,36 +169,22 @@ const QuizManagement = () => {
         })) || []
       };
       
-      if (quiz.id === 'new-quiz') {
-        // Create new quiz
-        const response = await fetch('/api/admin/quizzes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(apiQuizData)
-        });
+      const isNew = !editingQuiz || editingQuiz.id === 'new-quiz';
+      const response = await fetch('/api/admin/quizzes', {
+        method: isNew ? 'POST' : 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiQuizData)
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-      } else {
-        // Update existing quiz
-        const response = await fetch('/api/admin/quizzes', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(apiQuizData)
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       setEditingQuiz(null);
-      fetchQuizzes();
+      await fetchQuizzes();
+      formHook.reset();
     } catch (error) {
       console.error('Save error:', error);
       setError(`Failed to save quiz: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -166,9 +192,6 @@ const QuizManagement = () => {
       setSaving(false);
     }
   };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
 
   const handleCreateSystemQuizzes = async () => {
     setCreatingSystemQuizzes(true);
@@ -184,15 +207,10 @@ const QuizManagement = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      console.log('System quizzes created:', result);
-      
-      // Refresh the quiz list
-      fetchQuizzes();
+      await fetchQuizzes();
       setError(null);
     } catch (err) {
       setError(`Failed to create system quizzes: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      console.error('Create system quizzes error:', err);
     }
     setCreatingSystemQuizzes(false);
   };
@@ -217,107 +235,201 @@ const QuizManagement = () => {
       }]
     };
     setEditingQuiz(newQuiz);
+    formHook.setData({
+      title: newQuiz.title,
+      description: newQuiz.description || '',
+      category: newQuiz.category || '',
+      pass_percentage: newQuiz.pass_percentage || 70,
+      total_questions: newQuiz.total_questions || 0,
+      quiz_questions: newQuiz.quiz_questions || []
+    });
   };
 
+  const handleCancel = () => {
+    setEditingQuiz(null);
+    formHook.reset();
+  };
+
+  const tableColumns: TableColumn<Quiz>[] = [
+    {
+      key: 'title',
+      label: 'Title',
+      sortable: true,
+      render: (quiz) => (
+        <div>
+          <div className="font-semibold text-gray-900">{quiz.title}</div>
+          <div className="text-sm text-gray-500">{quiz.description}</div>
+        </div>
+      )
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      render: (quiz) => (
+        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+          {quiz.category || 'General'}
+        </span>
+      )
+    },
+    {
+      key: 'quiz_questions',
+      label: 'Questions',
+      render: (quiz) => (
+        <div className="text-sm">
+          <div className="font-medium">{quiz.quiz_questions?.length || 0} questions</div>
+          <div className="text-gray-500">{quiz.pass_percentage || 70}% to pass</div>
+        </div>
+      )
+    },
+    {
+      key: 'actions',
+      label: 'Actions'
+    }
+  ];
+
+  const tableActions: TableAction<Quiz>[] = [
+    {
+      label: 'Edit',
+      onClick: handleEditQuiz,
+      variant: 'primary'
+    },
+    {
+      label: 'Delete',
+      onClick: (quiz) => handleDeleteQuiz(quiz.id),
+      variant: 'ghost'
+    }
+  ];
+
+  const formSections: FormSection[] = [
+    {
+      title: 'Quiz Information',
+      fields: [
+        {
+          name: 'title',
+          label: 'Title',
+          type: 'text',
+          required: true,
+          placeholder: 'Enter quiz title'
+        },
+        {
+          name: 'category',
+          label: 'Category',
+          type: 'text',
+          placeholder: 'e.g. Ethics, Professional Practice'
+        },
+        {
+          name: 'pass_percentage',
+          label: 'Pass Percentage',
+          type: 'number',
+          required: true,
+          min: 0,
+          max: 100
+        },
+        {
+          name: 'total_questions',
+          label: 'Total Questions',
+          type: 'number',
+          required: true,
+          min: 0
+        },
+        {
+          name: 'description',
+          label: 'Description',
+          type: 'textarea',
+          placeholder: 'Brief description of the quiz',
+          gridColumn: 'span-full'
+        }
+      ]
+    },
+    {
+      title: 'Questions',
+      fields: [
+        {
+          name: 'quiz_questions',
+          label: 'Questions',
+          type: 'custom',
+          gridColumn: 'span-full',
+          render: (questions, onChange) => (
+            <QuizQuestionsEditor
+              questions={questions || []}
+              onChange={onChange}
+            />
+          )
+        }
+      ]
+    }
+  ];
+
+  if (loading) {
+    return <LoadingState message="Loading quizzes..." />;
+  }
+
+  if (error) {
+    return <ErrorDisplay error={error} onRetry={fetchQuizzes} />;
+  }
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Quiz Management</h2>
         {!editingQuiz && (
           <div className="flex gap-2">
-            <button 
+            <Button 
               onClick={handleCreateSystemQuizzes}
               disabled={creatingSystemQuizzes}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+              variant="secondary"
+              loading={creatingSystemQuizzes}
             >
-              {creatingSystemQuizzes ? 'Creating...' : 'Create System Quizzes'}
-            </button>
-            <button 
+              Create System Quizzes
+            </Button>
+            <Button 
               onClick={handleCreateQuiz}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+              variant="primary"
             >
               Add New Quiz
-            </button>
+            </Button>
           </div>
         )}
       </div>
+
       {editingQuiz ? (
-        <QuizForm quiz={editingQuiz} onSave={handleSaveQuiz} onCancel={() => setEditingQuiz(null)} />
+        <AdminForm
+          title={editingQuiz.id === 'new-quiz' ? 'Create New Quiz' : 'Edit Quiz'}
+          formHook={formHook}
+          sections={formSections}
+          onSubmit={handleSaveQuiz}
+          onCancel={handleCancel}
+          loading={saving}
+          error={error}
+        />
       ) : (
-        <QuizList quizzes={quizzes} onEdit={handleEditQuiz} onDelete={handleDeleteQuiz} />
+        <AdminDataTable
+          data={quizzes}
+          columns={tableColumns}
+          actions={tableActions}
+          emptyMessage="No quizzes found. Click 'Add New Quiz' to create your first quiz."
+        />
       )}
     </div>
   );
 };
 
-interface QuizListProps {
-  quizzes: Quiz[];
-  onEdit: (quiz: Quiz) => void;
-  onDelete: (quizId: string) => void;
+// Quiz Questions Editor Component
+interface QuizQuestionsEditorProps {
+  questions: QuizQuestion[];
+  onChange: (questions: QuizQuestion[]) => void;
 }
 
-const QuizList: React.FC<QuizListProps> = ({ quizzes, onEdit, onDelete }) => (
-  <div>
-    {quizzes.length === 0 ? (
-      <div className="text-center py-8 text-gray-500">
-        <p>No quizzes found. Click "Add New Quiz" to create your first quiz.</p>
-      </div>
-    ) : (
-      quizzes.map(quiz => (
-        <div key={quiz.id} className="border p-4 my-2 rounded-lg bg-white shadow-sm">
-          <h3 className="text-xl font-bold text-gray-900">{quiz.title}</h3>
-          <p className="text-gray-600 mt-1">{quiz.description}</p>
-          <div className="text-sm text-gray-500 mt-2">
-            <span className="inline-block mr-4">📊 {quiz.quiz_questions?.length || 0} questions</span>
-            <span className="inline-block mr-4">🎯 {quiz.pass_percentage || 70}% to pass</span>
-            <span className="inline-block">📁 {quiz.category || 'General'}</span>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <button 
-              onClick={() => onEdit(quiz)} 
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Edit Quiz
-            </button>
-            <button 
-              onClick={() => onDelete(quiz.id)} 
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-            >
-              Delete Quiz
-            </button>
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-);
-
-interface QuizFormProps {
-  quiz: Quiz;
-  onSave: (quiz: Quiz) => void;
-  onCancel: () => void;
-}
-
-const QuizForm: React.FC<QuizFormProps> = ({ quiz, onSave, onCancel }) => {
-  const [formData, setFormData] = useState<Quiz>(quiz);
-
-  const handleQuizChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: name === 'pass_percentage' ? parseInt(value) || 70 : value 
-    }));
-  };
-
+const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, onChange }) => {
   const handleQuestionChange = (index: number, updatedQuestion: QuizQuestion) => {
-    const newQuestions = [...(formData.quiz_questions || [])];
+    const newQuestions = [...questions];
     newQuestions[index] = updatedQuestion;
-    setFormData(prev => ({ ...prev, quiz_questions: newQuestions }));
+    onChange(newQuestions);
   };
 
   const handleAddQuestion = () => {
     const newQuestion: QuizQuestion = {
-      question_number: (formData.quiz_questions?.length || 0) + 1,
+      question_number: questions.length + 1,
       question_text: '',
       answers: [
         { answer_letter: 'A', answer_text: '', is_correct: false },
@@ -326,260 +438,167 @@ const QuizForm: React.FC<QuizFormProps> = ({ quiz, onSave, onCancel }) => {
         { answer_letter: 'D', answer_text: '', is_correct: false },
       ]
     };
-    setFormData(prev => ({ 
-      ...prev, 
-      quiz_questions: [...(prev.quiz_questions || []), newQuestion] 
-    }));
+    onChange([...questions, newQuestion]);
   };
 
   const handleRemoveQuestion = (index: number) => {
-    const newQuestions = [...(formData.quiz_questions || [])];
+    const newQuestions = [...questions];
     newQuestions.splice(index, 1);
-    // Renumber questions
     newQuestions.forEach((q, i) => q.question_number = i + 1);
-    setFormData(prev => ({ ...prev, quiz_questions: newQuestions }));
-  };
-
-  const handleAddAnswer = (questionIndex: number) => {
-    const newQuestions = [...(formData.quiz_questions || [])];
-    const question = newQuestions[questionIndex];
-    if (!question.answers) {
-      question.answers = [];
-    }
-    
-    // Determine the next answer letter
-    const existingLetters = question.answers.map(a => a.answer_letter);
-    const availableLetters = ['A', 'B', 'C', 'D', 'E'];
-    const nextLetter = availableLetters.find(letter => !existingLetters.includes(letter)) || 'A';
-    
-    question.answers.push({
-      answer_letter: nextLetter,
-      answer_text: '',
-      is_correct: false
-    });
-    
-    setFormData(prev => ({ ...prev, quiz_questions: newQuestions }));
-  };
-
-  const handleRemoveAnswer = (questionIndex: number, answerIndex: number) => {
-    const newQuestions = [...(formData.quiz_questions || [])];
-    const question = newQuestions[questionIndex];
-    if (question.answers) {
-      question.answers.splice(answerIndex, 1);
-    }
-    setFormData(prev => ({ ...prev, quiz_questions: newQuestions }));
-  };
-
-  const handleAnswerChange = (questionIndex: number, answerIndex: number, updatedAnswer: QuestionAnswer) => {
-    const newQuestions = [...(formData.quiz_questions || [])];
-    const question = newQuestions[questionIndex];
-    if (question.answers) {
-      question.answers[answerIndex] = updatedAnswer;
-    }
-    setFormData(prev => ({ ...prev, quiz_questions: newQuestions }));
+    onChange(newQuestions);
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">
-        {quiz.id === 'new-quiz' ? 'Create New Quiz' : 'Edit Quiz'}
-      </h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-          <input 
-            name="title" 
-            value={formData.title} 
-            onChange={handleQuizChange} 
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-            placeholder="Quiz title"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-          <input 
-            name="category" 
-            value={formData.category || ''} 
-            onChange={handleQuizChange} 
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-            placeholder="e.g. Ethics, Professional Practice"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Pass Percentage</label>
-          <input 
-            name="pass_percentage" 
-            type="number" 
-            min="0" 
-            max="100" 
-            value={formData.pass_percentage || 70} 
-            onChange={handleQuizChange} 
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Total Questions</label>
-          <input 
-            name="total_questions" 
-            type="number" 
-            value={formData.total_questions || 0} 
-            onChange={handleQuizChange} 
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-          />
-        </div>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h4 className="text-lg font-semibold text-gray-900">Questions</h4>
+        <Button onClick={handleAddQuestion} variant="secondary" size="sm">
+          Add Question
+        </Button>
       </div>
       
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-        <textarea 
-          name="description" 
-          value={formData.description || ''} 
-          onChange={handleQuizChange} 
-          rows={3}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-          placeholder="Brief description of the quiz"
+      {questions.map((question, index) => (
+        <QuestionEditor
+          key={index}
+          question={question}
+          index={index}
+          onChange={(updatedQuestion) => handleQuestionChange(index, updatedQuestion)}
+          onRemove={() => handleRemoveQuestion(index)}
         />
-      </div>
-
-      <hr className="my-6" />
+      ))}
       
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">Questions</h4>
-          <button 
-            onClick={handleAddQuestion} 
-            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
-          >
-            Add Question
-          </button>
+      {questions.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No questions yet. Click "Add Question" to get started.</p>
         </div>
-        
-        {formData.quiz_questions?.map((question, index) => (
-          <div key={index} className="border border-gray-200 rounded-md p-4 mb-4">
-            <div className="flex justify-between items-start mb-3">
-              <h5 className="font-medium text-gray-900">Question {question.question_number}</h5>
-              <button 
-                onClick={() => handleRemoveQuestion(index)}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                Remove
-              </button>
-            </div>
-            <textarea
-              value={question.question_text}
-              onChange={(e) => handleQuestionChange(index, { ...question, question_text: e.target.value })}
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your question here..."
-            />
-            <div className="mt-3">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Learning Outcome</label>
-              <textarea
-                value={question.learning_outcome || ''}
-                onChange={(e) => handleQuestionChange(index, { ...question, learning_outcome: e.target.value })}
-                rows={3}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="What the student should learn from this question. This will be shown after the user answers."
-              />
-            </div>
-            <div className="mt-3">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rationale (Explanation for correct answer)</label>
-              <textarea
-                value={question.rationale || ''}
-                onChange={(e) => handleQuestionChange(index, { ...question, rationale: e.target.value })}
-                rows={3}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Explain why the correct answer is correct. This will be shown after the user answers."
-              />
-            </div>
-            <div className="mt-4">
-              <h6 className="text-md font-medium text-gray-700 mb-2">Answers</h6>
-              {question.answers?.map((answer, ansIndex) => (
-                <AnswerForm 
-                  key={ansIndex}
-                  answer={answer}
-                  onAnswerChange={(updatedAnswer) => handleAnswerChange(index, ansIndex, updatedAnswer)}
-                  onRemoveAnswer={() => handleRemoveAnswer(index, ansIndex)}
-                />
-              ))}
-              <button 
-                onClick={() => handleAddAnswer(index)}
-                className="mt-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-sm hover:bg-blue-200 transition-colors"
-              >
-                Add Answer
-              </button>
-            </div>
-          </div>
-        ))}
-        
-        {(!formData.quiz_questions || formData.quiz_questions.length === 0) && (
-          <p className="text-gray-500 text-center py-8">No questions yet. Click "Add Question" to get started.</p>
-        )}
-      </div>
-
-      <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-        <button 
-          onClick={onCancel} 
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button 
-          onClick={() => onSave(formData)} 
-          className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-        >
-          Save Quiz
-        </button>
-      </div>
+      )}
     </div>
   );
 };
 
-interface AnswerFormProps {
-  answer: QuestionAnswer;
-  onAnswerChange: (answer: QuestionAnswer) => void;
-  onRemoveAnswer: () => void;
+// Question Editor Component
+interface QuestionEditorProps {
+  question: QuizQuestion;
+  index: number;
+  onChange: (question: QuizQuestion) => void;
+  onRemove: () => void;
 }
 
-const AnswerForm: React.FC<AnswerFormProps> = ({ answer, onAnswerChange, onRemoveAnswer }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    onAnswerChange({
-      ...answer,
-      [name]: type === 'checkbox' ? checked : value
-    });
+const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, index, onChange, onRemove }) => {
+  const handleAnswerChange = (answerIndex: number, updatedAnswer: QuestionAnswer) => {
+    const newAnswers = [...(question.answers || [])];
+    newAnswers[answerIndex] = updatedAnswer;
+    onChange({ ...question, answers: newAnswers });
+  };
+
+  const handleAddAnswer = () => {
+    const existingLetters = (question.answers || []).map(a => a.answer_letter);
+    const availableLetters = ['A', 'B', 'C', 'D', 'E'];
+    const nextLetter = availableLetters.find(letter => !existingLetters.includes(letter)) || 'A';
+    
+    const newAnswer: QuestionAnswer = {
+      answer_letter: nextLetter,
+      answer_text: '',
+      is_correct: false
+    };
+    
+    onChange({ ...question, answers: [...(question.answers || []), newAnswer] });
+  };
+
+  const handleRemoveAnswer = (answerIndex: number) => {
+    const newAnswers = [...(question.answers || [])];
+    newAnswers.splice(answerIndex, 1);
+    onChange({ ...question, answers: newAnswers });
   };
 
   return (
-    <div className="flex items-center gap-2 mb-2">
-      <input
-        type="text"
-        name="answer_text"
-        value={answer.answer_text}
-        onChange={handleChange}
-        className="flex-grow border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500"
-        placeholder={`Answer ${answer.answer_letter}`}
-      />
-      <label className="flex items-center text-sm text-gray-700">
-        <input
-          type="checkbox"
-          name="is_correct"
-          checked={answer.is_correct}
-          onChange={handleChange}
-          className="form-checkbox h-4 w-4 text-blue-600 rounded"
-        />
-        <span className="ml-1">Correct</span>
-      </label>
-      <button
-        onClick={onRemoveAnswer}
-        className="text-red-500 hover:text-red-700 text-sm"
-      >
-        Remove
-      </button>
+    <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+      <div className="flex justify-between items-start">
+        <h5 className="font-medium text-gray-900">Question {question.question_number}</h5>
+        <Button
+          onClick={onRemove}
+          variant="ghost"
+          size="sm"
+          className="text-red-500 hover:text-red-700"
+        >
+          Remove
+        </Button>
+      </div>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+          <textarea
+            value={question.question_text}
+            onChange={(e) => onChange({ ...question, question_text: e.target.value })}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            placeholder="Enter your question here..."
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Learning Outcome</label>
+          <textarea
+            value={question.learning_outcome || ''}
+            onChange={(e) => onChange({ ...question, learning_outcome: e.target.value })}
+            rows={2}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            placeholder="What the student should learn from this question..."
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Rationale</label>
+          <textarea
+            value={question.rationale || ''}
+            onChange={(e) => onChange({ ...question, rationale: e.target.value })}
+            rows={2}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            placeholder="Explain why the correct answer is correct..."
+          />
+        </div>
+        
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium text-gray-700">Answers</label>
+            <Button onClick={handleAddAnswer} variant="ghost" size="sm">
+              Add Answer
+            </Button>
+          </div>
+          
+          <div className="space-y-2">
+            {question.answers?.map((answer, answerIndex) => (
+              <div key={answerIndex} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={answer.answer_text}
+                  onChange={(e) => handleAnswerChange(answerIndex, { ...answer, answer_text: e.target.value })}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder={`Answer ${answer.answer_letter}`}
+                />
+                <label className="flex items-center text-sm">
+                  <input
+                    type="checkbox"
+                    checked={answer.is_correct}
+                    onChange={(e) => handleAnswerChange(answerIndex, { ...answer, is_correct: e.target.checked })}
+                    className="mr-1"
+                  />
+                  Correct
+                </label>
+                <Button
+                  onClick={() => handleRemoveAnswer(answerIndex)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
