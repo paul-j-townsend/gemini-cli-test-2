@@ -268,5 +268,4 @@ export const useQuizState = () => {
   };
 };
 
-export { useQuizState };
 export type { QuizState, QuizData, Question, McqAnswer, QuizAttempt };

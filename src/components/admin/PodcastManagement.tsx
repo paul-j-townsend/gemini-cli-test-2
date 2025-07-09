@@ -72,7 +72,7 @@ export default function PodcastManagement() {
   const handleCreateNew = () => {
     setEditingEpisode(null);
     const nextEpisodeNumber = podcastManagement.getNextEpisodeNumber();
-    reset(createInitialEpisodeData(nextEpisodeNumber));
+    setData(createInitialEpisodeData(nextEpisodeNumber));
     setShowForm(true);
     podcastManagement.clearError();
   };
