@@ -46,24 +46,26 @@ async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
         return res.status(500).json({ message: 'Failed to fetch episodes' });
       }
 
-      // Map database fields to frontend-expected fields for fallback too
-      const mappedFallbackEpisodes = episodesWithoutQuiz?.map(episode => ({
+      // Map database fields to expected format
+      const mappedFallbackEpisodes = (episodesWithoutQuiz || []).map(episode => ({
         ...episode,
         audio_url: episode.audio_src,
         full_audio_url: episode.full_audio_src,
-        published: episode.is_published
-      })) || [];
+        published: episode.is_published,
+        category: []
+      }));
 
       return res.status(200).json({ episodes: mappedFallbackEpisodes });
     }
 
-    // Map database fields to frontend-expected fields
-    const mappedEpisodes = episodes?.map(episode => ({
+    // Map database fields to expected format
+    const mappedEpisodes = (episodes || []).map(episode => ({
       ...episode,
       audio_url: episode.audio_src,
       full_audio_url: episode.full_audio_src,
-      published: episode.is_published
-    })) || [];
+      published: episode.is_published,
+      category: []
+    }));
 
     return res.status(200).json({ episodes: mappedEpisodes });
   } catch (err) {
@@ -117,22 +119,44 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    // Only insert columns that exist in the database
+    // Parse duration from string format (MM:SS or HH:MM:SS) to seconds
+    let durationInSeconds = null;
+    if (duration && duration !== '') {
+      if (typeof duration === 'string' && duration.includes(':')) {
+        const parts = duration.split(':').map(Number);
+        if (parts.length === 2) {
+          durationInSeconds = parts[0] * 60 + parts[1]; // MM:SS
+        } else if (parts.length === 3) {
+          durationInSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS
+        }
+      } else if (typeof duration === 'number') {
+        durationInSeconds = duration;
+      }
+    }
+
+    // Map form fields to database schema
     const insertData: any = {
       title,
       description,
-      audio_src: audio_url, // Map to correct column name
-      full_audio_src: full_audio_url, // Map to correct column name
-      image_url: image_url || thumbnail_path, // Map to correct column name
+      audio_src: audio_url,
+      full_audio_src: full_audio_url,
+      image_url,
       thumbnail_path,
       published_at,
+      is_published: published || false,
       episode_number,
       season,
-      duration,
+      duration: durationInSeconds,
       slug,
-      quiz_id: validQuizId,
-      is_published: published || false // Map to correct column name
+      quiz_id: validQuizId
     };
+
+    // Remove undefined fields
+    Object.keys(insertData).forEach(key => {
+      if (insertData[key] === undefined) {
+        delete insertData[key];
+      }
+    });
 
     const { data: episode, error } = await supabaseAdmin
       .from('vsk_podcast_episodes')

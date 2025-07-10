@@ -235,6 +235,7 @@ const Home = () => {
                       className="w-12 h-12 rounded-full mr-4 object-cover ring-2 ring-red-200 group-hover:ring-red-400 transition-all duration-300"
                       width={48}
                       height={48}
+                      style={{ width: 'auto', height: 'auto' }}
                     />
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full border-2 border-white"></div>
                   </div>

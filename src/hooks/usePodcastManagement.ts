@@ -112,7 +112,7 @@ export const usePodcastManagement = (): PodcastManagementHook => {
       
       const quizOptions = data.map((quiz: any) => ({
         id: quiz.id,
-        title: `${quiz.title} (${quiz.quiz_questions?.length || 0} questions)`,
+        title: `${quiz.title} (${quiz.vsk_quiz_questions?.length || 0} questions)`,
         question_number: null
       }));
       
@@ -127,6 +127,8 @@ export const usePodcastManagement = (): PodcastManagementHook => {
     setState(prev => ({ ...prev, saving: true, error: null }));
     
     try {
+      console.log('Creating episode with data:', data);
+      
       const response = await fetch('/api/podcast-admin/episodes', {
         method: 'POST',
         headers: {

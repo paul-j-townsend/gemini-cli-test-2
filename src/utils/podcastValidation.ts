@@ -14,6 +14,7 @@ export interface EpisodeFormData {
   published: boolean;
   full_audio_url: string;
   quiz_id: string;
+  category: string[];
 }
 
 export const podcastValidationSchema: ValidationSchema<EpisodeFormData> = {
@@ -38,10 +39,17 @@ export const podcastValidationSchema: ValidationSchema<EpisodeFormData> = {
   duration: {
     custom: (value: number | string) => {
       if (typeof value === 'string') {
+        // Allow empty string
+        if (value === '') return null;
+        
         const timePattern = /^\d{1,2}:\d{2}(:\d{2})?$/;
-        if (value !== '' && !timePattern.test(value)) {
+        if (!timePattern.test(value)) {
           return 'Duration must be in MM:SS or HH:MM:SS format';
         }
+      }
+      // Numbers (converted durations in seconds) are always valid
+      if (typeof value === 'number') {
+        return null;
       }
       return null;
     },
@@ -60,21 +68,27 @@ export const podcastValidationSchema: ValidationSchema<EpisodeFormData> = {
   },
 };
 
-export const createInitialEpisodeData = (nextEpisodeNumber: number = 1): EpisodeFormData => ({
-  title: '',
-  description: '',
-  audio_url: '',
-  thumbnail_path: '',
-  image_url: '',
-  published_at: new Date().toISOString().slice(0, 16),
-  episode_number: nextEpisodeNumber,
-  season: 1,
-  duration: '',
-  slug: '',
-  published: false,
-  full_audio_url: '',
-  quiz_id: ''
-});
+export const createInitialEpisodeData = (nextEpisodeNumber: number = 1): EpisodeFormData => {
+  const now = new Date();
+  const publishDate = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // Default to 1 week from now
+  
+  return {
+    title: `Episode ${nextEpisodeNumber}`,
+    description: 'A new episode discussing veterinary topics and professional development.',
+    audio_url: '',
+    thumbnail_path: 'podcast-thumbnails/2025-07-03_thumb2.webp',
+    image_url: '',
+    published_at: publishDate.toISOString().slice(0, 16),
+    episode_number: nextEpisodeNumber,
+    season: 1,
+    duration: 1800, // Default 30 minutes (30 * 60 seconds)
+    slug: generateSlug(`Episode ${nextEpisodeNumber}`),
+    published: false,
+    full_audio_url: '',
+    quiz_id: '',
+    category: []
+  };
+};
 
 export const mapEpisodeToFormData = (episode: any): EpisodeFormData => ({
   title: episode.title,
@@ -91,7 +105,8 @@ export const mapEpisodeToFormData = (episode: any): EpisodeFormData => ({
   slug: episode.slug || '',
   published: episode.published || false,
   full_audio_url: episode.full_audio_url || '',
-  quiz_id: episode.quiz_id || ''
+  quiz_id: episode.quiz_id || '',
+  category: episode.category ? (Array.isArray(episode.category) ? episode.category : [episode.category]) : []
 });
 
 export const formatDate = (dateString: string) => {

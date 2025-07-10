@@ -179,8 +179,6 @@ export interface Quiz {
   title: string;
   description: string;
   category: string;
-  pass_percentage: number;
-  total_questions: number;
   podcast_id?: string;
   max_attempts?: number;
   cooldown_period_hours?: number;
@@ -194,8 +192,6 @@ export interface QuizTable {
   title: string;
   description: string;
   category: string;
-  pass_percentage: number;
-  total_questions: number;
   podcast_id: string | null;
   max_attempts?: number;
   cooldown_period_hours?: number;

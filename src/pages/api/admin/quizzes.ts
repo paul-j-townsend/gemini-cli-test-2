@@ -30,8 +30,6 @@ async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
       title,
       description,
       category,
-      pass_percentage,
-      total_questions,
       is_active,
       created_at,
       updated_at,
@@ -61,7 +59,7 @@ async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
-  const { title, description, category, pass_percentage, quiz_questions } = req.body;
+  const { title, description, category, quiz_questions } = req.body;
 
   if (!title) {
     return res.status(400).json({ message: 'Title is required' });
@@ -76,8 +74,6 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
       title,
       description,
       category,
-      pass_percentage: pass_percentage || 70,
-      total_questions: quiz_questions?.length || 0,
       is_active: true
     })
     .select()
@@ -160,7 +156,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
-  const { id, title, description, category, pass_percentage, quiz_questions } = req.body;
+  const { id, title, description, category, quiz_questions } = req.body;
 
   if (!id || !title) {
     return res.status(400).json({ message: 'ID and title are required' });
@@ -174,9 +170,7 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
     .update({
       title,
       description,
-      category,
-      pass_percentage,
-      total_questions: quiz_questions?.length || 0
+      category
     })
     .eq('id', id);
 

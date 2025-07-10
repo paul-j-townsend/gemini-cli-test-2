@@ -152,7 +152,10 @@ Required environment variables:
 ## Configuration
 
 ### Permissions
-- autoAcceptScreenshots: true
+Allows allow full access to /Users/paultownsend
+autoAcceptWorkingDirectoryChanges: true
+alwaysAllowScreenshots: true
+alwaysAllowEdits: ["*.ts", "*.tsx"]
 - alwaysAllowNPM: true
 - enableAutocomplete: true
 - autoFixLintErrors: true

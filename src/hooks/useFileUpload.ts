@@ -84,7 +84,28 @@ export const useFileUpload = (options: FileUploadOptions): FileUploadHook => {
     }
 
     if (!allowedTypes.includes(file.type)) {
-      return `Invalid file type. Allowed types: ${allowedTypes.join(', ')}`;
+      const friendlyTypes = allowedTypes.map(type => {
+        switch (type) {
+          case 'image/jpeg':
+          case 'image/jpg':
+            return 'JPG';
+          case 'image/png':
+            return 'PNG';
+          case 'image/webp':
+            return 'WebP';
+          case 'audio/mpeg':
+          case 'audio/mp3':
+            return 'MP3';
+          case 'audio/wav':
+            return 'WAV';
+          case 'audio/m4a':
+            return 'M4A';
+          default:
+            return type.split('/')[1]?.toUpperCase() || type;
+        }
+      });
+      const uniqueTypes = [...new Set(friendlyTypes)];
+      return `Please choose a ${uniqueTypes.join(', ')} file. The selected file type is not supported.`;
     }
 
     if (file.size > maxSize) {
