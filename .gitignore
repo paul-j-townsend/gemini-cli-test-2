@@ -31,3 +31,6 @@ connect_to_fasthosts.ssh
 server_memories.md
 public/audio/walkalone.mp3
 CLAUDE.md
+# LibreOffice/OpenOffice lock files
+.~lock.*#
+*/.~lock.*#
