@@ -369,8 +369,8 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                     <AlertCircle size={12} />
                   )}
                   <span>
-                    {quizPassed ? `Passed (${quizPercentage}%)` : 
-                     quizCompleted ? `Failed (${quizPercentage}%)` : 'Not Completed'}
+                    {quizPassed ? 'Complete' : 
+                     quizCompleted ? 'Failed' : 'Not Started'}
                   </span>
                 </div>
               </div>

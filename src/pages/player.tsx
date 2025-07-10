@@ -343,7 +343,7 @@ const PodcastPlayer = () => {
                                   <Check size={20} className="text-green-600" />
                                 </div>
                                 <span className="text-lg font-semibold text-green-700">
-                                  {quizPassed ? 'Passed!' : `Quiz Completed (${quizPercentage}%)`}
+                                  {quizPassed ? 'Complete' : 'Failed'}
                                 </span>
                               </div>
                               {quizPassed && (
