@@ -7,8 +7,8 @@ interface Podcast {
   id: string;
   title: string;
   description: string;
-  audio_src: string;
-  full_audio_src?: string;
+  audio_src: string | null;
+  full_audio_src?: string | null;
   thumbnail: string;
   quiz_id?: string;
 }
@@ -91,12 +91,11 @@ const PodcastPlayer = () => {
 
       const formattedPodcasts: Podcast[] = (data || [])
         .filter((episode: any) => {
-          // Filter out episodes with invalid or empty audio URLs
-          const hasValidAudio = episode.audio_src && episode.audio_src.trim() !== '';
+          // Only filter out episodes without titles - episodes without audio can still be shown as drafts
           const hasValidTitle = episode.title && episode.title.trim() !== '';
           
-          if (!hasValidAudio || !hasValidTitle) {
-            console.warn('Skipping invalid episode:', episode);
+          if (!hasValidTitle) {
+            console.warn('Skipping episode without title:', episode);
             return false;
           }
           
@@ -106,8 +105,8 @@ const PodcastPlayer = () => {
           id: episode.id,
           title: episode.title || 'Untitled Episode',
           description: episode.description || 'No description available',
-          audio_src: episode.audio_src || '', // Preview version
-          full_audio_src: episode.full_audio_src || episode.audio_src || '', // Full version or fallback to preview
+          audio_src: episode.audio_src || null, // Preview version - use null instead of empty string
+          full_audio_src: episode.full_audio_src || episode.audio_src || null, // Full version or fallback to preview
           thumbnail: getThumbnailUrl(episode),
           quiz_id: episode.quiz_id || undefined
         }));

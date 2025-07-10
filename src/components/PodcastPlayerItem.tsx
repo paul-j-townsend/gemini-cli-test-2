@@ -25,8 +25,8 @@ interface Podcast {
   id: string;
   title: string;
   description: string;
-  audio_src: string; // Preview audio
-  full_audio_src?: string; // Full version audio
+  audio_src: string | null; // Preview audio
+  full_audio_src?: string | null; // Full version audio
   thumbnail: string;
   quiz_id?: string; // Add quiz ID
 }
@@ -73,17 +73,17 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const currentAudioSrc = isFullVersion && podcast.full_audio_src ? podcast.full_audio_src : podcast.audio_src;
+  const hasAudio = currentAudioSrc && currentAudioSrc.trim() !== '';
 
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    // Validate audio source
-    if (!currentAudioSrc || currentAudioSrc.trim() === '') {
-      console.error('Invalid audio source:', currentAudioSrc);
+    // Skip audio setup if no audio source is available
+    if (!hasAudio) {
       setIsLoading(false);
-      setError('Invalid audio source');
+      setError(null);
       return;
     }
 
@@ -171,7 +171,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       audio.removeEventListener('waiting', handleWaiting);
       audio.removeEventListener('suspend', handleSuspend);
     };
-  }, [currentAudioSrc, isScrubbing, volume, playbackRate, isLoading]);
+  }, [currentAudioSrc, isScrubbing, volume, playbackRate, isLoading, hasAudio]);
 
   // Update audio source when switching between preview and full version
   useEffect(() => {
@@ -196,7 +196,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     if (!audio) return;
 
     // Check for invalid audio source
-    if (!currentAudioSrc || currentAudioSrc.trim() === '') {
+    if (!hasAudio) {
       setError('No audio available');
       return;
     }
@@ -316,7 +316,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
 
   return (
     <div className="card-glow p-6 animate-fade-in-up hover-lift group">
-      <audio ref={audioRef} src={currentAudioSrc} preload="metadata" />
+      {hasAudio && <audio ref={audioRef} src={currentAudioSrc} preload="metadata" />}
       
       {/* Header Section */}
       <div className="flex items-start gap-4 mb-6">
@@ -328,6 +328,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               width={80}
               height={80}
+              priority
             />
           </div>
           {isPlaying && (
@@ -370,7 +371,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                   )}
                   <span>
                     {quizPassed ? 'Complete' : 
-                     quizCompleted ? 'Failed' : 'Not Started'}
+                     quizCompleted ? 'Incomplete' : 'Not Started'}
                   </span>
                 </div>
               </div>
@@ -418,6 +419,16 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             </p>
           </div>
         )}
+        
+        {/* No Audio Message */}
+        {!hasAudio && !error && (
+          <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-sm text-gray-600 flex items-center gap-2">
+              <AlertCircle size={16} />
+              No audio available for this episode
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Controls */}
@@ -427,7 +438,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handleSkipBack}
             className="audio-control w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading || !!error}
+            disabled={isLoading || !!error || !hasAudio}
             aria-label="Skip back 15 seconds"
           >
             <SkipBack size={16} />
@@ -436,7 +447,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handlePlayPause}
             className="audio-control w-12 h-12 flex items-center justify-center text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 rounded-xl shadow-soft hover:shadow-medium focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading || !!error}
+            disabled={isLoading || !!error || !hasAudio}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isLoading ? (
@@ -451,7 +462,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handleSkipForward}
             className="audio-control w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading || !!error}
+            disabled={isLoading || !!error || !hasAudio}
             aria-label="Skip forward 15 seconds"
           >
             <SkipForward size={16} />
@@ -522,10 +533,10 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button 
             onClick={handleListenToFull}
             className="btn-primary w-full flex items-center justify-center gap-2"
-            disabled={!podcast.full_audio_src}
+            disabled={!podcast.full_audio_src || !hasAudio}
           >
             <Play size={20} />
-            Listen to Full Version
+            {hasAudio ? 'Listen to Full Version' : 'No Audio Available'}
           </button>
         ) : (
           /* Show Quiz and Certificate buttons after accessing full version */

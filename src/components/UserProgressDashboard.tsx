@@ -3,7 +3,7 @@ import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useAuth } from '../hooks/useAuth';
 import { calculateUserProgress, formatDuration, calculateUserLevel } from '../utils/progressUtils';
 import { useMemoizedProgressCalculations } from '../utils/performanceUtils';
-import { quizService } from '../services/quizService';
+import { quizServiceClient } from '../services/quizServiceClient';
 import type { ProgressSummary, Achievement } from '../utils/progressUtils';
 
 export const UserProgressDashboard: React.FC = React.memo(() => {
@@ -26,7 +26,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
         
         await Promise.all(
           uniqueQuizIds.map(async (quizId) => {
-            titles[quizId] = await quizService.getQuizTitle(quizId);
+            titles[quizId] = await quizServiceClient.getQuizTitle(quizId);
           })
         );
         

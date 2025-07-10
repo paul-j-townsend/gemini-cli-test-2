@@ -30,6 +30,7 @@ interface AdminDataTableProps<T> {
   addButtonLabel?: string;
   className?: string;
   itemsPerPage?: number;
+  onRowClick?: (item: T) => void;
 }
 
 export const AdminDataTable = React.memo(<T extends { id: string }>({
@@ -43,6 +44,7 @@ export const AdminDataTable = React.memo(<T extends { id: string }>({
   addButtonLabel = 'Add New',
   className = '',
   itemsPerPage = 10,
+  onRowClick,
 }: AdminDataTableProps<T>) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [sortColumn, setSortColumn] = React.useState<keyof T | null>(null);
@@ -167,13 +169,23 @@ export const AdminDataTable = React.memo(<T extends { id: string }>({
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedData.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
+                  <tr 
+                    key={item.id} 
+                    className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+                    onClick={() => onRowClick?.(item)}
+                  >
                     {columns.map((column) => (
                       <td
                         key={String(column.key)}
                         className={`px-6 py-4 whitespace-nowrap text-sm ${
                           column.className || ''
                         }`}
+                        onClick={(e) => {
+                          // Prevent row click when clicking on action buttons
+                          if (column.key === 'actions') {
+                            e.stopPropagation();
+                          }
+                        }}
                       >
                         {renderCellContent(item, column)}
                       </td>

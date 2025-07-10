@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { DurationInput } from '@/components/ui/DurationInput';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { AdminDataTable, TableColumn, TableAction, FileUploadField, Select, TextArea, Checkbox } from '@/components/admin/shared';
@@ -46,6 +47,61 @@ interface Episode {
     total_questions: number;
   };
 }
+
+// Category Selector Component
+interface CategorySelectorProps {
+  selectedCategories: string[];
+  onCategoryChange: (categories: string[]) => void;
+}
+
+const CategorySelector: React.FC<CategorySelectorProps> = ({ selectedCategories, onCategoryChange }) => {
+  const categories = [
+    'General',
+    'Clinical Practice', 
+    'Surgery',
+    'Internal Medicine',
+    'Emergency Medicine',
+    'Cardiology',
+    'Dermatology',
+    'Oncology',
+    'Behavior',
+    'Nutrition',
+    'Preventive Medicine',
+    'Radiology',
+    'Laboratory Medicine',
+    'Professional Development',
+    'Practice Management',
+    'Ethics',
+    'Research'
+  ];
+
+  const handleCategoryToggle = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      onCategoryChange(selectedCategories.filter(c => c !== category));
+    } else {
+      onCategoryChange([...selectedCategories, category]);
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {categories.map((category) => (
+        <button
+          key={category}
+          type="button"
+          onClick={() => handleCategoryToggle(category)}
+          className={`px-3 py-1 text-sm rounded-full border transition-all duration-200 ${
+            selectedCategories.includes(category)
+              ? 'bg-primary-500 text-white border-primary-500'
+              : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+          }`}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export default function PodcastManagement() {
   const [showForm, setShowForm] = useState(false);
@@ -290,7 +346,13 @@ export default function PodcastManagement() {
             <Input
               label="Title"
               value={formData.title}
-              onChange={(value) => handleChange('title', value)}
+              onChange={(value) => {
+                handleChange('title', value);
+                // Auto-generate slug from title if slug is empty or was auto-generated
+                if (!formData.slug || formData.slug === generateSlug(formData.title)) {
+                  handleChange('slug', generateSlug(value));
+                }
+              }}
               required
               error={errors.title}
             />
@@ -302,6 +364,16 @@ export default function PodcastManagement() {
               rows={3}
               error={errors.description}
             />
+
+            {/* Categories section - temporarily disabled until database column is added
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Categories</label>
+              <CategorySelector
+                selectedCategories={formData.category}
+                onCategoryChange={(categories) => handleChange('category', categories)}
+              />
+            </div>
+            */}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
@@ -322,17 +394,10 @@ export default function PodcastManagement() {
                 error={errors.episode_number}
               />
 
-              <Input
-                label="Duration (MM:SS or HH:MM:SS)"
-                value={typeof formData.duration === 'string' ? formData.duration : formatDuration(formData.duration)}
-                onChange={(value) => {
-                  if (value.match(/^\d{1,2}:\d{2}(:\d{2})?$/)) {
-                    handleChange('duration', parseDuration(value));
-                  } else {
-                    handleChange('duration', value);
-                  }
-                }}
-                placeholder="5:30 or 1:05:30"
+              <DurationInput
+                label="Duration"
+                value={formData.duration}
+                onChange={(value) => handleChange('duration', value)}
                 error={errors.duration}
               />
             </div>
@@ -353,13 +418,16 @@ export default function PodcastManagement() {
 
             <Select
               label="Associated Quiz"
-              value={formData.quiz_id}
+              value={formData.quiz_id || ''}
               onChange={(value) => handleChange('quiz_id', value)}
-              options={podcastManagement.quizzes.map(quiz => ({ 
-                value: quiz.id, 
-                label: quiz.title 
-              }))}
-              placeholder="No Quiz"
+              options={[
+                { value: '', label: 'No Quiz' },
+                ...podcastManagement.quizzes.map(quiz => ({ 
+                  value: quiz.id, 
+                  label: quiz.title 
+                }))
+              ]}
+              placeholder="Select a quiz"
             />
 
             <FileUploadField
@@ -424,8 +492,7 @@ export default function PodcastManagement() {
           actions={actions}
           loading={podcastManagement.loading}
           emptyMessage="No episodes found. Create your first podcast episode to get started."
-          onAdd={handleCreateNew}
-          addButtonLabel="Create New Episode"
+          onRowClick={handleEdit}
         />
       )}
     </div>

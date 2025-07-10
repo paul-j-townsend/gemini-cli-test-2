@@ -30,8 +30,6 @@ interface Quiz {
   title: string;
   description?: string;
   category?: string;
-  pass_percentage?: number;
-  total_questions?: number;
   is_active?: boolean;
   quiz_questions?: QuizQuestion[];
 }
@@ -39,9 +37,6 @@ interface Quiz {
 interface QuizFormData {
   title: string;
   description: string;
-  category: string;
-  pass_percentage: number;
-  total_questions: number;
   quiz_questions: QuizQuestion[];
 }
 
@@ -51,23 +46,16 @@ const QuizManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [saving, setSaving] = useState(false);
-  const [creatingSystemQuizzes, setCreatingSystemQuizzes] = useState(false);
 
   const formHook = useFormManagement<QuizFormData>({
     initialData: {
       title: '',
       description: '',
-      category: '',
-      pass_percentage: 70,
-      total_questions: 0,
       quiz_questions: []
     },
     validationSchema: {
       title: { required: true, minLength: 1 },
-      description: { required: false },
-      category: { required: false },
-      pass_percentage: { required: true, min: 0, max: 100 },
-      total_questions: { required: true, min: 0 }
+      description: { required: false }
     },
     validateOnChange: true,
     validateOnBlur: true
@@ -120,9 +108,6 @@ const QuizManagement = () => {
     formHook.setData({
       title: editableQuiz.title,
       description: editableQuiz.description || '',
-      category: editableQuiz.category || '',
-      pass_percentage: editableQuiz.pass_percentage || 70,
-      total_questions: editableQuiz.total_questions || 0,
       quiz_questions: editableQuiz.quiz_questions || []
     });
   };
@@ -155,8 +140,6 @@ const QuizManagement = () => {
         id: editingQuiz?.id || 'new-quiz',
         title: data.title,
         description: data.description,
-        category: data.category,
-        pass_percentage: data.pass_percentage,
         quiz_questions: data.quiz_questions?.map(q => ({
           id: q.id,
           quiz_id: q.quiz_id,
@@ -211,44 +194,23 @@ const QuizManagement = () => {
     }
   };
 
-  const handleCreateSystemQuizzes = async () => {
-    setCreatingSystemQuizzes(true);
-    try {
-      const response = await fetch('/api/create-sample-quizzes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      await fetchQuizzes();
-      setError(null);
-    } catch (err) {
-      setError(`Failed to create system quizzes: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
-    setCreatingSystemQuizzes(false);
-  };
 
   const handleCreateQuiz = () => {
     const newQuiz: Quiz = {
       id: 'new-quiz',
       title: 'New Quiz',
-      description: 'A new quiz',
-      category: '',
-      pass_percentage: 70,
-      total_questions: 0,
+      description: 'Enter a brief description of the quiz',
       quiz_questions: [{
         question_number: 1,
-        question_text: '',
+        question_text: 'Enter your question here...',
+        explanation: 'Provide additional context or explanation for this question',
+        rationale: 'Explain why the correct answer is correct',
+        learning_outcome: 'What should students learn from this question?',
         answers: [
-          { answer_letter: 'A', answer_text: '', is_correct: false },
-          { answer_letter: 'B', answer_text: '', is_correct: false },
-          { answer_letter: 'C', answer_text: '', is_correct: false },
-          { answer_letter: 'D', answer_text: '', is_correct: false },
+          { answer_letter: 'A', answer_text: 'First answer option', is_correct: true },
+          { answer_letter: 'B', answer_text: 'Second answer option', is_correct: false },
+          { answer_letter: 'C', answer_text: 'Third answer option', is_correct: false },
+          { answer_letter: 'D', answer_text: 'Fourth answer option', is_correct: false },
         ]
       }]
     };
@@ -256,9 +218,6 @@ const QuizManagement = () => {
     formHook.setData({
       title: newQuiz.title,
       description: newQuiz.description || '',
-      category: newQuiz.category || '',
-      pass_percentage: newQuiz.pass_percentage || 70,
-      total_questions: newQuiz.total_questions || 0,
       quiz_questions: newQuiz.quiz_questions || []
     });
   };
@@ -281,21 +240,11 @@ const QuizManagement = () => {
       )
     },
     {
-      key: 'category',
-      label: 'Category',
-      render: (quiz) => (
-        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
-          {quiz.category || 'General'}
-        </span>
-      )
-    },
-    {
       key: 'quiz_questions',
       label: 'Questions',
       render: (quiz) => (
         <div className="text-sm">
           <div className="font-medium">{quiz.quiz_questions?.length || 0} questions</div>
-          <div className="text-gray-500">{quiz.pass_percentage || 70}% to pass</div>
         </div>
       )
     },
@@ -328,27 +277,6 @@ const QuizManagement = () => {
           type: 'text',
           required: true,
           placeholder: 'Enter quiz title'
-        },
-        {
-          name: 'category',
-          label: 'Category',
-          type: 'text',
-          placeholder: 'e.g. Ethics, Professional Practice'
-        },
-        {
-          name: 'pass_percentage',
-          label: 'Pass Percentage',
-          type: 'number',
-          required: true,
-          min: 0,
-          max: 100
-        },
-        {
-          name: 'total_questions',
-          label: 'Total Questions',
-          type: 'number',
-          required: true,
-          min: 0
         },
         {
           name: 'description',
@@ -391,22 +319,12 @@ const QuizManagement = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Quiz Management</h2>
         {!editingQuiz && (
-          <div className="flex gap-2">
-            <Button 
-              onClick={handleCreateSystemQuizzes}
-              disabled={creatingSystemQuizzes}
-              variant="secondary"
-              loading={creatingSystemQuizzes}
-            >
-              Create System Quizzes
-            </Button>
-            <Button 
-              onClick={handleCreateQuiz}
-              variant="primary"
-            >
-              Add New Quiz
-            </Button>
-          </div>
+          <Button 
+            onClick={handleCreateQuiz}
+            variant="primary"
+          >
+            Add New Quiz
+          </Button>
         )}
         {editingQuiz && (
           <div className="text-sm text-gray-500">
@@ -453,12 +371,15 @@ const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, on
   const handleAddQuestion = () => {
     const newQuestion: QuizQuestion = {
       question_number: questions.length + 1,
-      question_text: '',
+      question_text: 'Enter your question here...',
+      explanation: 'Provide additional context or explanation for this question',
+      rationale: 'Explain why the correct answer is correct',
+      learning_outcome: 'What should students learn from this question?',
       answers: [
-        { answer_letter: 'A', answer_text: '', is_correct: false },
-        { answer_letter: 'B', answer_text: '', is_correct: false },
-        { answer_letter: 'C', answer_text: '', is_correct: false },
-        { answer_letter: 'D', answer_text: '', is_correct: false },
+        { answer_letter: 'A', answer_text: 'First answer option', is_correct: true },
+        { answer_letter: 'B', answer_text: 'Second answer option', is_correct: false },
+        { answer_letter: 'C', answer_text: 'Third answer option', is_correct: false },
+        { answer_letter: 'D', answer_text: 'Fourth answer option', is_correct: false },
       ]
     };
     onChange([...questions, newQuestion]);
@@ -473,8 +394,7 @@ const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, on
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h4 className="text-lg font-semibold text-gray-900">Questions</h4>
+      <div className="flex justify-end items-center">
         <Button onClick={handleAddQuestion} variant="secondary" size="sm">
           Add Question
         </Button>
@@ -521,7 +441,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, index, onChan
     
     const newAnswer: QuestionAnswer = {
       answer_letter: nextLetter,
-      answer_text: '',
+      answer_text: `Answer option ${nextLetter}`,
       is_correct: false
     };
     
