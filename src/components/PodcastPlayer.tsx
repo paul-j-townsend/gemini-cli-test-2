@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import PodcastPlayerItem from './PodcastPlayerItem';
 import { supabase } from '@/lib/supabase';
 import { useQuizCompletion } from '@/hooks/useQuizCompletion';
+import { PodcastEpisode } from '@/types/database';
+import { podcastService } from '@/services/podcastService';
 
 interface Podcast {
   id: string;
@@ -10,32 +12,32 @@ interface Podcast {
   audio_src: string | null;
   full_audio_src?: string | null;
   thumbnail: string;
-  quiz_id?: string;
-}
-
-interface PodcastEpisode {
-  id: string;
-  title: string;
-  description: string;
-  audio_src: string;
-  thumbnail_path: string;
-  published_at: string;
-  episode_number?: number;
-  season?: number;
-  duration?: number;
-  slug?: string;
-  published?: boolean;
-  featured?: boolean;
-  category?: string;
-  tags?: string[];
-  full_audio_src?: string;
-  quiz_id?: string;
+  quiz_id: string; // Required - enforces one-to-one relationship
   quiz?: {
     id: string;
     title: string;
-    description?: string;
+    description: string;
+    category: string;
+    pass_percentage: number;
     total_questions: number;
-  } | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    questions: {
+      id: string;
+      question_number: number;
+      question_text: string;
+      explanation: string;
+      rationale: string;
+      learning_outcome: string;
+      answers: {
+        id: string;
+        answer_letter: string;
+        answer_text: string;
+        is_correct: boolean;
+      }[];
+    }[];
+  };
 }
 
 const PodcastPlayer = () => {
@@ -65,32 +67,11 @@ const PodcastPlayer = () => {
       setLoading(true);
       setError(null);
       
-      // Start with basic query, then try enhanced if it works
-      let { data, error } = await supabase
-        .from('vsk_podcast_episodes')
-        .select('id, title, description, audio_src, thumbnail_path, published_at, full_audio_src, quiz_id')
-        .not('published_at', 'is', null)
-        .order('published_at', { ascending: false })
-        .limit(4);
-
-      // If basic query fails, try even simpler
-      if (error) {
-        console.log('Basic query failed, trying minimal query:', error);
-        const minimalResult = await supabase
-          .from('vsk_podcast_episodes')
-          .select('id, title, description, audio_src, thumbnail_path, published_at')
-          .not('published_at', 'is', null)
-          .order('published_at', { ascending: false })
-          .limit(4);
-        
-        data = minimalResult.data as any;
-        error = minimalResult.error;
-      }
-
-      if (error) throw error;
-
-      const formattedPodcasts: Podcast[] = (data || [])
-        .filter((episode: any) => {
+      // Use the podcast service to always get complete episode data with quiz info
+      const episodes = await podcastService.getPublishedEpisodesClient(4);
+      
+      const formattedPodcasts: Podcast[] = episodes
+        .filter((episode) => {
           // Only filter out episodes without titles - episodes without audio can still be shown as drafts
           const hasValidTitle = episode.title && episode.title.trim() !== '';
           
@@ -101,14 +82,16 @@ const PodcastPlayer = () => {
           
           return true;
         })
-        .map((episode: any) => ({
+        .map((episode) => ({
           id: episode.id,
           title: episode.title || 'Untitled Episode',
           description: episode.description || 'No description available',
           audio_src: episode.audio_src || null, // Preview version - use null instead of empty string
           full_audio_src: episode.full_audio_src || episode.audio_src || null, // Full version or fallback to preview
           thumbnail: getThumbnailUrl(episode),
-          quiz_id: episode.quiz_id || undefined
+          quiz_id: episode.quiz_id,
+          // Always include complete quiz data as part of unified entity
+          quiz: episode.quiz
         }));
 
       // If no valid podcasts found, add some mock data for testing
@@ -135,19 +118,7 @@ const PodcastPlayer = () => {
         ];
         setPodcasts(mockPodcasts);
       } else {
-        // Assign quiz IDs to existing podcasts for testing if they don't have them
-        const podcastsWithQuizIds = formattedPodcasts.map((podcast, index) => {
-          if (!podcast.quiz_id) {
-            // Assign quiz IDs based on title or index
-            if (podcast.title.toLowerCase().includes('anatomy') || podcast.title === 'a' || index === 0) {
-              podcast.quiz_id = 'fed2a63e-196d-43ff-9ebc-674db34e72a7';
-            } else {
-              podcast.quiz_id = '550e8400-e29b-41d4-a716-446655440000';
-            }
-          }
-          return podcast;
-        });
-        setPodcasts(podcastsWithQuizIds);
+        setPodcasts(formattedPodcasts);
       }
     } catch (error) {
       console.error('Error fetching podcasts:', error);

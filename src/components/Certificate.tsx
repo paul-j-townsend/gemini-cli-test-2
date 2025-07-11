@@ -61,9 +61,8 @@ const Certificate: React.FC<CertificateProps> = ({
       link.href = dataURL;
       link.click();
 
-      if (onDownload) {
-        onDownload();
-      }
+      // Don't automatically close modal after download
+      // Users can use the X button to close if they want
     } catch (error) {
       console.error('Error generating certificate:', error);
       alert('Failed to generate certificate. Please try again.');
@@ -428,7 +427,7 @@ const Certificate: React.FC<CertificateProps> = ({
             e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
           }}
         >
-          Download Certificate
+          📄 Download Certificate
         </button>
       </div>
     </div>

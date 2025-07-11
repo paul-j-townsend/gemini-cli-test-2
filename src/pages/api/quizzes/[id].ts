@@ -47,6 +47,21 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
           answer_text,
           is_correct
         )
+      ),
+      vsk_podcast_episodes!vsk_podcast_episodes_quiz_id_fkey (
+        id,
+        title,
+        description,
+        audio_src,
+        full_audio_src,
+        published_at,
+        is_published,
+        episode_number,
+        season,
+        duration,
+        slug,
+        image_url,
+        thumbnail_path
       )
     `)
     .eq('id', id)
@@ -60,7 +75,7 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
     return res.status(500).json({ message: 'Failed to fetch quiz' });
   }
 
-  // Transform the quiz data to match the expected format
+  // Transform the quiz data to match the expected format with podcast info
   const transformedQuiz = {
     ...quiz,
     questions: quiz.vsk_quiz_questions?.map(q => ({
@@ -70,7 +85,23 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
       rationale: q.rationale,
       category: quiz.category,
       mcq_answers: q.vsk_question_answers?.sort((a, b) => a.answer_letter.localeCompare(b.answer_letter)) || []
-    })) || []
+    })) || [],
+    // Always include podcast episode information as part of unified entity
+    podcast_episode: quiz.vsk_podcast_episodes ? {
+      id: quiz.vsk_podcast_episodes.id,
+      title: quiz.vsk_podcast_episodes.title,
+      description: quiz.vsk_podcast_episodes.description,
+      audio_src: quiz.vsk_podcast_episodes.audio_src,
+      full_audio_src: quiz.vsk_podcast_episodes.full_audio_src,
+      published_at: quiz.vsk_podcast_episodes.published_at,
+      is_published: quiz.vsk_podcast_episodes.is_published,
+      episode_number: quiz.vsk_podcast_episodes.episode_number,
+      season: quiz.vsk_podcast_episodes.season,
+      duration: quiz.vsk_podcast_episodes.duration,
+      slug: quiz.vsk_podcast_episodes.slug,
+      image_url: quiz.vsk_podcast_episodes.image_url,
+      thumbnail_path: quiz.vsk_podcast_episodes.thumbnail_path
+    } : null
   };
 
   return res.status(200).json(transformedQuiz);

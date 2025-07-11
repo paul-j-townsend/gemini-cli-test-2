@@ -40,7 +40,7 @@ interface Episode {
   published?: boolean;
   featured?: boolean;
   full_audio_url?: string;
-  quiz_id?: string;
+  quiz_id: string; // Required - enforces one-to-one relationship
   vsk_quizzes?: {
     id: string;
     title: string;

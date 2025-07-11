@@ -1,6 +1,4 @@
-# Podcast/Quiz Refactoring Plan: One Quiz Per Podcast
-
-I want the 'create new podcast and quiz' to be combined, so the podcast and quiz become one entity on the admin page.
+# Quiz Refactor TODO
 
 ## Pre-Implementation Analysis
 
@@ -28,7 +26,6 @@ I want the 'create new podcast and quiz' to be combined, so the podcast and quiz
 ## Current State Analysis
 
 ### Database Schema Issues
-
 - [ ] `vsk_quizzes` table has optional `podcast_id` field (nullable)
 - [ ] `vsk_podcast_episodes` table has optional `quiz_id` field
 - [ ] Inconsistent relationships: Some queries try to join with `vsk_quizzes`, others expect quiz data via different methods
@@ -36,24 +33,15 @@ I want the 'create new podcast and quiz' to be combined, so the podcast and quiz
 - [ ] Virtual quiz system: Currently groups questions by category rather than proper quiz entities
 
 ### Current Workflow Problems
-
 - [ ] Quizzes can exist without podcasts
 - [ ] Podcasts can exist without quizzes
 - [ ] Many-to-many relationship possibility (confusing)
 - [ ] Certificate system assumes quiz completion but relationship unclear
 - [ ] Admin interface has to handle optional relationships
 
-## Refactoring Objectives
+## Database Schema Restructuring
 
-### 1. Unified Podcast-Quiz Entity Creation
-
-**Goal**: Transform podcast and quiz into a single unified entity in the admin interface and database architecture
-
-### 2. Database Schema Restructuring
-
-**Goal**: Establish strict one-to-one relationship supporting the unified entity model
-
-**Changes**:
+### Changes
 - [ ] Make `vsk_podcast_episodes.quiz_id` required (NOT NULL)
 - [ ] Remove `vsk_quizzes.podcast_id` (redundant with above relationship)
 - [ ] Add foreign key constraint with CASCADE DELETE
@@ -61,47 +49,44 @@ I want the 'create new podcast and quiz' to be combined, so the podcast and quiz
 - [ ] Add database constraint to ensure one quiz per podcast
 - [ ] Consider renaming tables to reflect unified concept (e.g., `vsk_podcast_quiz_entities`)
 
-### 3. Data Migration Strategy
+## Data Migration Strategy
 
-**Handle existing data safely**:
+### Handle existing data safely
 - [ ] Audit current podcast episodes without quizzes
 - [ ] Create placeholder/default quizzes for episodes missing them
 - [ ] Audit quizzes without associated podcasts
 - [ ] Either associate orphaned quizzes with episodes or archive them
 
-### 4. Application Layer Changes
+## Application Layer Changes
 
-#### Type System Updates
-
+### Type System Updates
 - [ ] Update `PodcastEpisode` interface to make `quiz_id` required
 - [ ] Remove optional `podcast_id` from `Quiz` interface
 - [ ] Update database table interfaces to reflect new constraints
 - [ ] Add type guards for validation
 
-#### Service Layer Updates
-
+### Service Layer Updates
 - [ ] Update `quizService` to always expect podcast association
 - [ ] Remove `getQuizzesByPodcastId` (no longer needed)
 - [ ] Update podcast fetching to always include quiz data
 - [ ] Simplify quiz creation to require podcast context
 
-#### UI Component Updates
-
+### UI Component Updates
 - [ ] Remove conditional quiz rendering in podcast components
 - [ ] Always show quiz section for each podcast episode
 - [ ] Update admin interface to create quiz with podcast episode
 - [ ] Simplify quiz navigation (no more podcast-less quizzes)
 
-### 5. Certificate System Integration
+## Certificate System Integration
 
-**Leverage the new one-to-one relationship**:
+### Leverage the new one-to-one relationship
 - [ ] Certificates can now reliably show podcast episode title
 - [ ] Simplify certificate API to use podcast-quiz relationship
 - [ ] Update certificate component to fetch podcast details
 
-### 6. Admin Interface Unification
+## Admin Interface Unification
 
-**Create unified podcast-quiz entity management**:
+### Create unified podcast-quiz entity management
 - [ ] Design single unified creation form for podcast+quiz entity
 - [ ] Integrate quiz question creation within podcast creation workflow
 - [ ] When creating podcast entity → automatically create associated quiz structure
@@ -247,15 +232,6 @@ I want the 'create new podcast and quiz' to be combined, so the podcast and quiz
 - [ ] Update quiz-related endpoints to expect podcast context
 - [ ] Simplify certificate API
 
-## Benefits of This Refactoring
-
-- [ ] **Simplified Mental Model**: Every podcast has exactly one quiz
-- [ ] **Reduced Complexity**: No more optional relationships to handle
-- [ ] **Better Data Integrity**: Database constraints prevent orphaned records
-- [ ] **Improved UX**: Users always know there's a quiz for each episode
-- [ ] **Cleaner Code**: Remove conditional logic throughout the application
-- [ ] **Better Certificates**: Can reliably include podcast information
-
 ## Edge Cases & Special Considerations
 
 ### Quiz Completion and Retry Scenarios
@@ -285,15 +261,6 @@ I want the 'create new podcast and quiz' to be combined, so the podcast and quiz
 - [ ] **Large Quiz Creation**: Handle performance with quizzes containing many questions
 - [ ] **File Upload Failures**: Handle podcast audio/image upload failures gracefully
 - [ ] **Validation Error Recovery**: Help users recover from complex validation errors
-
-## Risks & Mitigation
-
-- [ ] **Data Loss Risk**: Comprehensive migration strategy with rollback plan
-- [ ] **Breaking Changes**: Staged rollout with feature flags if needed
-- [ ] **Admin Workflow Changes**: Update documentation and provide training
-- [ ] **Type Errors**: Update all TypeScript gradually in phases
-- [ ] **User Experience Disruption**: Minimize downtime and provide clear migration communication
-- [ ] **Performance Degradation**: Monitor and optimize database queries post-migration
 
 ## Monitoring and Observability
 
@@ -354,4 +321,13 @@ I want the 'create new podcast and quiz' to be combined, so the podcast and quiz
 - [ ] System performance remains optimal with new unified structure
 - [ ] All security considerations have been addressed and verified
 
-This refactoring will create a much cleaner, more maintainable system where the podcast-quiz relationship is clear and enforced, with comprehensive monitoring and security measures in place.
+---
+
+## Change Log
+
+### 2025-01-11
+- **Created**: Initial TODO document extracted from `PODCAST_QUIZ_REFACTORING_PLAN.md`
+- **Total Tasks**: 200+ tasks organized into phases and categories
+- **Structure**: Organized by implementation phases and technical domains
+- **Focus**: Unified podcast-quiz entity creation workflow
+- **Coverage**: Database migration, application layer changes, admin interface, security, monitoring

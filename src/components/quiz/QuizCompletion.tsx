@@ -16,6 +16,7 @@ interface QuizCompletionProps {
   score: ScoreData;
   onRestartQuiz: () => void;
   quizTitle?: string;
+  episodeTitle?: string;
   quizId?: string;
   completion?: QuizCompletionType;
 }
@@ -24,6 +25,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
   score,
   onRestartQuiz,
   quizTitle,
+  episodeTitle,
   quizId,
   completion
 }) => {
@@ -97,26 +99,20 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
 
       {/* Certificate Modal */}
       {showCertificate && completion && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-auto">
-            <div className="p-6 border-b border-neutral-200 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-neutral-900">Certificate of Completion</h2>
-              <button
-                onClick={() => setShowCertificate(false)}
-                className="text-neutral-400 hover:text-neutral-600"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="bg-white rounded-xl w-fit h-fit max-w-[95vw] max-h-[95vh] flex flex-col">
+            <div className="p-4 border-b border-neutral-200 flex-shrink-0">
+              <h2 className="text-xl font-bold text-neutral-900 text-center">Certificate of Completion</h2>
             </div>
-            <div className="p-6">
-              <Certificate
-                completion={completion}
-                userName={user?.name || 'User'}
-                quizTitle={quizTitle || 'Quiz'}
-                onDownload={() => setShowCertificate(false)}
-              />
+            <div className="p-4 flex items-center justify-center">
+              <div className="transform scale-75 sm:scale-90 md:scale-100 origin-center">
+                <Certificate
+                  completion={completion}
+                  userName={user?.name || 'User'}
+                  quizTitle={episodeTitle || quizTitle || 'Quiz'}
+                  onDownload={() => setShowCertificate(false)}
+                />
+              </div>
             </div>
           </div>
         </div>

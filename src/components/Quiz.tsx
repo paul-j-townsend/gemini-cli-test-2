@@ -9,11 +9,12 @@ import QuizNavigation from './quiz/QuizNavigation';
 import QuizCompletion from './quiz/QuizCompletion';
 
 interface QuizProps {
-  quizId?: string;
+  quizId: string; // Required - every podcast now has a quiz
   podcastId?: string;
+  episodeTitle?: string;
 }
 
-const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
+const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle }) => {
   const {
     // State
     quiz,
@@ -74,6 +75,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
         score={score} 
         onRestartQuiz={handleRestartQuiz}
         quizTitle={quiz?.title}
+        episodeTitle={episodeTitle}
         quizId={quizId}
         completion={lastCompletion}
       />

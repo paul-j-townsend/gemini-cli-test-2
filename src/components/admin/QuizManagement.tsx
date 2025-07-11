@@ -16,7 +16,7 @@ interface QuestionAnswer {
 
 interface QuizQuestion {
   id?: string;
-  quiz_id?: string;
+  quiz_id: string;
   question_number: number;
   question_text: string;
   explanation?: string;
@@ -201,6 +201,7 @@ const QuizManagement = () => {
       title: 'New Quiz',
       description: 'Enter a brief description of the quiz',
       quiz_questions: [{
+        quiz_id: 'new-quiz',
         question_number: 1,
         question_text: 'Enter your question here...',
         explanation: 'Provide additional context or explanation for this question',
@@ -299,6 +300,7 @@ const QuizManagement = () => {
             <QuizQuestionsEditor
               questions={questions || []}
               onChange={onChange}
+              quizId={editingQuiz?.id || 'new-quiz'}
             />
           )
         }
@@ -359,9 +361,10 @@ const QuizManagement = () => {
 interface QuizQuestionsEditorProps {
   questions: QuizQuestion[];
   onChange: (questions: QuizQuestion[]) => void;
+  quizId: string;
 }
 
-const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, onChange }) => {
+const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, onChange, quizId }) => {
   const handleQuestionChange = (index: number, updatedQuestion: QuizQuestion) => {
     const newQuestions = [...questions];
     newQuestions[index] = updatedQuestion;
@@ -370,6 +373,7 @@ const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, on
 
   const handleAddQuestion = () => {
     const newQuestion: QuizQuestion = {
+      quiz_id: quizId,
       question_number: questions.length + 1,
       question_text: 'Enter your question here...',
       explanation: 'Provide additional context or explanation for this question',

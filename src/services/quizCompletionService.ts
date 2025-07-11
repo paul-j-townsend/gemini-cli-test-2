@@ -99,18 +99,6 @@ class QuizCompletionService {
     return data as QuizCompletion[];
   }
 
-  async findCompletionsByPodcastId(podcast_id: string): Promise<QuizCompletion[]> {
-    const { data, error } = await supabaseAdmin
-      .from('vsk_quiz_completions')
-      .select('*')
-      .eq('podcast_id', podcast_id);
-
-    if (error) {
-      console.error('Error fetching completions by podcast ID:', error);
-      throw new Error('Failed to fetch quiz completions');
-    }
-    return data as QuizCompletion[];
-  }
 
   async hasUserCompletedQuiz(user_id: string, quiz_id: string): Promise<boolean> {
     const { data, error } = await supabaseAdmin

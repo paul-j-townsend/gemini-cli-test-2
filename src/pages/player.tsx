@@ -6,6 +6,7 @@ import Layout from '@/components/Layout';
 import Quiz from '@/components/Quiz';
 import { supabase } from '@/lib/supabase';
 import { useQuizCompletion } from '@/hooks/useQuizCompletion';
+import { podcastService, PodcastEpisode } from '@/services/podcastService';
 import { 
   Play, 
   Pause, 
@@ -21,19 +22,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-interface PodcastEpisode {
-  id: string;
-  title: string;
-  description: string;
-  audio_src: string;
-  full_audio_src?: string;
-  thumbnail_path: string;
-  published_at: string;
-  episode_number?: number;
-  season?: number;
-  duration?: number;
-  quiz_id?: string;
-}
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -72,7 +60,7 @@ const PodcastPlayer = () => {
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const currentAudioSrc = episode?.full_audio_src || episode?.audio_src;
 
-  // Fetch episode data
+  // Fetch episode data with complete quiz information
   useEffect(() => {
     if (!id) return;
     
@@ -81,16 +69,12 @@ const PodcastPlayer = () => {
         setLoading(true);
         setError(null);
         
-        const { data, error } = await supabase
-          .from('vsk_podcast_episodes')
-          .select('*')
-          .eq('id', id)
-          .single();
-          
-        if (error) throw error;
-        if (!data) throw new Error('Episode not found');
+        // Use podcastService to get complete episode data with quiz info
+        const episodeData = await podcastService.getEpisodeByIdClient(id as string);
         
-        setEpisode(data);
+        if (!episodeData) throw new Error('Episode not found');
+        
+        setEpisode(episodeData);
       } catch (err) {
         console.error('Error fetching episode:', err);
         setError('Failed to load episode');
@@ -484,7 +468,7 @@ const PodcastPlayer = () => {
                     <X size={24} />
                   </button>
                 </div>
-                <Quiz quizId={episode.quiz_id} />
+                <Quiz quizId={episode.quiz_id} episodeTitle={episode.title} />
               </div>
             </div>
           </div>

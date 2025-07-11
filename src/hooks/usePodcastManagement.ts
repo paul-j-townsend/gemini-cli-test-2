@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
+import { podcastService, PodcastEpisode } from '@/services/podcastService';
 
 interface Episode {
   id: string;
@@ -25,7 +26,34 @@ interface Episode {
   meta_title?: string;
   meta_description?: string;
   full_audio_url?: string;
-  quiz_id?: string;
+  quiz_id: string; // Required - enforces one-to-one relationship
+  // Always include complete quiz data as part of unified entity
+  quiz?: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    pass_percentage: number;
+    total_questions: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    questions: {
+      id: string;
+      question_number: number;
+      question_text: string;
+      explanation: string;
+      rationale: string;
+      learning_outcome: string;
+      answers: {
+        id: string;
+        answer_letter: string;
+        answer_text: string;
+        is_correct: boolean;
+      }[];
+    }[];
+  };
+  // Keep legacy format for backward compatibility
   vsk_quizzes?: {
     id: string;
     title: string;
@@ -80,15 +108,39 @@ export const usePodcastManagement = (): PodcastManagementHook => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const response = await fetch('/api/podcast-admin/episodes');
-      if (!response.ok) {
-        throw new Error('Failed to fetch episodes');
-      }
-
-      const data = await response.json();
+      // Use the podcast service to always get complete episode data with quiz info
+      const episodes = await podcastService.getAllEpisodes();
+      
+      // Transform to match expected Episode interface
+      const transformedEpisodes = episodes.map((episode: PodcastEpisode) => ({
+        id: episode.id,
+        title: episode.title,
+        description: episode.description,
+        audio_url: episode.audio_src || '',
+        image_url: episode.image_url,
+        thumbnail_path: episode.thumbnail_path || '',
+        published_at: episode.published_at,
+        created_at: episode.created_at,
+        updated_at: episode.updated_at,
+        episode_number: episode.episode_number,
+        season: episode.season,
+        duration: episode.duration,
+        slug: episode.slug,
+        published: episode.is_published,
+        full_audio_url: episode.full_audio_src,
+        quiz_id: episode.quiz_id,
+        quiz: episode.quiz,
+        // Keep legacy format for backward compatibility
+        vsk_quizzes: episode.quiz ? {
+          id: episode.quiz.id,
+          title: episode.quiz.title,
+          total_questions: episode.quiz.total_questions
+        } : undefined
+      }));
+      
       setState(prev => ({
         ...prev,
-        episodes: data.episodes || [],
+        episodes: transformedEpisodes,
         loading: false,
         error: null,
       }));
@@ -112,7 +164,7 @@ export const usePodcastManagement = (): PodcastManagementHook => {
       
       const quizOptions = data.map((quiz: any) => ({
         id: quiz.id,
-        title: `${quiz.title} (${quiz.vsk_quiz_questions?.length || 0} questions)`,
+        title: `${quiz.title} (${quiz.questions?.length || 0} questions)`,
         question_number: null
       }));
       

@@ -13,7 +13,7 @@ export interface EpisodeFormData {
   slug: string;
   published: boolean;
   full_audio_url: string;
-  quiz_id: string;
+  quiz_id: string; // Required - enforces one-to-one relationship
   category: string[];
 }
 
@@ -66,9 +66,21 @@ export const podcastValidationSchema: ValidationSchema<EpisodeFormData> = {
   published_at: {
     required: true,
   },
+  quiz_id: {
+    required: true,
+    custom: (value: string) => {
+      if (!value || value.trim() === '') {
+        return 'A quiz must be selected for each episode';
+      }
+      return null;
+    },
+  },
 };
 
-export const createInitialEpisodeData = (nextEpisodeNumber: number = 1): EpisodeFormData => {
+export const createInitialEpisodeData = (
+  nextEpisodeNumber: number = 1,
+  quiz_id: string = ''
+): EpisodeFormData => {
   const now = new Date();
   const publishDate = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // Default to 1 week from now
   
@@ -85,7 +97,7 @@ export const createInitialEpisodeData = (nextEpisodeNumber: number = 1): Episode
     slug: generateSlug(`Episode ${nextEpisodeNumber}`),
     published: false,
     full_audio_url: '',
-    quiz_id: '',
+    quiz_id: quiz_id, // Required - must be provided
     category: []
   };
 };

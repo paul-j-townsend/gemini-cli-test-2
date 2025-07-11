@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { 
+  transformToQuizPodcastEntity, 
+  QUIZ_PODCAST_QUERY_FRAGMENT 
+} from '@/utils/podcastQuizTransforms';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -25,29 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
   const { data: quizzes, error } = await supabaseAdmin
     .from('vsk_quizzes')
-    .select(`
-      id,
-      title,
-      description,
-      category,
-      is_active,
-      created_at,
-      updated_at,
-      vsk_quiz_questions (
-        id,
-        question_number,
-        question_text,
-        explanation,
-        rationale,
-        learning_outcome,
-        vsk_question_answers (
-          id,
-          answer_letter,
-          answer_text,
-          is_correct
-        )
-      )
-    `)
+    .select(QUIZ_PODCAST_QUERY_FRAGMENT)
     .order('created_at', { ascending: false });
   
   if (error) {
@@ -55,25 +37,42 @@ async function getQuizzes(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ message: 'Failed to fetch quizzes' });
   }
 
-  return res.status(200).json(quizzes || []);
+  const transformedQuizzes = (quizzes || []).map(quiz => transformToQuizPodcastEntity(quiz));
+
+  return res.status(200).json(transformedQuizzes);
 }
 
 async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
-  const { title, description, category, quiz_questions } = req.body;
+  const { podcast_id, title, description, category, pass_percentage, quiz_questions } = req.body;
+
+  if (!podcast_id) {
+    return res.status(400).json({ message: 'Podcast ID is required for unified entity model' });
+  }
 
   if (!title) {
     return res.status(400).json({ message: 'Title is required' });
   }
 
-  console.log('Creating quiz with data:', { title, quiz_questions });
+  // Verify podcast exists
+  const { data: podcast, error: podcastError } = await supabaseAdmin
+    .from('vsk_podcast_episodes')
+    .select('id')
+    .eq('id', podcast_id)
+    .single();
 
-  // Create the quiz first
+  if (podcastError || !podcast) {
+    return res.status(404).json({ message: 'Podcast episode not found' });
+  }
+
+  // Create the quiz
   const { data: quiz, error: quizError } = await supabaseAdmin
     .from('vsk_quizzes')
     .insert({
       title,
       description,
-      category,
+      category: category || '',
+      pass_percentage: pass_percentage || 70,
+      total_questions: quiz_questions ? quiz_questions.length : 0,
       is_active: true
     })
     .select()
@@ -84,20 +83,30 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ message: 'Failed to create quiz' });
   }
 
+  // Link quiz to podcast
+  const { error: linkError } = await supabaseAdmin
+    .from('vsk_podcast_episodes')
+    .update({ quiz_id: quiz.id })
+    .eq('id', podcast_id);
+
+  if (linkError) {
+    console.error('Error linking quiz to podcast:', linkError);
+    await supabaseAdmin.from('vsk_quizzes').delete().eq('id', quiz.id);
+    return res.status(500).json({ message: 'Failed to link quiz to podcast' });
+  }
+
   // Create questions and answers if provided
   if (quiz_questions && quiz_questions.length > 0) {
     for (const q of quiz_questions) {
-      console.log('Creating question:', q);
-      
       const { data: newQuestion, error: questionError } = await supabaseAdmin
         .from('vsk_quiz_questions')
         .insert([{
           quiz_id: quiz.id,
           question_number: q.question_number,
           question_text: q.question_text,
-          explanation: q.explanation,
-          rationale: q.rationale,
-          learning_outcome: q.learning_outcome
+          explanation: q.explanation || '',
+          rationale: q.rationale || '',
+          learning_outcome: q.learning_outcome || ''
         }])
         .select()
         .single();
@@ -108,10 +117,7 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
         return res.status(500).json({ message: 'Failed to create question' });
       }
 
-      // Process answers - check for both 'answers' and 'question_answers' fields
       const answersArray = q.question_answers || q.answers || [];
-      console.log('Creating answers for question:', newQuestion.id, answersArray);
-
       if (answersArray && answersArray.length > 0) {
         const answersToInsert = answersArray.map((a: any) => ({
           question_id: newQuestion.id,
@@ -133,44 +139,38 @@ async function createQuiz(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  // Return the complete quiz with questions
-  const { data: completeQuiz } = await supabaseAdmin
+  // Return the unified entity
+  const { data: completeQuiz, error: fetchError } = await supabaseAdmin
     .from('vsk_quizzes')
-    .select(`
-      id,
-      title,
-      description,
-      category,
-      pass_percentage,
-      total_questions,
-      vsk_quiz_questions (
-        id,
-        question_number,
-        question_text
-      )
-    `)
+    .select(QUIZ_PODCAST_QUERY_FRAGMENT)
     .eq('id', quiz.id)
     .single();
 
-  return res.status(201).json(completeQuiz);
+  if (fetchError) {
+    console.error('Error fetching complete quiz:', fetchError);
+    return res.status(500).json({ message: 'Quiz created but failed to fetch complete data' });
+  }
+
+  return res.status(201).json(transformToQuizPodcastEntity(completeQuiz));
 }
 
 async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
-  const { id, title, description, category, quiz_questions } = req.body;
+  const { id, title, description, category, pass_percentage, is_active, quiz_questions } = req.body;
 
   if (!id || !title) {
     return res.status(400).json({ message: 'ID and title are required' });
   }
 
-  console.log('Updating quiz with data:', { id, title, quiz_questions });
-
-  // Update the quiz
+  // Update the quiz metadata
   const { error: quizError } = await supabaseAdmin
     .from('vsk_quizzes')
     .update({
       title,
       description,
-      category
+      category,
+      pass_percentage,
+      is_active,
+      total_questions: quiz_questions ? quiz_questions.length : 0
     })
     .eq('id', id);
 
@@ -179,70 +179,54 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ message: 'Failed to update quiz' });
   }
 
-  // Delete existing questions and answers for this quiz
-  // First, get all existing question IDs for this quiz
-  const { data: existingQuestions, error: fetchError } = await supabaseAdmin
-    .from('vsk_quiz_questions')
-    .select('id')
-    .eq('quiz_id', id);
-
-  if (fetchError) {
-    console.error('Error fetching existing questions:', fetchError);
-    return res.status(500).json({ message: 'Failed to update quiz (fetch existing questions)' });
-  }
-
-  // Delete all existing answers for this quiz's questions
-  if (existingQuestions && existingQuestions.length > 0) {
-    const existingQuestionIds = existingQuestions.map(q => q.id);
-    const { error: deleteAnswersError } = await supabaseAdmin
-      .from('vsk_question_answers')
-      .delete()
-      .in('question_id', existingQuestionIds);
-
-    if (deleteAnswersError) {
-      console.error('Error deleting old answers:', deleteAnswersError);
-      return res.status(500).json({ message: 'Failed to update quiz (delete old answers)' });
-    }
-  }
-
-  // Delete all existing questions for this quiz
-  const { error: deleteQuestionsError } = await supabaseAdmin
-    .from('vsk_quiz_questions')
-    .delete()
-    .eq('quiz_id', id);
-
-  if (deleteQuestionsError) {
-    console.error('Error deleting old questions:', deleteQuestionsError);
-    return res.status(500).json({ message: 'Failed to update quiz (delete old questions)' });
-  }
-
-  // Insert new/updated questions and answers
+  // If questions are provided, replace all existing questions
   if (quiz_questions && quiz_questions.length > 0) {
+    // Get existing question IDs for cleanup
+    const { data: existingQuestions, error: fetchError } = await supabaseAdmin
+      .from('vsk_quiz_questions')
+      .select('id')
+      .eq('quiz_id', id);
+
+    if (fetchError) {
+      console.error('Error fetching existing questions:', fetchError);
+      return res.status(500).json({ message: 'Failed to update quiz questions' });
+    }
+
+    // Delete existing answers and questions
+    if (existingQuestions && existingQuestions.length > 0) {
+      const existingQuestionIds = existingQuestions.map(q => q.id);
+      await supabaseAdmin
+        .from('vsk_question_answers')
+        .delete()
+        .in('question_id', existingQuestionIds);
+    }
+
+    await supabaseAdmin
+      .from('vsk_quiz_questions')
+      .delete()
+      .eq('quiz_id', id);
+
+    // Insert new questions and answers
     for (const q of quiz_questions) {
-      console.log('Processing question:', q);
-      
       const { data: newQuestion, error: questionError } = await supabaseAdmin
         .from('vsk_quiz_questions')
         .insert([{
           quiz_id: id,
           question_number: q.question_number,
           question_text: q.question_text,
-          explanation: q.explanation,
-          rationale: q.rationale,
-          learning_outcome: q.learning_outcome
+          explanation: q.explanation || '',
+          rationale: q.rationale || '',
+          learning_outcome: q.learning_outcome || ''
         }])
         .select()
         .single();
 
       if (questionError) {
-        console.error('Error inserting new question:', questionError);
-        return res.status(500).json({ message: 'Failed to update quiz (insert new question)' });
+        console.error('Error creating question:', questionError);
+        return res.status(500).json({ message: 'Failed to update quiz questions' });
       }
 
-      // Process answers - check for both 'answers' and 'question_answers' fields
       const answersArray = q.question_answers || q.answers || [];
-      console.log('Processing answers for question:', newQuestion.id, answersArray);
-
       if (answersArray && answersArray.length > 0) {
         const answersToInsert = answersArray.map((a: any) => ({
           question_id: newQuestion.id,
@@ -256,14 +240,26 @@ async function updateQuiz(req: NextApiRequest, res: NextApiResponse) {
           .insert(answersToInsert);
 
         if (answersError) {
-          console.error('Error inserting new answers:', answersError);
-          return res.status(500).json({ message: 'Failed to update quiz (insert new answers)' });
+          console.error('Error creating answers:', answersError);
+          return res.status(500).json({ message: 'Failed to update quiz answers' });
         }
       }
     }
   }
-  
-  return res.status(200).json({ message: 'Quiz updated successfully' });
+
+  // Return the updated unified entity
+  const { data: updatedQuiz, error: fetchUpdatedError } = await supabaseAdmin
+    .from('vsk_quizzes')
+    .select(QUIZ_PODCAST_QUERY_FRAGMENT)
+    .eq('id', id)
+    .single();
+
+  if (fetchUpdatedError) {
+    console.error('Error fetching updated quiz:', fetchUpdatedError);
+    return res.status(500).json({ message: 'Quiz updated but failed to fetch updated data' });
+  }
+
+  return res.status(200).json(transformToQuizPodcastEntity(updatedQuiz));
 }
 
 async function deleteQuiz(req: NextApiRequest, res: NextApiResponse) {

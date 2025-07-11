@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { podcastService } from '@/services/podcastService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -117,28 +118,41 @@ async function updateEpisode(req: NextApiRequest, res: NextApiResponse, id: stri
 
     console.log('Mapped update data:', updateData);
 
-    const { data: episode, error } = await supabaseAdmin
-      .from('vsk_podcast_episodes')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+    // Use the podcast service to update episode with complete quiz data
+    const episode = await podcastService.updateEpisode({
+      id,
+      title,
+      description,
+      audio_src: audio_url,
+      full_audio_src: full_audio_url,
+      image_url: image_url || thumbnail_path,
+      thumbnail_path,
+      published_at,
+      episode_number,
+      season,
+      duration,
+      slug,
+      is_published: published || false,
+      quiz_id: validQuizId
+    });
 
-    if (error) {
-      console.error('Database error updating episode:', error);
-      return res.status(500).json({ 
-        message: 'Failed to update episode',
-        error: error.message,
-        details: error.details
-      });
+    if (!episode) {
+      return res.status(404).json({ message: 'Episode not found' });
     }
 
-    // Map database fields to frontend-expected fields
+    // Map to expected format for admin interface
     const mappedEpisode = {
       ...episode,
       audio_url: episode.audio_src,
       full_audio_url: episode.full_audio_src,
-      published: episode.is_published
+      published: episode.is_published,
+      quiz: episode.quiz,
+      // Keep legacy format for backward compatibility
+      vsk_quizzes: episode.quiz ? {
+        id: episode.quiz.id,
+        title: episode.quiz.title,
+        total_questions: episode.quiz.total_questions
+      } : undefined
     };
 
     return res.status(200).json({ episode: mappedEpisode });
@@ -152,13 +166,9 @@ async function updateEpisode(req: NextApiRequest, res: NextApiResponse, id: stri
 }
 
 async function deleteEpisode(req: NextApiRequest, res: NextApiResponse, id: string) {
-  const { error } = await supabaseAdmin
-    .from('vsk_podcast_episodes')
-    .delete()
-    .eq('id', id);
+  const success = await podcastService.deleteEpisode(id);
 
-  if (error) {
-    console.error('Error deleting episode:', error);
+  if (!success) {
     return res.status(500).json({ message: 'Failed to delete episode' });
   }
 

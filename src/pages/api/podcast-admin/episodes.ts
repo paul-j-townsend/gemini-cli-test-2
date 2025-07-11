@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { podcastService } from '@/services/podcastService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -19,52 +20,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function getEpisodes(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // First try with quiz relationship - use quizzes table instead of quiz_questions
-    const { data: episodes, error } = await supabaseAdmin
-      .from('vsk_podcast_episodes')
-      .select(`
-        *,
-        vsk_quizzes (
-          id,
-          title,
-          total_questions
-        )
-      `)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      // If join fails (likely quiz_id column doesn't exist), try without quiz relationship
-      console.log('Quiz relationship query failed, trying without quiz data:', error);
-      
-      const { data: episodesWithoutQuiz, error: fallbackError } = await supabaseAdmin
-        .from('vsk_podcast_episodes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (fallbackError) {
-        console.error('Error fetching episodes (fallback):', fallbackError);
-        return res.status(500).json({ message: 'Failed to fetch episodes' });
-      }
-
-      // Map database fields to expected format
-      const mappedFallbackEpisodes = (episodesWithoutQuiz || []).map(episode => ({
-        ...episode,
-        audio_url: episode.audio_src,
-        full_audio_url: episode.full_audio_src,
-        published: episode.is_published,
-        category: []
-      }));
-
-      return res.status(200).json({ episodes: mappedFallbackEpisodes });
-    }
-
-    // Map database fields to expected format
-    const mappedEpisodes = (episodes || []).map(episode => ({
+    // Use the podcast service to always get complete episode data with quiz info
+    const episodes = await podcastService.getAllEpisodes();
+    
+    // Map to expected format for admin interface
+    const mappedEpisodes = episodes.map(episode => ({
       ...episode,
       audio_url: episode.audio_src,
       full_audio_url: episode.full_audio_src,
       published: episode.is_published,
-      category: []
+      category: [],
+      // Always include quiz data as part of unified entity
+      quiz: episode.quiz,
+      // Keep legacy format for backward compatibility
+      vsk_quizzes: episode.quiz ? {
+        id: episode.quiz.id,
+        title: episode.quiz.title,
+        total_questions: episode.quiz.total_questions
+      } : undefined
     }));
 
     return res.status(200).json({ episodes: mappedEpisodes });
@@ -158,22 +131,39 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    const { data: episode, error } = await supabaseAdmin
-      .from('vsk_podcast_episodes')
-      .insert([insertData])
-      .select()
-      .single();
+    // Use the podcast service to create episode with complete quiz data
+    const episode = await podcastService.createEpisode({
+      title,
+      description,
+      audio_src: audio_url,
+      full_audio_src: full_audio_url,
+      image_url,
+      thumbnail_path,
+      published_at,
+      episode_number,
+      season,
+      duration: durationInSeconds,
+      slug,
+      is_published: published || false,
+      quiz_id: validQuizId
+    });
 
-    if (error) {
-      console.error('Error creating episode:', error);
-      return res.status(500).json({ 
-        message: 'Failed to create episode',
-        error: error.message,
-        details: error.details
-      });
-    }
+    // Map to expected format for admin interface
+    const mappedEpisode = {
+      ...episode,
+      audio_url: episode.audio_src,
+      full_audio_url: episode.full_audio_src,
+      published: episode.is_published,
+      quiz: episode.quiz,
+      // Keep legacy format for backward compatibility
+      vsk_quizzes: episode.quiz ? {
+        id: episode.quiz.id,
+        title: episode.quiz.title,
+        total_questions: episode.quiz.total_questions
+      } : undefined
+    };
 
-    return res.status(201).json({ episode });
+    return res.status(201).json({ episode: mappedEpisode });
   } catch (err) {
     console.error('Unexpected error in createEpisode:', err);
     return res.status(500).json({ 

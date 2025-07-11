@@ -19,8 +19,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-
-
 interface Podcast {
   id: string;
   title: string;
@@ -28,7 +26,7 @@ interface Podcast {
   audio_src: string | null; // Preview audio
   full_audio_src?: string | null; // Full version audio
   thumbnail: string;
-  quiz_id?: string; // Add quiz ID
+  quiz_id: string; // Required - enforces one-to-one relationship
 }
 
 interface PodcastPlayerItemProps {
@@ -57,18 +55,18 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
   const [hasAccessedFull, setHasAccessedFull] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [audioReady, setAudioReady] = useState(false);
   
-  // Quiz completion checking
+  // Quiz completion checking - every podcast now has a quiz
   const { isQuizCompleted, isQuizPassed, getQuizPercentage, isQuizPassedWithThreshold } = useQuizCompletion();
-  const quizCompleted = podcast.quiz_id ? isQuizCompleted(podcast.quiz_id) : false;
-  const quizPercentage = podcast.quiz_id ? getQuizPercentage(podcast.quiz_id) : 0;
+  const quizCompleted = isQuizCompleted(podcast.quiz_id);
+  const quizPercentage = getQuizPercentage(podcast.quiz_id);
   
   // Use the robust threshold-based checking instead of manual validation
   // This properly validates percentage against the actual pass criteria
   // TODO: Get actual quiz pass percentage from quiz data instead of defaulting to 70%
-  const quizPassed = podcast.quiz_id ? 
-    isQuizPassedWithThreshold(podcast.quiz_id, 70) : 
-    false;
+  const quizPassed = isQuizPassedWithThreshold(podcast.quiz_id, 70);
 
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
@@ -91,6 +89,8 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       setDuration(audio.duration || 0);
       setIsLoading(false);
       setError(null);
+      setAudioReady(true);
+      setRetryCount(0); // Reset retry count on successful load
     };
 
     const handleTimeUpdate = () => {
@@ -107,6 +107,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     const handleCanPlay = () => {
       setIsLoading(false);
       setError(null);
+      setAudioReady(true);
     };
 
     const handleEnded = () => {
@@ -118,13 +119,31 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       console.error('Audio loading error for:', currentAudioSrc, event);
       setIsLoading(false);
       setIsPlaying(false);
-      setError('Failed to load audio');
+      setAudioReady(false);
+      
+      // Provide more specific error messages
+      if (retryCount < 2) {
+        setError(`Loading audio... (attempt ${retryCount + 1}/3)`);
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          audio.load();
+        }, 1000);
+      } else {
+        setError('Audio unavailable - please try again later');
+      }
     };
 
     const handleStalled = () => {
       console.warn('Audio stalled for:', currentAudioSrc);
       setIsLoading(false);
-      setError('Audio playback stalled');
+      setError('Audio buffering - please wait');
+      // Auto-retry after stall
+      setTimeout(() => {
+        if (audio && !audio.ended && !isPlaying) {
+          setError(null);
+          setIsLoading(true);
+        }
+      }, 2000);
     };
 
     const handleWaiting = () => {
@@ -412,10 +431,19 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
         
         {/* Error Message */}
         {error && (
-          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600 flex items-center gap-2">
+          <div className={`mt-2 p-2 rounded-lg ${
+            retryCount < 2 
+              ? 'bg-yellow-50 border border-yellow-200' 
+              : 'bg-red-50 border border-red-200'
+          }`}>
+            <p className={`text-sm flex items-center gap-2 ${
+              retryCount < 2 ? 'text-yellow-700' : 'text-red-600'
+            }`}>
               <AlertCircle size={16} />
               {error}
+              {retryCount < 2 && (
+                <span className="ml-auto text-xs opacity-75">Retrying...</span>
+              )}
             </p>
           </div>
         )}
@@ -438,7 +466,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handleSkipBack}
             className="audio-control w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading || !!error || !hasAudio}
+            disabled={isLoading || (!audioReady && !!error) || !hasAudio}
             aria-label="Skip back 15 seconds"
           >
             <SkipBack size={16} />
@@ -447,7 +475,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handlePlayPause}
             className="audio-control w-12 h-12 flex items-center justify-center text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 rounded-xl shadow-soft hover:shadow-medium focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading || !!error || !hasAudio}
+            disabled={isLoading || (!audioReady && !!error) || !hasAudio}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isLoading ? (
@@ -462,7 +490,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <button
             onClick={handleSkipForward}
             className="audio-control w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50"
-            disabled={isLoading || !!error || !hasAudio}
+            disabled={isLoading || (!audioReady && !!error) || !hasAudio}
             aria-label="Skip forward 15 seconds"
           >
             <SkipForward size={16} />
@@ -552,13 +580,10 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             ) : (
               <button 
                 onClick={() => setShowQuiz(true)}
-                disabled={!podcast.quiz_id}
-                className={`btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2 ${
-                  !podcast.quiz_id ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
               >
-                  <Settings size={20} />
-                {podcast.quiz_id ? 'Take Quiz' : 'No Quiz Available'}
+                <Settings size={20} />
+                Take Quiz
               </button>
             )}
             <button 
@@ -577,9 +602,9 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       </div>
 
       {/* Quiz Component */}
-      {showQuiz && podcast.quiz_id && (
+      {showQuiz && (
         <div className="mt-6 pt-6 border-t border-neutral-200/80">
-          <Quiz quizId={podcast.quiz_id} />
+          <Quiz quizId={podcast.quiz_id} episodeTitle={podcast.title} />
         </div>
       )}
     </div>
