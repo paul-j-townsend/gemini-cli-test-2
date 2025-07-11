@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import PadlockIcon from '../PadlockIcon';
+import Certificate from '../Certificate';
+import { useAuth } from '../../hooks/useAuth';
+import { QuizCompletion as QuizCompletionType } from '../../types/database';
 
 interface ScoreData {
   correct: number;
@@ -12,12 +15,26 @@ interface ScoreData {
 interface QuizCompletionProps {
   score: ScoreData;
   onRestartQuiz: () => void;
+  quizTitle?: string;
+  quizId?: string;
+  completion?: QuizCompletionType;
 }
 
 export const QuizCompletion: React.FC<QuizCompletionProps> = ({
   score,
-  onRestartQuiz
+  onRestartQuiz,
+  quizTitle,
+  quizId,
+  completion
 }) => {
+  const { user } = useAuth();
+  const [showCertificate, setShowCertificate] = useState(false);
+
+  const handleGetCertificate = () => {
+    if (completion) {
+      setShowCertificate(true);
+    }
+  };
   return (
     <div className="card p-8 text-center animate-fade-in-up">
       <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
@@ -71,11 +88,39 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
         <Button
           disabled={!score.passed}
           variant="primary"
+          onClick={handleGetCertificate}
         >
           <PadlockIcon isLocked={!score.passed} />
           <span className="ml-2">Get Certificate</span>
         </Button>
       </div>
+
+      {/* Certificate Modal */}
+      {showCertificate && completion && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-neutral-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-neutral-900">Certificate of Completion</h2>
+              <button
+                onClick={() => setShowCertificate(false)}
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <Certificate
+                completion={completion}
+                userName={user?.name || 'User'}
+                quizTitle={quizTitle || 'Quiz'}
+                onDownload={() => setShowCertificate(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

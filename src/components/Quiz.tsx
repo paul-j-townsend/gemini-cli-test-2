@@ -38,6 +38,9 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
     handleNextQuestion,
     handleRestartQuiz,
     retryQuiz,
+    
+    // Quiz completion related
+    lastCompletion,
   } = useQuizLogic({ quizId, podcastId });
 
   if (loading) {
@@ -70,6 +73,9 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId }) => {
       <QuizCompletion 
         score={score} 
         onRestartQuiz={handleRestartQuiz}
+        quizTitle={quiz?.title}
+        quizId={quizId}
+        completion={lastCompletion}
       />
     );
   }

@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useAuth } from '../hooks/useAuth';
-import { calculateUserProgress, formatDuration, calculateUserLevel } from '../utils/progressUtils';
+import { formatDuration, calculateUserLevel } from '../utils/progressUtils';
 import { useMemoizedProgressCalculations } from '../utils/performanceUtils';
 import { quizServiceClient } from '../services/quizServiceClient';
-import type { ProgressSummary, Achievement } from '../utils/progressUtils';
+import Certificate from './Certificate';
+import { QuizCompletion } from '../types/database';
 
 export const UserProgressDashboard: React.FC = React.memo(() => {
   const { user } = useAuth();
   const { completions, userProgress, isLoading, deleteCompletion } = useQuizCompletion();
   const [quizTitles, setQuizTitles] = useState<Record<string, string>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showCertificate, setShowCertificate] = useState<QuizCompletion | null>(null);
 
   const progressSummary = useMemoizedProgressCalculations(completions);
 
@@ -68,12 +70,6 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
     [userProgress]
   );
 
-  const overviewStats = useMemo(() => ({
-    totalQuizzes: progressSummary?.totalQuizzes || 0,
-    totalPassed: progressSummary?.totalPassed || 0,
-    averageScore: progressSummary?.averageScore || 0,
-    streakDays: progressSummary?.streakDays || 0
-  }), [progressSummary]);
 
   const recentActivity = useMemo(() => 
     progressSummary?.recentActivity || [],
@@ -204,6 +200,17 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
                         {completion.percentage}%
                       </p>
                     </div>
+                    {completion.passed && (
+                      <button
+                        onClick={() => setShowCertificate(completion)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 text-neutral-400 hover:text-blue-500 hover:bg-blue-50 rounded-md"
+                        title="Download certificate"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDeleteCompletion(completion.id)}
                       disabled={deletingId === completion.id}
@@ -291,6 +298,33 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
           </div>
         </div>
       </div>
+
+      {/* Certificate Modal */}
+      {showCertificate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-neutral-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-neutral-900">Certificate of Completion</h2>
+              <button
+                onClick={() => setShowCertificate(null)}
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <Certificate
+                completion={showCertificate}
+                userName={user?.name || 'User'}
+                quizTitle={quizTitles[showCertificate.quiz_id] || 'Quiz'}
+                onDownload={() => setShowCertificate(null)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

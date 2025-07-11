@@ -104,7 +104,7 @@ export const useFileUpload = (options: FileUploadOptions): FileUploadHook => {
             return type.split('/')[1]?.toUpperCase() || type;
         }
       });
-      const uniqueTypes = [...new Set(friendlyTypes)];
+      const uniqueTypes = Array.from(new Set(friendlyTypes));
       return `Please choose a ${uniqueTypes.join(', ')} file. The selected file type is not supported.`;
     }
 

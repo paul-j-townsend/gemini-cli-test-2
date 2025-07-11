@@ -1,6 +1,6 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuizState, QuizData, QuizAttempt } from './useQuizState';
-import { QuizAnswer } from '../types/database';
+import { QuizAnswer, QuizCompletion } from '../types/database';
 import { useAuth } from './useAuth';
 import { useQuizCompletion } from './useQuizCompletion';
 
@@ -11,6 +11,7 @@ interface UseQuizLogicProps {
 
 export const useQuizLogic = ({ quizId, podcastId }: UseQuizLogicProps) => {
   const { user } = useAuth();
+  const [lastCompletion, setLastCompletion] = useState<QuizCompletion | null>(null);
   const { 
     submitQuizCompletion, 
     isQuizCompleted, 
@@ -126,7 +127,7 @@ export const useQuizLogic = ({ quizId, podcastId }: UseQuizLogicProps) => {
           points: attempt.is_correct ? Math.round(100 / state.quiz!.questions.length) : 0
         }));
 
-        await submitQuizCompletion(
+        const completion = await submitQuizCompletion(
           quizId,
           quizAnswers,
           score.percentage,
@@ -135,6 +136,7 @@ export const useQuizLogic = ({ quizId, podcastId }: UseQuizLogicProps) => {
           podcastId,
           100
         );
+        setLastCompletion(completion);
       }
     }
   }, [
@@ -156,6 +158,7 @@ export const useQuizLogic = ({ quizId, podcastId }: UseQuizLogicProps) => {
   const handleRestartQuiz = useCallback(() => {
     resetQuiz();
     setStartTime(Date.now());
+    setLastCompletion(null);
   }, [resetQuiz, setStartTime]);
 
   const retryQuiz = useCallback(() => {
@@ -206,5 +209,6 @@ export const useQuizLogic = ({ quizId, podcastId }: UseQuizLogicProps) => {
     getQuizScore,
     getQuizPercentage,
     completionLoading,
+    lastCompletion,
   };
 };
