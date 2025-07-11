@@ -145,8 +145,8 @@ const calculateAchievements = (completions: any[]): any[] => {
   if (perfectScores.length >= 3) {
     achievements.push({
       id: 'perfect-scores',
-      name: 'Perfectionist',
-      description: 'Achieved 3 perfect scores',
+      name: 'Triple Trouble',
+      description: 'Completed three quizzes',
       icon: '⭐',
       earned_at: perfectScores[2].completed_at
     });
