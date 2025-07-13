@@ -17,10 +17,10 @@ export const DurationInput: React.FC<DurationInputProps> = ({
   disabled = false,
   placeholder = "0:00"
 }) => {
+  const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
 
-  // Convert value to minutes and seconds
+  // Convert value to hours and minutes
   useEffect(() => {
     let totalSeconds = 0;
     
@@ -35,70 +35,70 @@ export const DurationInput: React.FC<DurationInputProps> = ({
       }
     }
     
-    setMinutes(Math.floor(totalSeconds / 60));
-    setSeconds(totalSeconds % 60);
+    setHours(Math.floor(totalSeconds / 3600));
+    setMinutes(Math.floor((totalSeconds % 3600) / 60));
   }, [value]);
 
-  // Update parent when minutes or seconds change
-  const updateDuration = (newMinutes: number, newSeconds: number) => {
-    const totalSeconds = newMinutes * 60 + newSeconds;
+  // Update parent when hours or minutes change
+  const updateDuration = (newHours: number, newMinutes: number) => {
+    const totalSeconds = newHours * 3600 + newMinutes * 60;
     onChange(totalSeconds);
   };
 
+  const incrementHours = () => {
+    const newHours = Math.min(hours + 1, 999);
+    setHours(newHours);
+    updateDuration(newHours, minutes);
+  };
+
+  const decrementHours = () => {
+    const newHours = Math.max(hours - 1, 0);
+    setHours(newHours);
+    updateDuration(newHours, minutes);
+  };
+
   const incrementMinutes = () => {
-    const newMinutes = Math.min(minutes + 1, 999);
+    let newMinutes = minutes + 1;
+    let newHours = hours;
+    
+    if (newMinutes >= 60) {
+      newMinutes = 0;
+      newHours = Math.min(hours + 1, 999);
+    }
+    
+    setHours(newHours);
     setMinutes(newMinutes);
-    updateDuration(newMinutes, seconds);
+    updateDuration(newHours, newMinutes);
   };
 
   const decrementMinutes = () => {
-    const newMinutes = Math.max(minutes - 1, 0);
-    setMinutes(newMinutes);
-    updateDuration(newMinutes, seconds);
-  };
-
-  const incrementSeconds = () => {
-    let newSeconds = seconds + 1;
-    let newMinutes = minutes;
+    let newMinutes = minutes - 1;
+    let newHours = hours;
     
-    if (newSeconds >= 60) {
-      newSeconds = 0;
-      newMinutes = Math.min(minutes + 1, 999);
-    }
-    
-    setMinutes(newMinutes);
-    setSeconds(newSeconds);
-    updateDuration(newMinutes, newSeconds);
-  };
-
-  const decrementSeconds = () => {
-    let newSeconds = seconds - 1;
-    let newMinutes = minutes;
-    
-    if (newSeconds < 0) {
-      if (minutes > 0) {
-        newSeconds = 59;
-        newMinutes = minutes - 1;
+    if (newMinutes < 0) {
+      if (hours > 0) {
+        newMinutes = 59;
+        newHours = hours - 1;
       } else {
-        newSeconds = 0;
+        newMinutes = 0;
       }
     }
     
+    setHours(newHours);
     setMinutes(newMinutes);
-    setSeconds(newSeconds);
-    updateDuration(newMinutes, newSeconds);
+    updateDuration(newHours, newMinutes);
+  };
+
+  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newHours = Math.max(0, Math.min(parseInt(e.target.value) || 0, 999));
+    setHours(newHours);
+    updateDuration(newHours, minutes);
   };
 
   const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMinutes = Math.max(0, Math.min(parseInt(e.target.value) || 0, 999));
+    const newMinutes = Math.max(0, Math.min(parseInt(e.target.value) || 0, 59));
     setMinutes(newMinutes);
-    updateDuration(newMinutes, seconds);
-  };
-
-  const handleSecondsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSeconds = Math.max(0, Math.min(parseInt(e.target.value) || 0, 59));
-    setSeconds(newSeconds);
-    updateDuration(minutes, newSeconds);
+    updateDuration(hours, newMinutes);
   };
 
   return (
@@ -110,16 +110,49 @@ export const DurationInput: React.FC<DurationInputProps> = ({
       )}
       
       <div className="flex items-center space-x-2">
-        {/* Minutes */}
+        {/* Hours */}
         <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
           <input
             type="number"
-            value={minutes}
-            onChange={handleMinutesChange}
+            value={hours}
+            onChange={handleHoursChange}
             disabled={disabled}
             className="w-16 px-2 py-1 text-center border-0 focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             min="0"
             max="999"
+          />
+          <div className="flex flex-col border-l border-gray-300">
+            <button
+              type="button"
+              onClick={incrementHours}
+              disabled={disabled}
+              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              ▲
+            </button>
+            <button
+              type="button"
+              onClick={decrementHours}
+              disabled={disabled}
+              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              ▼
+            </button>
+          </div>
+        </div>
+
+        <span className="text-gray-500 font-medium">:</span>
+
+        {/* Minutes */}
+        <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+          <input
+            type="number"
+            value={minutes.toString().padStart(2, '0')}
+            onChange={handleMinutesChange}
+            disabled={disabled}
+            className="w-16 px-2 py-1 text-center border-0 focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            min="0"
+            max="59"
           />
           <div className="flex flex-col border-l border-gray-300">
             <button
@@ -141,40 +174,7 @@ export const DurationInput: React.FC<DurationInputProps> = ({
           </div>
         </div>
 
-        <span className="text-gray-500 font-medium">:</span>
-
-        {/* Seconds */}
-        <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-          <input
-            type="number"
-            value={seconds.toString().padStart(2, '0')}
-            onChange={handleSecondsChange}
-            disabled={disabled}
-            className="w-16 px-2 py-1 text-center border-0 focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            min="0"
-            max="59"
-          />
-          <div className="flex flex-col border-l border-gray-300">
-            <button
-              type="button"
-              onClick={incrementSeconds}
-              disabled={disabled}
-              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              ▲
-            </button>
-            <button
-              type="button"
-              onClick={decrementSeconds}
-              disabled={disabled}
-              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              ▼
-            </button>
-          </div>
-        </div>
-
-        <span className="text-sm text-gray-400">mm:ss</span>
+        <span className="text-sm text-gray-400">hh:mm</span>
       </div>
 
       {error && (

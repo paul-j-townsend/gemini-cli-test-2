@@ -151,14 +151,25 @@ export const AdminDataTable = React.memo(<T extends { id: string }>({
                       {column.sortable && column.key !== 'actions' ? (
                         <button
                           onClick={() => handleSort(column.key as keyof T)}
-                          className="flex items-center space-x-1 hover:text-gray-700"
+                          className="flex items-center space-x-1 hover:text-gray-700 group"
                         >
                           <span>{column.label}</span>
-                          {sortColumn === column.key && (
-                            <span className="text-gray-400">
-                              {sortDirection === 'asc' ? '↑' : '↓'}
+                          <div className="flex flex-col">
+                            <span className={`text-xs leading-none ${
+                              sortColumn === column.key && sortDirection === 'asc' 
+                                ? 'text-blue-600' 
+                                : 'text-gray-300'
+                            }`}>
+                              ▲
                             </span>
-                          )}
+                            <span className={`text-xs leading-none ${
+                              sortColumn === column.key && sortDirection === 'desc' 
+                                ? 'text-blue-600' 
+                                : 'text-gray-300'
+                            }`}>
+                              ▼
+                            </span>
+                          </div>
                         </button>
                       ) : (
                         column.label
