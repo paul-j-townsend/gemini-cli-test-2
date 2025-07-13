@@ -116,34 +116,44 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     };
 
     const handleError = (event: Event) => {
-      console.error('Audio loading error for:', currentAudioSrc, event);
+      // Only log the first error to avoid spam
+      if (retryCount === 0) {
+        console.warn('Audio loading failed for:', currentAudioSrc);
+      }
+      
       setIsLoading(false);
       setIsPlaying(false);
       setAudioReady(false);
       
-      // Provide more specific error messages
-      if (retryCount < 2) {
-        setError(`Loading audio... (attempt ${retryCount + 1}/3)`);
+      // Provide more specific error messages with limited retries
+      if (retryCount < 1) { // Reduced retry attempts from 2 to 1
+        setError(`Loading audio... (attempt ${retryCount + 1}/2)`);
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
-          audio.load();
-        }, 1000);
+          if (audio) {
+            audio.load();
+          }
+        }, 2000); // Increased delay between retries
       } else {
-        setError('Audio unavailable - please try again later');
+        setError('Audio unavailable');
+        // Don't retry anymore to prevent console spam
       }
     };
 
     const handleStalled = () => {
-      console.warn('Audio stalled for:', currentAudioSrc);
+      // Only log if we don't already have an error state
+      if (!error) {
+        console.warn('Audio stalled for:', currentAudioSrc);
+      }
       setIsLoading(false);
       setError('Audio buffering - please wait');
       // Auto-retry after stall
       setTimeout(() => {
-        if (audio && !audio.ended && !isPlaying) {
+        if (audio && !audio.ended && !isPlaying && !error?.includes('unavailable')) {
           setError(null);
           setIsLoading(true);
         }
-      }, 2000);
+      }, 3000); // Increased timeout
     };
 
     const handleWaiting = () => {
@@ -170,13 +180,13 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
 
     // Add timeout to prevent indefinite loading
     const loadTimeout = setTimeout(() => {
-      if (isLoading) {
+      if (isLoading && !error) {
         console.warn('Audio load timeout for:', currentAudioSrc);
         setIsLoading(false);
         setIsPlaying(false);
-        setError('Audio loading timeout');
+        setError('Audio unavailable');
       }
-    }, 5000); // 5 second timeout
+    }, 8000); // Increased timeout to 8 seconds
 
     return () => {
       clearTimeout(loadTimeout);
@@ -347,7 +357,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               width={80}
               height={80}
-              priority
+              loading="lazy"
             />
           </div>
           {isPlaying && (

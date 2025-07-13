@@ -17,7 +17,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
   const progressSummary = useMemoizedProgressCalculations(completions);
 
   const uniqueQuizIds = useMemo(() => 
-    Array.from(new Set(completions.map(c => c.quiz_id))), 
+    Array.from(new Set(completions.map(c => c.content_id))), 
     [completions]
   );
 
@@ -318,7 +318,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
               <Certificate
                 completion={showCertificate}
                 userName={user?.name || 'User'}
-                quizTitle={quizTitles[showCertificate.quiz_id] || 'Quiz'}
+                quizTitle={quizTitles[showCertificate.content_id] || 'Quiz'}
                 onDownload={() => setShowCertificate(null)}
               />
             </div>

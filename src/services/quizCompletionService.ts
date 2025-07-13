@@ -5,18 +5,18 @@ import { continuationService } from './continuationService';
 class QuizCompletionService {
   async createCompletion(completion: Omit<QuizCompletion, 'id'>): Promise<QuizCompletion> {
     // Check attempt limits before creating completion
-    const continuationStatus = await continuationService.checkAttemptLimits(completion.user_id, completion.quiz_id);
+    const continuationStatus = await continuationService.checkAttemptLimits(completion.user_id, completion.content_id);
     
     if (!continuationStatus.canAttempt) {
       throw new Error(`Cannot create completion: ${continuationStatus.message}`);
     }
 
     // Get current attempt number
-    const currentAttempts = await this.getUserQuizAttempts(completion.user_id, completion.quiz_id);
+    const currentAttempts = await this.getUserQuizAttempts(completion.user_id, completion.content_id);
     const attemptNumber = currentAttempts + 1;
 
     // Check if user has existing completions for this quiz
-    const existingBest = await this.getUserBestScore(completion.user_id, completion.quiz_id);
+    const existingBest = await this.getUserBestScore(completion.user_id, completion.content_id);
     
     // Only save if this is the first attempt or if the new score is higher
     const shouldSave = !existingBest || completion.percentage > existingBest.percentage;
@@ -24,7 +24,7 @@ class QuizCompletionService {
     if (!shouldSave) {
       console.log(`Score ${completion.percentage}% is not higher than existing best ${existingBest!.percentage}%, not saving`);
       // Still record the attempt for continuation tracking
-      await continuationService.recordAttempt(completion.user_id, completion.quiz_id, completion.passed);
+      await continuationService.recordAttempt(completion.user_id, completion.content_id, completion.passed);
       // Return the existing best completion instead of creating a new one
       return existingBest!;
     }
@@ -33,8 +33,7 @@ class QuizCompletionService {
       .from('vsk_quiz_completions')
       .insert({
         user_id: completion.user_id,
-        quiz_id: completion.quiz_id,
-        podcast_id: completion.podcast_id,
+        content_id: completion.content_id,
         score: completion.score,
         max_score: completion.max_score,
         percentage: completion.percentage,
@@ -53,7 +52,7 @@ class QuizCompletionService {
     }
 
     // Record the attempt in continuation service
-    await continuationService.recordAttempt(completion.user_id, completion.quiz_id, completion.passed);
+    await continuationService.recordAttempt(completion.user_id, completion.content_id, completion.passed);
 
     await this.updateUserProgress(completion.user_id, data as QuizCompletion);
     return data as QuizCompletion;

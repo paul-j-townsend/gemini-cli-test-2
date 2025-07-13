@@ -1,11 +1,32 @@
 import { 
   PodcastEpisode, 
-  Quiz, 
-  isValidPodcastEpisode, 
-  isValidQuiz,
-  validatePodcastQuizRelationship,
-  hasRequiredQuizId 
+  Quiz
 } from '@/types/database';
+
+// Simple validation helpers for unified content system
+function hasRequiredQuizId(data: any): boolean {
+  return data && (data.quiz_id || data.id);
+}
+
+function isValidPodcastEpisode(data: any): boolean {
+  return data && data.title && data.id;
+}
+
+function isValidQuiz(data: any): boolean {
+  return data && data.title && data.id;
+}
+
+function validatePodcastQuizRelationship(podcast: any, quiz: any): { isValid: boolean; error?: string } {
+  if (!podcast || !quiz) {
+    return { isValid: false, error: 'Missing podcast or quiz data' };
+  }
+  
+  const isValid = podcast.quiz_id === quiz.id || podcast.id === quiz.content_id;
+  return { 
+    isValid, 
+    error: isValid ? undefined : 'Podcast and quiz IDs do not match' 
+  };
+}
 
 export interface ValidationResult {
   isValid: boolean;
@@ -100,16 +121,8 @@ export function validateUniqueQuizAssignment(
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Check if another episode already uses this quiz
-  const existingEpisode = episodes.find(
-    ep => ep.id !== newEpisode.id && ep.quiz_id === newEpisode.quiz_id
-  );
-
-  if (existingEpisode) {
-    errors.push(
-      `Quiz "${newEpisode.quiz_id}" is already assigned to episode "${existingEpisode.title}". Each quiz can only be assigned to one episode.`
-    );
-  }
+  // In unified content system, each content item is unique by design
+  // No need to check for quiz duplication since content is already unified
 
   return {
     isValid: errors.length === 0,
@@ -130,12 +143,8 @@ export function validateBulkEpisodeData(episodes: PodcastEpisode[]): ValidationR
       errors.push(`Episode "${episode.title}": ${episodeValidation.errors.join(', ')}`);
     }
 
-    // Check for duplicate quiz assignments
-    if (quizIds.has(episode.quiz_id)) {
-      errors.push(`Duplicate quiz assignment found: Quiz "${episode.quiz_id}" is assigned to multiple episodes`);
-    } else {
-      quizIds.add(episode.quiz_id);
-    }
+    // In unified content system, no duplicate quiz assignments possible
+    // Each content item is inherently unique
   }
 
   return {

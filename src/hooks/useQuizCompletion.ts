@@ -39,8 +39,7 @@ export const useQuizCompletion = (quizId?: string) => {
           {
             id: '1',
             user_id: user.id,
-            quiz_id: 'fed2a63e-196d-43ff-9ebc-674db34e72a7',
-            podcast_id: 'podcast-1',
+            content_id: 'fed2a63e-196d-43ff-9ebc-674db34e72a7',
             score: 100,
             max_score: 100,
             percentage: 100,
@@ -125,7 +124,7 @@ export const useQuizCompletion = (quizId?: string) => {
 
     try {
       // Calculate attempts from existing completions
-      const attempts = completions.filter(c => c.quiz_id === quizId).length;
+      const attempts = completions.filter(c => c.content_id === quizId).length;
       const percentage = Math.round((score / maxScore) * 100);
       const passed = percentage >= (passPercentage || 70); // Use quiz-specific pass percentage or default to 70%
 
@@ -264,12 +263,12 @@ export const useQuizCompletion = (quizId?: string) => {
 
   // Filter completions for specific quiz
   const getQuizCompletions = (target_quiz_id: string): QuizCompletion[] => {
-    return completions.filter(c => c.quiz_id === target_quiz_id);
+    return completions.filter(c => c.content_id === target_quiz_id);
   };
 
-  // Get completions for a specific podcast
-  const getPodcastCompletions = (podcast_id: string): QuizCompletion[] => {
-    return completions.filter(c => c.podcast_id === podcast_id);
+  // Get completions for a specific content item (unified podcast+quiz)
+  const getPodcastCompletions = (content_id: string): QuizCompletion[] => {
+    return completions.filter(c => c.content_id === content_id);
   };
 
   // Calculate statistics
@@ -322,25 +321,25 @@ export const useQuizCompletion = (quizId?: string) => {
     badges: userProgress?.badges || [],
     
     // Helper functions
-    isQuizCompleted: (quiz_id: string) => completions.some(c => c.quiz_id === quiz_id),
+    isQuizCompleted: (quiz_id: string) => completions.some(c => c.content_id === quiz_id),
     isQuizPassed: (quiz_id: string) => {
       // More robust checking: validate both stored pass status AND actual percentage
       // This handles cases where stale data might have passed=true but percentage=0
-      const completion = completions.find(c => c.quiz_id === quiz_id);
+      const completion = completions.find(c => c.content_id === quiz_id);
       if (!completion) return false;
       return completion.passed && completion.percentage >= 70; // Default 70% threshold
     },
     getQuizScore: (quiz_id: string) => {
-      const completion = completions.find(c => c.quiz_id === quiz_id);
+      const completion = completions.find(c => c.content_id === quiz_id);
       return completion ? completion.score : 0;
     },
     getQuizPercentage: (quiz_id: string) => {
-      const completion = completions.find(c => c.quiz_id === quiz_id);
+      const completion = completions.find(c => c.content_id === quiz_id);
       return completion ? completion.percentage : 0;
     },
     // New function to check if quiz is passed with custom pass percentage
     isQuizPassedWithThreshold: (quiz_id: string, passPercentage: number = 70) => {
-      const completion = completions.find(c => c.quiz_id === quiz_id);
+      const completion = completions.find(c => c.content_id === quiz_id);
       if (!completion) return false;
       return completion.percentage >= passPercentage;
     }

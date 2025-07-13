@@ -46,8 +46,9 @@ async function getCompletions(req: NextApiRequest, res: NextApiResponse) {
 async function createCompletion(req: NextApiRequest, res: NextApiResponse) {
   const { 
     user_id, 
-    quiz_id, 
-    podcast_id, 
+    content_id,
+    quiz_id, // legacy support 
+    podcast_id, // legacy support
     score, 
     max_score, 
     percentage, 
@@ -57,17 +58,19 @@ async function createCompletion(req: NextApiRequest, res: NextApiResponse) {
     attempts 
   } = req.body;
 
-  if (!user_id || !quiz_id || score === undefined || max_score === undefined) {
+  // Support both new content_id and legacy quiz_id
+  const finalContentId = content_id || quiz_id;
+
+  if (!user_id || !finalContentId || score === undefined || max_score === undefined) {
     return res.status(400).json({ 
-      message: 'user_id, quiz_id, score, and max_score are required' 
+      message: 'user_id, content_id (or quiz_id), score, and max_score are required' 
     });
   }
 
   try {
     const completionData = {
       user_id,
-      quiz_id,
-      podcast_id: podcast_id || null,
+      content_id: finalContentId,
       score,
       max_score,
       percentage: percentage !== undefined ? percentage : Math.round((score / max_score) * 100),

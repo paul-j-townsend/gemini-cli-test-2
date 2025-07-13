@@ -26,9 +26,10 @@ class ContinuationService {
         };
       }
 
-      const maxAttempts = quiz.max_attempts || this.DEFAULT_MAX_ATTEMPTS;
-      const cooldownHours = quiz.cooldown_period_hours || this.DEFAULT_COOLDOWN_HOURS;
-      const resetDays = quiz.reset_period_days || this.DEFAULT_RESET_DAYS;
+      // Use defaults since unified content doesn't have these specific quiz settings
+      const maxAttempts = this.DEFAULT_MAX_ATTEMPTS;
+      const cooldownHours = this.DEFAULT_COOLDOWN_HOURS;
+      const resetDays = this.DEFAULT_RESET_DAYS;
 
       let attemptsUsed = 0;
       let lastAttemptAt: Date | null = null;
@@ -146,8 +147,8 @@ class ContinuationService {
         throw new Error('Quiz not found');
       }
 
-      const cooldownHours = quiz.cooldown_period_hours || this.DEFAULT_COOLDOWN_HOURS;
-      const resetDays = quiz.reset_period_days || this.DEFAULT_RESET_DAYS;
+      const cooldownHours = this.DEFAULT_COOLDOWN_HOURS;
+      const resetDays = this.DEFAULT_RESET_DAYS;
       const now = new Date();
 
       let blockedUntil: Date | null = null;

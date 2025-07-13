@@ -282,7 +282,7 @@ export const generateAchievements = (
 
 // Get quiz-specific progress
 export const getQuizProgress = (completions: QuizCompletion[], quiz_id: string): QuizProgressStats | null => {
-  const quizCompletions = completions.filter(c => c.quiz_id === quiz_id);
+  const quizCompletions = completions.filter(c => c.content_id === quiz_id);
   
   if (quizCompletions.length === 0) return null;
 

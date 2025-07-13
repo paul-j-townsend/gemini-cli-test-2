@@ -88,7 +88,7 @@ const PodcastPlayer = () => {
           description: episode.description || 'No description available',
           audio_src: episode.audio_src || null, // Preview version - use null instead of empty string
           full_audio_src: episode.full_audio_src || episode.audio_src || null, // Full version or fallback to preview
-          thumbnail: getThumbnailUrl(episode),
+          thumbnail: getThumbnailUrl(episode as any),
           quiz_id: episode.quiz_id,
           // Always include complete quiz data as part of unified entity
           quiz: episode.quiz
@@ -101,8 +101,8 @@ const PodcastPlayer = () => {
             id: 'mock-1',
             title: 'Animal Anatomy & Physiology',
             description: 'Understanding animal body systems and their functions',
-            audio_src: 'https://www.soundjay.com/misc/sounds/computer-01.wav',
-            full_audio_src: 'https://www.soundjay.com/misc/sounds/computer-01.wav',
+            audio_src: '', // No audio for mock data to prevent loading errors
+            full_audio_src: '',
             thumbnail: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center',
             quiz_id: 'fed2a63e-196d-43ff-9ebc-674db34e72a7'
           },
@@ -110,8 +110,8 @@ const PodcastPlayer = () => {
             id: 'mock-2',
             title: 'Veterinary Fundamentals',
             description: 'Basic principles of veterinary medicine and practice',
-            audio_src: 'https://www.soundjay.com/misc/sounds/computer-02.wav',
-            full_audio_src: 'https://www.soundjay.com/misc/sounds/computer-02.wav',
+            audio_src: '', // No audio for mock data to prevent loading errors
+            full_audio_src: '',
             thumbnail: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center',
             quiz_id: 'quiz-1'
           }
@@ -130,8 +130,8 @@ const PodcastPlayer = () => {
           id: 'mock-1',
           title: 'Animal Anatomy & Physiology',
           description: 'Understanding animal body systems and their functions',
-          audio_src: 'https://www.soundjay.com/misc/sounds/computer-01.wav',
-          full_audio_src: 'https://www.soundjay.com/misc/sounds/computer-01.wav',
+          audio_src: '', // No audio for mock data to prevent loading errors
+          full_audio_src: '',
           thumbnail: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center',
           quiz_id: 'fed2a63e-196d-43ff-9ebc-674db34e72a7'
         }
