@@ -74,6 +74,9 @@ class PodcastService {
   }
 
   private mapContentToEpisode(content: any): PodcastEpisode {
+    if (!content) {
+      throw new Error('Content data is required');
+    }
     return {
       id: content.id,
       title: content.title,
@@ -142,10 +145,10 @@ class PodcastService {
   async getEpisodeById(id: string): Promise<PodcastEpisode | null> {
     try {
       const data = await this.fetchContentFromAPI(`/api/admin/content?id=${id}`);
-      if (!data || data.length === 0) {
+      if (!data) {
         return null;
       }
-      return this.mapContentToEpisode(data[0]);
+      return this.mapContentToEpisode(data);
     } catch (error) {
       console.error('Error fetching episode by ID:', error);
       return null;

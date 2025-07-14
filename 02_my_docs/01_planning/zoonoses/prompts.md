@@ -1,1 +1,3 @@
+quizzes:
+
 create a 5 question multiple choice quiz from the report that test the users understanding of the learning objectives. all of the quiz items should be multiple choice. allow more than one correct answer if required

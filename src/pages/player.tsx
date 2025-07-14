@@ -133,16 +133,30 @@ const PodcastPlayer = () => {
     }
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
-    if (!audio || !duration) return;
+    if (!audio) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    const newTime = percent * duration;
-    
-    audio.currentTime = newTime;
+    const newTime = parseFloat(e.target.value);
     setCurrentTime(newTime);
+    
+    if (!isScrubbing) {
+      audio.currentTime = newTime;
+    }
+  };
+
+  const handleScrubberMouseDown = () => {
+    setIsScrubbing(true);
+  };
+
+  const handleScrubberMouseUp = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    setIsScrubbing(false);
+    const target = e.target as HTMLInputElement;
+    const newTime = parseFloat(target.value);
+    audio.currentTime = newTime;
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -361,14 +375,22 @@ const PodcastPlayer = () => {
               <div className="bg-gray-50 px-8 lg:px-12 py-6">
                 {/* Progress Bar */}
                 <div className="mb-6">
-                  <div 
-                    className="w-full h-2 bg-gray-200 rounded-full cursor-pointer"
-                    onClick={handleSeek}
-                  >
-                    <div 
-                      className="h-full bg-primary-600 rounded-full transition-all duration-100"
-                      style={{ width: `${progressPercentage}%` }}
-                    ></div>
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration || 0}
+                      value={currentTime}
+                      onChange={handleSeek}
+                      onMouseDown={handleScrubberMouseDown}
+                      onMouseUp={handleScrubberMouseUp}
+                      onTouchStart={handleScrubberMouseDown}
+                      onTouchEnd={handleScrubberMouseUp}
+                      className="audio-player-progress w-full cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${progressPercentage}%, rgb(228, 228, 231) ${progressPercentage}%, rgb(228, 228, 231) 100%)`
+                      }}
+                    />
                   </div>
                   <div className="flex justify-between text-sm text-gray-500 mt-2">
                     <span>{formatTime(currentTime)}</span>
