@@ -133,7 +133,7 @@ async function updateEpisode(req: NextApiRequest, res: NextApiResponse, id: stri
       duration,
       slug,
       is_published: published || false,
-      quiz_id: validQuizId
+      content_id: validQuizId
     });
 
     if (!episode) {

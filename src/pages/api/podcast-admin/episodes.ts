@@ -76,19 +76,19 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ message: 'Title is required' });
     }
 
-    // Validate quiz_id exists if provided
-    let validQuizId = null;
+    // Validate content_id exists if provided
+    let validContentId = null;
     if (quiz_id && quiz_id.trim() !== '') {
-      const { data: quizExists } = await supabaseAdmin
-        .from('vsk_quizzes')
+      const { data: contentExists } = await supabaseAdmin
+        .from('vsk_content')
         .select('id')
         .eq('id', quiz_id)
         .single();
       
-      if (quizExists) {
-        validQuizId = quiz_id;
+      if (contentExists) {
+        validContentId = quiz_id;
       } else {
-        console.log(`Quiz ID ${quiz_id} not found, setting to null`);
+        console.log(`Content ID ${quiz_id} not found, setting to null`);
       }
     }
 
@@ -121,7 +121,7 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
       season,
       duration: durationInSeconds,
       slug,
-      quiz_id: validQuizId
+      content_id: validContentId
     };
 
     // Remove undefined fields
@@ -145,7 +145,7 @@ async function createEpisode(req: NextApiRequest, res: NextApiResponse) {
       duration: durationInSeconds,
       slug,
       is_published: published || false,
-      quiz_id: validQuizId
+      content_id: validContentId
     });
 
     // Map to expected format for admin interface

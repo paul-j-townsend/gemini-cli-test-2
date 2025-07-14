@@ -1,8 +1,59 @@
 import Head from 'next/head';
-import PodcastPlayer from '@/components/PodcastPlayer';
+import { useState, useEffect } from 'react';
+import SeriesGroup from '@/components/SeriesGroup';
 import Layout from '@/components/Layout';
+import { podcastService, SeriesGroup as SeriesGroupType } from '@/services/podcastService';
+import { supabase } from '@/lib/supabase';
+
+interface Episode {
+  id: string;
+  title: string;
+  description: string;
+  audio_src: string | null;
+  thumbnail: string;
+  content_id: string;
+  episode_number?: number;
+  season?: number;
+  published_at?: string;
+  duration?: number;
+  series?: string;
+}
 
 const Podcasts = () => {
+  const [seriesData, setSeriesData] = useState<SeriesGroupType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchEpisodes();
+  }, []);
+
+  const getThumbnailUrl = (thumbnailPath: string): string => {
+    if (!thumbnailPath) {
+      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+    }
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl(thumbnailPath);
+    return data.publicUrl;
+  };
+
+  const fetchEpisodes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const seriesGroups = await podcastService.getEpisodesBySeriesClient();
+      
+      setSeriesData(seriesGroups);
+    } catch (err) {
+      console.error('Error fetching episodes:', err);
+      setError('Failed to load episodes. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <Head>
@@ -12,7 +63,6 @@ const Podcasts = () => {
 
       {/* Hero Section */}
       <section className="relative py-16 lg:py-24 bg-gradient-to-br from-primary-50 via-white to-neutral-50 overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-float"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary-200/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
@@ -58,7 +108,9 @@ const Podcasts = () => {
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-white">
             <div className="animate-scale-in" style={{ animationDelay: '200ms' }}>
-              <div className="text-3xl lg:text-4xl font-bold mb-2">50+</div>
+              <div className="text-3xl lg:text-4xl font-bold mb-2">
+                {seriesData.reduce((total, series) => total + series.episodeCount, 0)}+
+              </div>
               <div className="text-primary-100">Expert Episodes</div>
             </div>
             <div className="animate-scale-in" style={{ animationDelay: '400ms' }}>
@@ -73,7 +125,7 @@ const Podcasts = () => {
         </div>
       </section>
 
-      {/* Episodes List Section */}
+      {/* Episodes by Series Section */}
       <section className="py-16 lg:py-24">
         <div className="container-wide">
           <div className="text-center mb-12 animate-fade-in-up">
@@ -81,13 +133,43 @@ const Podcasts = () => {
               Latest Episodes
             </h2>
             <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Dive into our latest discussions on veterinary practice, animal welfare 
-              and the future of companion animal care.
+              Explore our comprehensive collection of veterinary education series, 
+              each designed to enhance your professional development.
             </p>
           </div>
 
           <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-            <PodcastPlayer />
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto"></div>
+                <p className="text-neutral-600 mt-4">Loading episodes...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <p className="text-red-600 mb-4">{error}</p>
+                <button 
+                  onClick={fetchEpisodes}
+                  className="btn-primary"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : seriesData.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-neutral-600">No episodes available yet.</p>
+                <p className="text-sm text-neutral-500 mt-2">Check back soon for new content.</p>
+              </div>
+            ) : (
+              seriesData.map((series, index) => (
+                <SeriesGroup 
+                  key={series.name}
+                  title={series.name}
+                  description={series.description}
+                  episodes={series.episodes}
+                  defaultExpanded={index === 0}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>

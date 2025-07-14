@@ -7,6 +7,7 @@ import Quiz from '@/components/Quiz';
 import { supabase } from '@/lib/supabase';
 import { useQuizCompletion } from '@/hooks/useQuizCompletion';
 import { podcastService, PodcastEpisode } from '@/services/podcastService';
+import { ReportGenerator } from '@/services/reportGenerator';
 import { 
   Play, 
   Pause, 
@@ -19,7 +20,9 @@ import {
   Download,
   Check,
   X,
-  AlertCircle
+  AlertCircle,
+  FileText,
+  HelpCircle
 } from 'lucide-react';
 
 
@@ -53,9 +56,9 @@ const PodcastPlayer = () => {
   // Quiz completion state
   const { isQuizCompleted, isQuizPassedWithThreshold, getQuizPercentage } = useQuizCompletion();
   
-  const quizCompleted = episode?.quiz_id ? isQuizCompleted(episode.quiz_id) : false;
-  const quizPassed = episode?.quiz_id ? isQuizPassedWithThreshold(episode.quiz_id, 70) : false;
-  const quizPercentage = episode?.quiz_id ? getQuizPercentage(episode.quiz_id) : 0;
+  const quizCompleted = episode?.content_id ? isQuizCompleted(episode.content_id) : false;
+  const quizPassed = episode?.content_id ? isQuizPassedWithThreshold(episode.content_id, 70) : false;
+  const quizPercentage = episode?.content_id ? getQuizPercentage(episode.content_id) : 0;
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const currentAudioSrc = episode?.full_audio_src || episode?.audio_src;
@@ -206,34 +209,49 @@ const PodcastPlayer = () => {
   };
 
   const downloadCertificate = () => {
-    if (!quizPassed) return;
+    if (!quizPassed || !episode) return;
     
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const reportData = {
+      episode: {
+        title: episode.title,
+        description: episode.description,
+        duration: episode.duration,
+        published_at: episode.published_at,
+        category: episode.category,
+        episode_number: episode.episode_number,
+        season: episode.season
+      },
+      quiz: {
+        completed: quizCompleted,
+        passed: quizPassed,
+        percentage: quizPercentage
+      }
+    };
+    
+    ReportGenerator.generateCertificate(reportData);
+  };
 
-    canvas.width = 800;
-    canvas.height = 600;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#1f2937';
-    ctx.font = 'bold 32px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Certificate of Completion', canvas.width / 2, 150);
-
-    ctx.font = '24px Arial';
-    ctx.fillText(episode?.title || 'Podcast Episode', canvas.width / 2, 250);
-
-    ctx.font = '18px Arial';
-    ctx.fillText(`Score: ${quizPercentage}%`, canvas.width / 2, 350);
-    ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 450);
-
-    const link = document.createElement('a');
-    link.download = `certificate-${episode?.title || 'episode'}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
+  const downloadReport = () => {
+    if (!episode) return;
+    
+    const reportData = {
+      episode: {
+        title: episode.title,
+        description: episode.description,
+        duration: episode.duration,
+        published_at: episode.published_at,
+        category: episode.category,
+        episode_number: episode.episode_number,
+        season: episode.season
+      },
+      quiz: {
+        completed: quizCompleted,
+        passed: quizPassed,
+        percentage: quizPercentage
+      }
+    };
+    
+    ReportGenerator.downloadTextReport(reportData);
   };
 
   if (loading) {
@@ -332,38 +350,47 @@ const PodcastPlayer = () => {
 
 
                       {/* Quiz Status */}
-                      {episode.quiz_id && (
+                      {episode.content_id && (
                         <div className="mb-8">
-                          {quizCompleted ? (
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-center lg:justify-start space-x-3">
-                                <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                                  <Check size={20} className="text-green-600" />
-                                </div>
-                                <span className="text-lg font-semibold text-green-700">
-                                  {quizPassed ? 'Complete' : 'Incomplete'}
-                                </span>
+                          {quizCompleted && (
+                            <div className="flex items-center justify-center lg:justify-start space-x-3 mb-4">
+                              <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                                <Check size={20} className="text-green-600" />
                               </div>
-                              {quizPassed && (
-                                <button
-                                  onClick={downloadCertificate}
-                                  className="btn-secondary flex items-center space-x-2"
-                                >
-                                  <div className="flex items-center justify-center w-5 h-5">
-                                    <Download size={16} />
-                                  </div>
-                                  <span>Download Certificate</span>
-                                </button>
-                              )}
+                              <span className="text-lg font-semibold text-green-700">
+                                Quiz {quizPassed ? 'Passed' : 'Failed'} - {quizPercentage}%
+                              </span>
                             </div>
-                          ) : (
+                          )}
+                          
+                          {/* Always-visible action buttons */}
+                          <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                             <button
                               onClick={() => setShowQuiz(true)}
-                              className="btn-primary"
+                              className="btn-primary flex items-center justify-center space-x-2"
                             >
-                              Take Quiz
+                              <HelpCircle size={20} />
+                              <span>{quizCompleted ? 'Retake Quiz' : 'Take Quiz'}</span>
                             </button>
-                          )}
+                            
+                            <button
+                              onClick={downloadReport}
+                              className="btn-secondary flex items-center justify-center space-x-2"
+                            >
+                              <FileText size={20} />
+                              <span>Download Report</span>
+                            </button>
+                            
+                            {quizPassed && (
+                              <button
+                                onClick={downloadCertificate}
+                                className="btn-secondary flex items-center justify-center space-x-2"
+                              >
+                                <Download size={20} />
+                                <span>Download Certificate</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -477,7 +504,7 @@ const PodcastPlayer = () => {
         <audio ref={audioRef} src={currentAudioSrc} preload="metadata" />
 
         {/* Quiz Modal */}
-        {showQuiz && episode.quiz_id && (
+        {showQuiz && episode.content_id && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
@@ -490,7 +517,7 @@ const PodcastPlayer = () => {
                     <X size={24} />
                   </button>
                 </div>
-                <Quiz quizId={episode.quiz_id} episodeTitle={episode.title} />
+                <Quiz quizId={episode.content_id} episodeTitle={episode.title} />
               </div>
             </div>
           </div>

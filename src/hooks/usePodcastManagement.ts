@@ -128,8 +128,19 @@ export const usePodcastManagement = (): PodcastManagementHook => {
         slug: episode.slug,
         published: episode.is_published,
         full_audio_url: episode.full_audio_src,
-        quiz_id: episode.quiz_id,
-        quiz: episode.quiz,
+        quiz_id: episode.quiz?.id || '',
+        quiz: episode.quiz ? {
+          id: episode.quiz.id,
+          title: episode.quiz.title,
+          description: episode.quiz.description,
+          category: Array.isArray(episode.quiz.category) ? episode.quiz.category[0] || '' : episode.quiz.category || '',
+          pass_percentage: 70, // Default pass percentage
+          total_questions: episode.quiz.total_questions,
+          is_active: episode.quiz.is_active,
+          created_at: episode.quiz.created_at,
+          updated_at: episode.quiz.updated_at,
+          questions: episode.quiz.questions
+        } : undefined,
         // Keep legacy format for backward compatibility
         vsk_quizzes: episode.quiz ? {
           id: episode.quiz.id,

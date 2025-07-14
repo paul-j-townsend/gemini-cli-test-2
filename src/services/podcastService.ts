@@ -17,6 +17,7 @@ export interface PodcastEpisode {
   duration?: number;
   slug?: string;
   is_published?: boolean;
+  category?: string; // Added category field
   content_id: string; // Changed from quiz_id to content_id
   quiz?: {
     id: string;
@@ -42,6 +43,13 @@ export interface PodcastEpisode {
       }[];
     }[];
   };
+}
+
+export interface SeriesGroup {
+  name: string;
+  description: string;
+  episodes: PodcastEpisode[];
+  episodeCount: number;
 }
 
 export interface PodcastCreateData {
@@ -93,6 +101,7 @@ class PodcastService {
       duration: content.duration,
       slug: content.slug,
       is_published: content.is_published,
+      category: content.category || 'General', // Map category field
       content_id: content.id, // Map content id to content_id
       quiz: content.questions && content.questions.length > 0 ? {
         id: content.id,
@@ -252,6 +261,78 @@ class PodcastService {
     }
   }
 
+  // Series-based methods
+  private getSeriesDescription(seriesName: string): string {
+    const descriptions: Record<string, string> = {
+      'General': 'Comprehensive veterinary education covering essential topics for professional development.',
+      'Zoonoses': 'Understanding diseases that can be transmitted between animals and humans.',
+      'Surgery': 'Advanced surgical techniques and procedures for veterinary professionals.',
+      'Emergency Medicine': 'Critical care and emergency protocols for veterinary practice.',
+      'Nutrition': 'Animal nutrition science and dietary management strategies.',
+      'Behavior': 'Animal behavior, psychology, and behavioral medicine approaches.',
+      'Radiology': 'Diagnostic imaging and interpretation for veterinary professionals.',
+      'Pharmacology': 'Veterinary drug therapy and pharmaceutical management.',
+      'Pathology': 'Disease diagnosis and pathological processes in animals.',
+      'Reproduction': 'Animal reproduction, breeding, and reproductive health management.'
+    };
+    return descriptions[seriesName] || 'Expert insights and educational content for veterinary professionals.';
+  }
+
+  async getEpisodesBySeries(limit?: number): Promise<SeriesGroup[]> {
+    try {
+      const episodes = await this.getPublishedEpisodes(limit);
+      
+      const groupedBySeries = episodes.reduce((acc, episode) => {
+        const seriesName = episode.category || 'General';
+        if (!acc[seriesName]) {
+          acc[seriesName] = [];
+        }
+        acc[seriesName].push(episode);
+        return acc;
+      }, {} as Record<string, PodcastEpisode[]>);
+
+      return Object.entries(groupedBySeries).map(([seriesName, episodes]) => ({
+        name: seriesName,
+        description: this.getSeriesDescription(seriesName),
+        episodes: episodes.sort((a, b) => {
+          // Sort by episode number (desc) then by published date (desc)
+          if (a.episode_number && b.episode_number) {
+            return b.episode_number - a.episode_number;
+          }
+          if (a.published_at && b.published_at) {
+            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+          }
+          return 0;
+        }),
+        episodeCount: episodes.length
+      }));
+    } catch (error) {
+      console.error('Error fetching episodes by series:', error);
+      throw new Error('Failed to fetch episodes by series');
+    }
+  }
+
+  async getEpisodesBySeriesName(seriesName: string, limit?: number): Promise<PodcastEpisode[]> {
+    try {
+      const episodes = await this.getPublishedEpisodes();
+      return episodes
+        .filter(episode => (episode.category || 'General') === seriesName)
+        .sort((a, b) => {
+          if (a.episode_number && b.episode_number) {
+            return b.episode_number - a.episode_number;
+          }
+          if (a.published_at && b.published_at) {
+            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+          }
+          return 0;
+        })
+        .slice(0, limit);
+    } catch (error) {
+      console.error('Error fetching episodes by series name:', error);
+      throw new Error('Failed to fetch episodes by series name');
+    }
+  }
+
   // Client-side method for frontend usage
   async getPublishedEpisodesClient(limit?: number): Promise<PodcastEpisode[]> {
     return this.getPublishedEpisodes(limit);
@@ -259,6 +340,10 @@ class PodcastService {
 
   async getEpisodeByIdClient(id: string): Promise<PodcastEpisode | null> {
     return this.getEpisodeById(id);
+  }
+
+  async getEpisodesBySeriesClient(limit?: number): Promise<SeriesGroup[]> {
+    return this.getEpisodesBySeries(limit);
   }
 }
 
