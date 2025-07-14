@@ -14,11 +14,8 @@ export const QuizHeader: React.FC<QuizHeaderProps> = React.memo(({
 }) => {
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">{quiz.title}</h2>
-      </div>
       {quiz.description && (
-        <p className="text-neutral-600 mb-4">{quiz.description}</p>
+        <p className="text-neutral-600 mb-4 font-bold text-lg">{quiz.description}</p>
       )}
       
       {/* Progress Bar */}

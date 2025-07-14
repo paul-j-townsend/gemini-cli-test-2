@@ -112,7 +112,7 @@ const Footer = () => {
                 Terms of Service
               </Link>
               <Link 
-                href="#" 
+                href="/cookies" 
                 className="text-sm text-neutral-400 hover:text-primary-400 transition-colors duration-200"
               >
                 Cookies

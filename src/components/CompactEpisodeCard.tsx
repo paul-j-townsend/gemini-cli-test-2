@@ -128,67 +128,70 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
       {hasAudio && <audio ref={audioRef} src={episode.audio_src} preload="metadata" />}
       
       <div onClick={handleCardClick} className="relative">
-        {/* Thumbnail */}
-        <div className="relative h-48 overflow-hidden bg-neutral-100">
-          <Image 
-            src={getThumbnailUrl(episode)} 
-            alt={episode.title}
-            fill
-            className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            priority={false}
-          />
-          
-          {/* Play overlay */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-              <ExternalLink size={24} className="text-primary-600" />
-            </div>
-          </div>
-          
-          {/* Episode number badge */}
-          {episode.episode_number && (
-            <div className="absolute top-3 left-3 bg-primary-600 text-white px-2 py-1 rounded-full text-xs font-medium">
-              Ep {episode.episode_number}
-            </div>
-          )}
-          
-          {/* Quiz completion badge */}
-          {quizCompleted && (
-            <div className="absolute top-3 right-3">
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                quizPassed 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-orange-500 text-white'
-              }`}>
-                {quizPassed ? (
-                  <Check size={12} />
-                ) : (
-                  <AlertCircle size={12} />
-                )}
+        {/* Redesigned layout: horizontal on mobile, vertical on desktop */}
+        <div className="flex flex-col">
+          {/* Thumbnail - improved aspect ratio */}
+          <div className="relative h-40 sm:h-48 overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-200">
+            <Image 
+              src={getThumbnailUrl(episode)} 
+              alt={episode.title}
+              fill
+              className="object-contain object-center group-hover:scale-105 transition-transform duration-300 p-4"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              priority={false}
+            />
+            
+            {/* Play overlay */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+                <ExternalLink size={24} className="text-primary-600" />
               </div>
             </div>
-          )}
-        </div>
-        
-        {/* Content */}
-        <div className="p-4">
-          <h3 className="font-semibold text-lg text-neutral-900 mb-2 line-clamp-2">
-            {episode.title}
-          </h3>
-          
-          <p className="text-sm text-neutral-600 mb-3 line-clamp-3">
-            {episode.description}
-          </p>
-          
-          {/* Episode meta */}
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-3">
-            <span>
-              {episode.published_at && new Date(episode.published_at).toLocaleDateString()}
-            </span>
-            {episode.duration && (
-              <span>{formatTime(episode.duration)}</span>
+            
+            {/* Episode number badge */}
+            {episode.episode_number && (
+              <div className="absolute top-3 left-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
+                Ep {episode.episode_number}
+              </div>
             )}
+            
+            {/* Quiz completion badge */}
+            {quizCompleted && (
+              <div className="absolute top-3 right-3">
+                <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg ${
+                  quizPassed 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-orange-500 text-white'
+                }`}>
+                  {quizPassed ? (
+                    <Check size={12} />
+                  ) : (
+                    <AlertCircle size={12} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Content */}
+          <div className="p-4 flex-1">
+            <h3 className="font-semibold text-lg text-neutral-900 mb-2 line-clamp-2">
+              {episode.title}
+            </h3>
+            
+            <p className="text-sm text-neutral-600 mb-3 line-clamp-3">
+              {episode.description}
+            </p>
+            
+            {/* Episode meta */}
+            <div className="flex items-center justify-between text-xs text-neutral-500 mb-3">
+              <span>
+                {episode.published_at && new Date(episode.published_at).toLocaleDateString()}
+              </span>
+              {episode.duration && (
+                <span>{formatTime(episode.duration)}</span>
+              )}
+            </div>
           </div>
         </div>
       </div>

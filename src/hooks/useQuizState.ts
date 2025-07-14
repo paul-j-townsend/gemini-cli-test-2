@@ -12,7 +12,7 @@ interface Question {
   id: string;
   question_text: string;
   learning_outcome?: string;
-  rationale?: string;
+  explanation?: string;
   category?: string;
   mcq_answers: McqAnswer[];
 }
