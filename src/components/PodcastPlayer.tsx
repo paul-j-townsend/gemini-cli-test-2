@@ -12,13 +12,12 @@ interface Podcast {
   audio_src: string | null;
   full_audio_src?: string | null;
   thumbnail: string;
-  quiz_id: string; // Required - enforces one-to-one relationship
+  content_id: string; // Required - maps to unified content
   quiz?: {
     id: string;
     title: string;
     description: string;
-    category: string;
-    pass_percentage: number;
+    category: string[];
     total_questions: number;
     is_active: boolean;
     created_at: string;
@@ -89,54 +88,16 @@ const PodcastPlayer = () => {
           audio_src: episode.audio_src || null, // Preview version - use null instead of empty string
           full_audio_src: episode.full_audio_src || episode.audio_src || null, // Full version or fallback to preview
           thumbnail: getThumbnailUrl(episode as any),
-          quiz_id: episode.quiz_id,
+          content_id: episode.content_id,
           // Always include complete quiz data as part of unified entity
           quiz: episode.quiz
         }));
 
-      // If no valid podcasts found, add some mock data for testing
-      if (formattedPodcasts.length === 0) {
-        const mockPodcasts: Podcast[] = [
-          {
-            id: 'mock-1',
-            title: 'Animal Anatomy & Physiology',
-            description: 'Understanding animal body systems and their functions',
-            audio_src: '', // No audio for mock data to prevent loading errors
-            full_audio_src: '',
-            thumbnail: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center',
-            quiz_id: 'fed2a63e-196d-43ff-9ebc-674db34e72a7'
-          },
-          {
-            id: 'mock-2',
-            title: 'Veterinary Fundamentals',
-            description: 'Basic principles of veterinary medicine and practice',
-            audio_src: '', // No audio for mock data to prevent loading errors
-            full_audio_src: '',
-            thumbnail: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center',
-            quiz_id: 'quiz-1'
-          }
-        ];
-        setPodcasts(mockPodcasts);
-      } else {
-        setPodcasts(formattedPodcasts);
-      }
+      setPodcasts(formattedPodcasts);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
-      setError('Failed to load podcasts');
-      
-      // Fallback to mock data on error
-      const mockPodcasts: Podcast[] = [
-        {
-          id: 'mock-1',
-          title: 'Animal Anatomy & Physiology',
-          description: 'Understanding animal body systems and their functions',
-          audio_src: '', // No audio for mock data to prevent loading errors
-          full_audio_src: '',
-          thumbnail: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center',
-          quiz_id: 'fed2a63e-196d-43ff-9ebc-674db34e72a7'
-        }
-      ];
-      setPodcasts(mockPodcasts);
+      setError(error instanceof Error ? error.message : 'Failed to load podcasts. Please check your connection and try again.');
+      setPodcasts([]);
     } finally {
       setLoading(false);
     }
@@ -146,11 +107,44 @@ const PodcastPlayer = () => {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
-            <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-            <div className="h-6 bg-gray-200 rounded mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded mb-4"></div>
-            <div className="h-12 bg-gray-200 rounded"></div>
+          <div key={i} className="card-glow p-6 animate-pulse">
+            {/* Header Section Skeleton */}
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gray-200 rounded-2xl flex-shrink-0"></div>
+              <div className="flex-grow min-w-0">
+                <div className="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded mb-1 w-full"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2 w-2/3"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            </div>
+            
+            {/* Progress Bar Skeleton */}
+            <div className="mb-4">
+              <div className="flex justify-between mb-2">
+                <div className="h-3 bg-gray-200 rounded w-8"></div>
+                <div className="h-3 bg-gray-200 rounded w-8"></div>
+              </div>
+              <div className="h-2 bg-gray-200 rounded w-full"></div>
+            </div>
+            
+            {/* Controls Skeleton */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
+                <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-20 h-8 bg-gray-200 rounded-lg"></div>
+                <div className="w-12 h-8 bg-gray-200 rounded-lg"></div>
+              </div>
+            </div>
+            
+            {/* Action Buttons Skeleton */}
+            <div className="pt-6 border-t border-neutral-200/80">
+              <div className="h-12 bg-gray-200 rounded-xl w-full"></div>
+            </div>
           </div>
         ))}
       </div>
@@ -171,10 +165,11 @@ const PodcastPlayer = () => {
     );
   }
 
-  if (podcasts.length === 0) {
+  if (podcasts.length === 0 && !error) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">No podcast episodes available yet.</p>
+        <p className="text-sm text-gray-500 mt-2">Check back soon for new content.</p>
       </div>
     );
   }
