@@ -78,7 +78,7 @@ async function getQuiz(req: NextApiRequest, res: NextApiResponse, id: string) {
         explanation: q.explanation,
         rationale: q.rationale,
         learning_outcome: q.learning_outcome,
-        answers: answers.filter(a => a.question_id === q.id).map(a => ({
+        mcq_answers: answers.filter(a => a.question_id === q.id).map(a => ({
           id: a.id,
           answer_letter: a.answer_letter,
           answer_text: a.answer_text,
