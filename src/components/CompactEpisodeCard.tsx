@@ -129,13 +129,14 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
       
       <div onClick={handleCardClick} className="relative">
         {/* Thumbnail */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-48 overflow-hidden bg-neutral-100">
           <Image 
             src={getThumbnailUrl(episode)} 
             alt={episode.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            priority={false}
           />
           
           {/* Play overlay */}
