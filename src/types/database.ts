@@ -106,8 +106,23 @@ export interface ContentCompletion {
   attempts: number;
 }
 
+// Actual database table structure for quiz completions
+export interface QuizCompletionTable {
+  id: string;
+  user_id: string;
+  quiz_id: string; // This is what the database actually has
+  score: number;
+  max_score: number;
+  percentage: number;
+  time_spent: number;
+  completed_at: string;
+  answers: ContentAnswer[];
+  passed: boolean;
+  attempts: number;
+}
+
 // Legacy aliases for backward compatibility
-export type QuizCompletion = ContentCompletion;
+export type QuizCompletion = QuizCompletionTable; // Use the actual table structure
 export type PodcastEpisode = Content;
 export type QuizAnswer = ContentAnswer;
 export type Quiz = Content;

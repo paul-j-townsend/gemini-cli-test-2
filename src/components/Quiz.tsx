@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuizLogic } from '../hooks/useQuizLogic';
 import { LoadingState } from './ui/LoadingState';
 import { ErrorDisplay } from './ui/ErrorDisplay';
@@ -12,9 +12,10 @@ interface QuizProps {
   quizId: string; // Required - every podcast now has a quiz
   podcastId?: string;
   episodeTitle?: string;
+  onComplete?: () => void; // Callback when quiz is completed
 }
 
-const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle }) => {
+const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, onComplete }) => {
   const {
     // State
     quiz,
@@ -43,6 +44,13 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle }) => {
     // Quiz completion related
     lastCompletion,
   } = useQuizLogic({ quizId, podcastId });
+
+  // Call onComplete callback when quiz is completed
+  useEffect(() => {
+    if (lastCompletion && onComplete) {
+      onComplete();
+    }
+  }, [lastCompletion, onComplete]);
 
   if (loading) {
     return <LoadingState message="Loading quiz..." />;

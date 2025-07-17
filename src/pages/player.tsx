@@ -6,6 +6,7 @@ import Layout from '@/components/Layout';
 import Quiz from '@/components/Quiz';
 import { supabase } from '@/lib/supabase';
 import { useQuizCompletion } from '@/hooks/useQuizCompletion';
+import { useUserContentProgress } from '@/hooks/useUserContentProgress';
 import { podcastService, PodcastEpisode } from '@/services/podcastService';
 import { ReportGenerator } from '@/services/reportGenerator';
 import { 
@@ -52,9 +53,21 @@ const PodcastPlayer = () => {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  
   // Quiz completion state
-  const { isQuizCompleted, isQuizPassedWithThreshold, getQuizPercentage } = useQuizCompletion();
+  const { isQuizCompleted, isQuizPassedWithThreshold, getQuizPercentage, refreshData } = useQuizCompletion();
+  
+  // User content progress state (database-backed)
+  const {
+    hasListened,
+    quizCompleted: progressQuizCompleted,
+    reportDownloaded,
+    certificateDownloaded,
+    updateListenProgress,
+    markQuizCompleted,
+    markReportDownloaded,
+    markCertificateDownloaded,
+    loading: progressLoading
+  } = useUserContentProgress(episode?.content_id);
   
   const quizCompleted = episode?.content_id ? isQuizCompleted(episode.content_id) : false;
   const quizPassed = episode?.content_id ? isQuizPassedWithThreshold(episode.content_id, 70) : false;
@@ -96,7 +109,21 @@ const PodcastPlayer = () => {
 
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
     const handleTimeUpdate = () => {
-      if (!isScrubbing) setCurrentTime(audio.currentTime || 0);
+      if (!isScrubbing) {
+        const currentTime = audio.currentTime || 0;
+        setCurrentTime(currentTime);
+        
+        // Update listen progress in database
+        const listenedPercentage = duration ? (currentTime / duration) * 100 : 0;
+        
+        // Update progress every 10% milestone to avoid too many database calls
+        const currentMilestone = Math.floor(listenedPercentage / 10);
+        const previousMilestone = Math.floor(progressPercentage / 10);
+        
+        if (currentMilestone > previousMilestone) {
+          updateListenProgress(listenedPercentage, hasListened);
+        }
+      }
     };
     const handleEnded = () => setIsPlaying(false);
 
@@ -109,7 +136,7 @@ const PodcastPlayer = () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [currentAudioSrc, isScrubbing]);
+  }, [currentAudioSrc, isScrubbing, duration, progressPercentage, hasListened, updateListenProgress]);
 
   // Update audio properties when state changes
   useEffect(() => {
@@ -129,6 +156,12 @@ const PodcastPlayer = () => {
       audio.pause();
     } else {
       audio.play().catch(console.error);
+      
+      // Mark as listened as soon as play button is clicked
+      if (!hasListened) {
+        updateListenProgress(progressPercentage, true);
+        console.log('Podcast marked as listened (play button clicked)');
+      }
     }
     setIsPlaying(!isPlaying);
   };
@@ -177,7 +210,7 @@ const PodcastPlayer = () => {
     return data.publicUrl;
   };
 
-  const downloadCertificate = () => {
+  const downloadCertificate = async () => {
     if (!quizPassed || !episode) return;
     
     const reportData = {
@@ -198,29 +231,26 @@ const PodcastPlayer = () => {
     };
     
     ReportGenerator.generateCertificate(reportData);
+    
+    // Mark certificate as downloaded in database
+    await markCertificateDownloaded();
+    console.log('Certificate downloaded and marked in database');
   };
 
-  const downloadReport = () => {
+  const downloadReport = async () => {
     if (!episode) return;
     
-    const reportData = {
-      episode: {
-        title: episode.title,
-        description: episode.description,
-        duration: episode.duration,
-        published_at: episode.published_at,
-        category: episode.category,
-        episode_number: episode.episode_number,
-        season: episode.season
-      },
-      quiz: {
-        completed: quizCompleted,
-        passed: quizPassed,
-        percentage: quizPercentage
-      }
-    };
+    // Create a temporary link to download the dummy PDF
+    const link = document.createElement('a');
+    link.href = '/documents/cpd-report-template.pdf';
+    link.download = `CPD-Report-${episode.title.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
-    ReportGenerator.downloadTextReport(reportData);
+    // Mark report as downloaded in database
+    await markReportDownloaded();
+    console.log('Report downloaded and marked in database');
   };
 
   if (loading) {
@@ -304,14 +334,91 @@ const PodcastPlayer = () => {
                         {episode.description}
                       </p>
 
-                      {/* Quiz Status - Compact */}
+                      {/* Learning Progress Breadcrumbs */}
+                      <div className="flex items-center gap-1 mb-2 text-xs">
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
+                          hasListened ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h6m-6 4h6m4 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="font-medium">Listen</span>
+                          {hasListened && <Check size={10} />}
+                        </div>
+                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
+                          progressQuizCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                          <span className="font-medium">Quiz</span>
+                          {progressQuizCompleted && <Check size={10} />}
+                        </div>
+                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
+                          reportDownloaded ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="font-medium">Report</span>
+                          {reportDownloaded && <Check size={10} />}
+                        </div>
+                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
+                          certificateDownloaded ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="font-medium">Certificate</span>
+                          {certificateDownloaded && <Check size={10} />}
+                        </div>
+                      </div>
+
+                      {/* CPD Context Indicators */}
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="flex items-center gap-1 text-xs bg-blue-50 px-2 py-1 rounded-full">
+                          <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="text-blue-700 font-medium">
+                            {duration > 0 ? `${Math.ceil(duration / 60)} min` : '30 min'} CPD
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs bg-green-50 px-2 py-1 rounded-full">
+                          <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="text-green-700 font-medium">1.0 CPD Points</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs bg-purple-50 px-2 py-1 rounded-full">
+                          <svg className="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
+                          <span className="text-purple-700 font-medium">Certificate Available</span>
+                        </div>
+                      </div>
+
+                      {/* Quiz Status - Compact with Celebration */}
                       {episode.content_id && quizCompleted && (
-                        <div className="flex items-center gap-1 mb-2">
-                          <div className="w-3 h-3 bg-green-100 rounded-full flex items-center justify-center">
-                            <Check size={8} className="text-green-600" />
+                        <div className={`flex items-center gap-1 mb-2 animate-pulse ${quizPassed ? 'animate-bounce' : ''}`}>
+                          <div className={`w-3 h-3 rounded-full flex items-center justify-center transition-all duration-500 ${
+                            quizPassed ? 'bg-green-100 animate-pulse' : 'bg-orange-100'
+                          }`}>
+                            <Check size={8} className={quizPassed ? 'text-green-600' : 'text-orange-600'} />
                           </div>
-                          <span className="text-xs font-medium text-green-700">
-                            Quiz {quizPassed ? 'Passed' : 'Failed'} - {quizPercentage}%
+                          <span className={`text-xs font-medium transition-colors duration-300 ${
+                            quizPassed ? 'text-green-700' : 'text-orange-700'
+                          }`}>
+                            Quiz {quizPassed ? 'Passed! 🎉' : 'Failed'} - {quizPercentage}%
                           </span>
                         </div>
                       )}
@@ -331,7 +438,7 @@ const PodcastPlayer = () => {
                           onMouseUp={handleScrubberMouseUp}
                           onTouchStart={handleScrubberMouseDown}
                           onTouchEnd={handleScrubberMouseUp}
-                          className="audio-player-progress w-full cursor-pointer h-1"
+                          className="audio-player-progress w-full cursor-pointer h-1 transition-all duration-300"
                           style={{
                             background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${progressPercentage}%, rgb(228, 228, 231) ${progressPercentage}%, rgb(228, 228, 231) 100%)`
                           }}
@@ -416,32 +523,47 @@ const PodcastPlayer = () => {
 
                     {/* Quiz & Report Buttons - Below Audio Controls */}
                     {episode.content_id && (
-                      <div className="flex gap-3 mt-4">
+                      <div className="flex flex-col gap-3 mt-4">
+                        {/* Primary CTA - Quiz Button */}
                         <button
                           onClick={() => setShowQuiz(true)}
-                          className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg flex items-center gap-2"
+                          className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                         >
-                          <HelpCircle size={16} />
-                          {quizCompleted ? 'Retake Quiz' : 'Take Quiz'}
+                          <HelpCircle size={18} />
+                          {quizCompleted ? 'Retake CPD Assessment' : 'Start CPD Assessment'}
+                          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
                         </button>
                         
-                        <button
-                          onClick={downloadReport}
-                          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-lg flex items-center gap-2"
-                        >
-                          <FileText size={16} />
-                          Download Report
-                        </button>
-                        
-                        {quizPassed && (
+                        {/* Secondary Actions */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={downloadReport}
+                            className={`flex-1 px-4 py-2 text-sm rounded-lg flex items-center justify-center gap-2 transition-colors ${
+                              quizCompleted 
+                                ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' 
+                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                            }`}
+                            disabled={!quizCompleted}
+                          >
+                            <FileText size={14} />
+                            {reportDownloaded ? 'Report Downloaded ✓' : 'Download Report'}
+                          </button>
+                          
                           <button
                             onClick={downloadCertificate}
-                            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-lg flex items-center gap-2"
+                            disabled={!quizPassed || !reportDownloaded}
+                            className={`flex-1 px-4 py-2 text-sm rounded-lg flex items-center justify-center gap-2 transition-colors ${
+                              quizPassed && reportDownloaded
+                                ? 'bg-green-100 hover:bg-green-200 text-green-700 cursor-pointer'
+                                : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+                            }`}
                           >
-                            <Download size={16} />
-                            Download Certificate
+                            <Download size={14} />
+                            {certificateDownloaded ? 'Certificate Downloaded ✓' : !quizPassed ? 'Pass Quiz First' : !reportDownloaded ? 'Download Report First' : 'Download Certificate'}
                           </button>
-                        )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -458,17 +580,39 @@ const PodcastPlayer = () => {
         {showQuiz && episode?.content_id && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">CPD Assessment Quiz - {episode.title}</h2>
+              <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-primary-50 to-primary-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 relative rounded-lg overflow-hidden shadow-md flex-shrink-0">
+                    <Image
+                      src={getThumbnailUrl(episode.thumbnail_path)}
+                      alt={episode.title}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-bold text-gray-900 mb-1">CPD Assessment Quiz</h2>
+                    <p className="text-sm text-gray-600 truncate">{episode.title}</p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowQuiz(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-white/50 rounded-lg transition-colors flex-shrink-0"
                 >
                   <X size={20} />
                 </button>
               </div>
               <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-6">
-                <Quiz quizId={episode.content_id} episodeTitle={episode.title} />
+                <Quiz 
+                  quizId={episode.content_id} 
+                  episodeTitle={episode.title} 
+                  onComplete={async () => {
+                    console.log('Quiz completed, refreshing data...');
+                    await refreshData();
+                    await markQuizCompleted();
+                  }}
+                />
               </div>
             </div>
           </div>

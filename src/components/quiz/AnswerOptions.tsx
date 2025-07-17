@@ -36,58 +36,73 @@ export const AnswerOptions: React.FC<AnswerOptionsProps> = React.memo(({
   }
 
   return (
-    <div className="space-y-3 mb-6">
-      {sortedAnswers.map(answer => {
+    <div className="space-y-4 mb-8">
+      <div className="flex items-center gap-2 mb-4">
+        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span className="font-semibold text-neutral-900">Select the {hasMultipleCorrectAnswers ? 'correct answers' : 'best answer'}:</span>
+        {hasMultipleCorrectAnswers && (
+          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">Multiple Selection</span>
+        )}
+      </div>
+      
+      {sortedAnswers.map((answer, index) => {
           const isSelected = selectedAnswers.includes(answer.id);
           const isCorrect = answer.is_correct;
           const isWrong = showExplanation && isSelected && !isCorrect;
           const showCorrect = showExplanation && isSelected && isCorrect;
+          const letterOption = String.fromCharCode(65 + index); // A, B, C, D...
           
           return (
             <label 
               key={answer.id} 
-              className={`flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-soft group ${
-                isSelected && !showExplanation ? 'border-primary-500 bg-primary-50' : 
-                showCorrect ? 'border-success-500 bg-success-50' :
-                isWrong ? 'border-error-500 bg-error-50' :
-                'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+              className={`flex items-start p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md group ${
+                isSelected && !showExplanation ? 'border-blue-500 bg-blue-50 shadow-sm' : 
+                showCorrect ? 'border-green-500 bg-green-50 shadow-sm' :
+                isWrong ? 'border-red-500 bg-red-50 shadow-sm' :
+                'border-neutral-200 hover:border-blue-300 hover:bg-blue-50/50'
               } ${showExplanation ? 'cursor-default' : ''}`}
               onClick={() => handleAnswerClick(answer.id)}
             >
-              <div className={`flex-shrink-0 w-6 h-6 mr-4 mt-0.5 flex items-center justify-center transition-all duration-200 ${
-                hasMultipleCorrectAnswers ? 'rounded border-2' : 'rounded-full border-2'
-              } ${
-                isSelected && !showExplanation ? 'border-primary-500 bg-primary-500' :
-                showCorrect ? 'border-success-500 bg-success-500' :
-                isWrong ? 'border-error-500 bg-error-500' :
-                'border-neutral-300 group-hover:border-neutral-400'
-              }`}>
-                {showCorrect && (
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-                {isWrong && (
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
-                {isSelected && !showExplanation && (
-                  hasMultipleCorrectAnswers ? (
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                    </svg>
+              {/* Enhanced Option Letter/Indicator */}
+              <div className="flex-shrink-0 mr-4">
+                <div className={`w-10 h-10 flex items-center justify-center transition-all duration-300 font-bold text-sm ${
+                  hasMultipleCorrectAnswers ? 'rounded-lg border-2' : 'rounded-full border-2'
+                } ${
+                  isSelected && !showExplanation ? 'border-blue-500 bg-blue-500 text-white shadow-lg' :
+                  showCorrect ? 'border-green-500 bg-green-500 text-white shadow-lg' :
+                  isWrong ? 'border-red-500 bg-red-500 text-white shadow-lg' :
+                  'border-neutral-300 bg-white text-neutral-600 group-hover:border-blue-400 group-hover:bg-blue-50 group-hover:text-blue-600'
+                }`}>
+                  {!showExplanation ? (
+                    letterOption
                   ) : (
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  )
-                )}
+                    showCorrect ? (
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : isWrong ? (
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      letterOption
+                    )
+                  )}
+                </div>
               </div>
+              {/* Enhanced Answer Text */}
               <div className="flex-grow">
-                <p className={`text-neutral-800 leading-relaxed ${
-                  showCorrect ? 'font-medium' : ''
+                <div className={`text-lg leading-relaxed transition-all duration-200 ${
+                  showCorrect ? 'font-semibold text-green-800' : 
+                  isWrong ? 'font-medium text-red-800' :
+                  isSelected && !showExplanation ? 'font-medium text-blue-800' :
+                  'text-neutral-800'
                 }`}>
                   {answer.answer_text}
-                </p>
+                </div>
+                
               </div>
             </label>
           );

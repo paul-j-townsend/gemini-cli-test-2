@@ -4,36 +4,79 @@ import { continuationService } from './continuationService';
 
 class QuizCompletionService {
   async createCompletion(completion: Omit<QuizCompletion, 'id'>): Promise<QuizCompletion> {
-    // Check attempt limits before creating completion
-    const continuationStatus = await continuationService.checkAttemptLimits(completion.user_id, completion.content_id);
+    console.log('=== QUIZ COMPLETION SERVICE START ===');
+    console.log('Input completion data:', JSON.stringify(completion, null, 2));
     
-    if (!continuationStatus.canAttempt) {
-      throw new Error(`Cannot create completion: ${continuationStatus.message}`);
-    }
+    try {
+      // Check if user exists in vsk_users table
+      console.log('Step 1: Checking if user exists...');
+      const { data: user, error: userError } = await supabaseAdmin
+        .from('vsk_users')
+        .select('id')
+        .eq('id', completion.user_id)
+        .single();
+      
+      console.log('User check result:', { user: !!user, error: userError?.message });
+      
+      if (userError || !user) {
+        console.log('Step 1b: User not found, creating user entry...');
+        // Create a basic user entry if it doesn't exist
+        const { error: createUserError } = await supabaseAdmin
+          .from('vsk_users')
+          .insert({
+            id: completion.user_id,
+            name: 'Development User',
+            email: 'dev@vetsidekick.com',
+            role: 'user',
+            status: 'active',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        
+        if (createUserError) {
+          console.error('Failed to create user:', createUserError);
+          // Continue anyway - maybe the user exists but we can't see it due to RLS
+        } else {
+          console.log('User created successfully');
+        }
+      }
 
-    // Get current attempt number
-    const currentAttempts = await this.getUserQuizAttempts(completion.user_id, completion.content_id);
-    const attemptNumber = currentAttempts + 1;
+      // Check attempt limits before creating completion
+      console.log('Step 2: Checking attempt limits...');
+      const continuationStatus = await continuationService.checkAttemptLimits(completion.user_id, completion.quiz_id);
+      console.log('Continuation status:', continuationStatus);
+      
+      if (!continuationStatus.canAttempt) {
+        throw new Error(`Cannot create completion: ${continuationStatus.message}`);
+      }
 
-    // Check if user has existing completions for this quiz
-    const existingBest = await this.getUserBestScore(completion.user_id, completion.content_id);
-    
-    // Only save if this is the first attempt or if the new score is higher
-    const shouldSave = !existingBest || completion.percentage > existingBest.percentage;
-    
-    if (!shouldSave) {
-      console.log(`Score ${completion.percentage}% is not higher than existing best ${existingBest!.percentage}%, not saving`);
-      // Still record the attempt for continuation tracking
-      await continuationService.recordAttempt(completion.user_id, completion.content_id, completion.passed);
-      // Return the existing best completion instead of creating a new one
-      return existingBest!;
-    }
+      // Get current attempt number
+      console.log('Step 3: Getting current attempts...');
+      const currentAttempts = await this.getUserQuizAttempts(completion.user_id, completion.quiz_id);
+      console.log('Current attempts:', currentAttempts);
+      const attemptNumber = currentAttempts + 1;
 
-    const { data, error } = await supabaseAdmin
-      .from('vsk_quiz_completions')
-      .insert({
+      // Check if user has existing completions for this quiz
+      console.log('Step 4: Checking existing completions...');
+      const existingBest = await this.getUserBestScore(completion.user_id, completion.quiz_id);
+      console.log('Existing best score:', existingBest);
+      
+      // Only save if this is the first attempt or if the new score is higher
+      const shouldSave = !existingBest || completion.percentage > existingBest.percentage;
+      console.log('Should save new completion:', shouldSave);
+      
+      if (!shouldSave) {
+        console.log(`Score ${completion.percentage}% is not higher than existing best ${existingBest!.percentage}%, not saving`);
+        // Still record the attempt for continuation tracking
+        await continuationService.recordAttempt(completion.user_id, completion.quiz_id, completion.passed);
+        // Return the existing best completion instead of creating a new one
+        return existingBest!;
+      }
+
+      console.log('Step 5: Inserting new completion into database...');
+      const insertData = {
         user_id: completion.user_id,
-        content_id: completion.content_id,
+        quiz_id: completion.quiz_id,
         score: completion.score,
         max_score: completion.max_score,
         percentage: completion.percentage,
@@ -42,33 +85,71 @@ class QuizCompletionService {
         answers: completion.answers,
         passed: completion.passed,
         attempts: completion.attempts,
-      })
-      .select()
-      .single();
+      };
+      console.log('Data to insert:', JSON.stringify(insertData, null, 2));
 
-    if (error) {
-      console.error('Error creating completion:', error);
-      throw new Error('Failed to create quiz completion');
+      const { data, error } = await supabaseAdmin
+        .from('vsk_quiz_completions')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('=== DATABASE INSERT ERROR ===');
+        console.error('Error code:', error.code);
+        console.error('Error details:', error.details);
+        console.error('Error message:', error.message);
+        console.error('Error hint:', error.hint);
+        console.error('=== END DATABASE INSERT ERROR ===');
+        throw new Error(`Failed to create quiz completion: ${error.message}`);
+      }
+
+      console.log('Step 6: Database insert successful, result:', JSON.stringify(data, null, 2));
+
+      // Record the attempt in continuation service
+      console.log('Step 7: Recording attempt in continuation service...');
+      await continuationService.recordAttempt(completion.user_id, completion.quiz_id, completion.passed);
+
+      console.log('Step 8: Updating user progress...');
+      await this.updateUserProgress(completion.user_id, data as QuizCompletion);
+      
+      console.log('=== QUIZ COMPLETION SERVICE SUCCESS ===');
+      return data as QuizCompletion;
+    } catch (error) {
+      console.error('=== QUIZ COMPLETION SERVICE ERROR ===');
+      console.error('Error in createCompletion:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+      console.error('=== END QUIZ COMPLETION SERVICE ERROR ===');
+      throw error;
     }
-
-    // Record the attempt in continuation service
-    await continuationService.recordAttempt(completion.user_id, completion.content_id, completion.passed);
-
-    await this.updateUserProgress(completion.user_id, data as QuizCompletion);
-    return data as QuizCompletion;
   }
 
   async findCompletionsByUserId(userId: string): Promise<QuizCompletion[]> {
-    const { data, error } = await supabaseAdmin
-      .from('vsk_quiz_completions')
-      .select('*')
-      .eq('user_id', userId);
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('vsk_quiz_completions')
+        .select('*')
+        .eq('user_id', userId);
 
-    if (error) {
-      console.error('Error fetching completions by user ID:', error);
-      throw new Error('Failed to fetch quiz completions');
+      if (error) {
+        console.error('Error fetching completions by user ID:', error);
+        console.error('Error code:', error.code);
+        console.error('Error details:', error.details);
+        
+        // If table doesn't exist, return empty array instead of throwing
+        if (error.code === '42P01') {
+          console.log('vsk_quiz_completions table does not exist, returning empty array');
+          return [];
+        }
+        
+        throw new Error('Failed to fetch quiz completions');
+      }
+      return data as QuizCompletion[];
+    } catch (error) {
+      console.error('Unexpected error in findCompletionsByUserId:', error);
+      // Return empty array for any unexpected errors to prevent app crashes
+      return [];
     }
-    return data as QuizCompletion[];
   }
 
   async findCompletionById(id: string): Promise<QuizCompletion | null> {
