@@ -22,15 +22,15 @@ Give all sources with direct links and author names where available
 
 ## questions from claude
 
-### What level of detail would you like for the foundations episode? Should I focus more on basic definitions and concepts, or include more advanced epidemiological and surveillance frameworks?
+1. **What level of detail would you like for the foundations episode? Should I focus more on basic definitions and concepts, or include more advanced epidemiological and surveillance frameworks?**
 
-intermediate level detail. focus more on basic definitions and concepts
+   intermediate level detail. focus more on basic definitions and concepts
 
-### For the UK bias, should I emphasize specific UK surveillance systems, legislation, and case studies, or would you prefer a broader European perspective with UK examples?
+2. **For the UK bias, should I emphasize specific UK surveillance systems, legislation, and case studies, or would you prefer a broader European perspective with UK examples?**
 
-emphasize specific UK surveillance systems, legislation, and case studies
+   emphasize specific UK surveillance systems, legislation, and case studies
 
-### Are there any particular One Health initiatives or success stories you'd like me to highlight as examples for veterinary audiences?
+3. **Are there any particular One Health initiatives or success stories you'd like me to highlight as examples for veterinary audiences?**
 
 I'll leave that to you
 
