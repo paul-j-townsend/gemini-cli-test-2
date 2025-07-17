@@ -34,3 +34,5 @@ CLAUDE.md
 # LibreOffice/OpenOffice lock files
 .~lock.*#
 */.~lock.*#
+.env.local.production
+.env.local.production.backup
