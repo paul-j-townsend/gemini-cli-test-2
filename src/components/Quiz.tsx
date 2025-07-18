@@ -12,10 +12,11 @@ interface QuizProps {
   quizId: string; // Required - every podcast now has a quiz
   podcastId?: string;
   episodeTitle?: string;
+  episodeDuration?: number; // Duration in seconds for CPD calculation
   onComplete?: () => void; // Callback when quiz is completed
 }
 
-const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, onComplete }) => {
+const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, episodeDuration, onComplete }) => {
   const {
     // State
     quiz,
@@ -84,6 +85,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, onComplete
         onRestartQuiz={handleRestartQuiz}
         quizTitle={quiz?.title}
         episodeTitle={episodeTitle}
+        episodeDuration={episodeDuration}
         quizId={quizId}
         completion={lastCompletion}
       />

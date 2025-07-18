@@ -349,18 +349,6 @@ const PodcastPlayer = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                         </svg>
                         <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
-                          progressQuizCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                          </svg>
-                          <span className="font-medium">Quiz</span>
-                          {progressQuizCompleted && <Check size={10} />}
-                        </div>
-                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
                           reportDownloaded ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                         }`}>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -368,6 +356,18 @@ const PodcastPlayer = () => {
                           </svg>
                           <span className="font-medium">Report</span>
                           {reportDownloaded && <Check size={10} />}
+                        </div>
+                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
+                          progressQuizCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                          <span className="font-medium">Quiz</span>
+                          {progressQuizCompleted && <Check size={10} />}
                         </div>
                         <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -389,7 +389,7 @@ const PodcastPlayer = () => {
                           <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-green-700 font-medium">1 CPD point</span>
+                          <span className="text-green-700 font-medium">1 CPD hour</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs bg-purple-50 px-2 py-1 rounded-full">
                           <svg className="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -516,46 +516,46 @@ const PodcastPlayer = () => {
                     {/* Quiz & Report Buttons - Below Audio Controls */}
                     {episode.content_id && (
                       <div className="flex flex-col gap-3 mt-4">
-                        {/* Primary CTA - Quiz Button */}
+                        {/* 1. Download Report */}
+                        <button
+                          onClick={downloadReport}
+                          className="w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:shadow-xl transform hover:scale-[1.02]"
+                        >
+                          <FileText size={18} />
+                          {reportDownloaded ? 'Report Downloaded ✓' : 'Download Report'}
+                        </button>
+                        
+                        {/* 2. Start Quiz */}
                         <button
                           onClick={() => setShowQuiz(true)}
-                          className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                          disabled={!hasListened}
+                          className={`w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
+                            hasListened 
+                              ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          }`}
                         >
                           <HelpCircle size={18} />
-                          {quizCompleted ? 'Retake CPD Assessment' : 'Start CPD Assessment'}
+                          {!hasListened ? 'Listen to Episode First' : (quizCompleted ? 'Retake CPD Quiz' : 'Start CPD Quiz')}
                           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
                         
-                        {/* Secondary Actions */}
-                        <div className="flex gap-2">
-                          <button
-                            onClick={downloadReport}
-                            className={`flex-1 px-4 py-2 text-sm rounded-lg flex items-center justify-center gap-2 transition-colors ${
-                              quizCompleted 
-                                ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' 
-                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                            }`}
-                            disabled={!quizCompleted}
-                          >
-                            <FileText size={14} />
-                            {reportDownloaded ? 'Report Downloaded ✓' : 'Download Report'}
-                          </button>
-                          
-                          <button
-                            onClick={downloadCertificate}
-                            disabled={!quizPassed || !reportDownloaded}
-                            className={`flex-1 px-4 py-2 text-sm rounded-lg flex items-center justify-center gap-2 transition-colors ${
-                              quizPassed && reportDownloaded
-                                ? 'bg-green-100 hover:bg-green-200 text-green-700 cursor-pointer'
-                                : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
-                            }`}
-                          >
-                            <Download size={14} />
-                            {certificateDownloaded ? 'Certificate Downloaded ✓' : !quizPassed ? 'Get Certificate (pass quiz first)' : !reportDownloaded ? 'Download Report First' : 'Get Certificate'}
-                          </button>
-                        </div>
+                        {/* 3. Download Certificate */}
+                        <button
+                          onClick={downloadCertificate}
+                          disabled={!quizPassed || !reportDownloaded}
+                          className={`w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
+                            quizPassed && reportDownloaded
+                              ? 'bg-green-100 hover:bg-green-200 text-green-700 hover:shadow-xl transform hover:scale-[1.02]'
+                              : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+                          }`}
+                        >
+                          <Download size={18} />
+                          {certificateDownloaded ? 'Certificate Downloaded ✓' : !quizPassed ? 'Get Certificate (pass quiz first)' : !reportDownloaded ? 'Download Report First' : 'Get Certificate'}
+                        </button>
+                        
                       </div>
                     )}
                   </div>
@@ -573,20 +573,8 @@ const PodcastPlayer = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
               <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-primary-50 to-primary-100">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 relative rounded-lg overflow-hidden shadow-md flex-shrink-0">
-                    <Image
-                      src={getThumbnailUrl(episode.thumbnail_path)}
-                      alt={episode.title}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-bold text-gray-900 mb-1">CPD Assessment Quiz</h2>
-                    <p className="text-sm text-gray-600 truncate">{episode.title}</p>
-                  </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-gray-900">CPD Assessment Quiz</h2>
                 </div>
                 <button
                   onClick={() => setShowQuiz(false)}
@@ -599,6 +587,7 @@ const PodcastPlayer = () => {
                 <Quiz 
                   quizId={episode.content_id} 
                   episodeTitle={episode.title} 
+                  episodeDuration={episode.duration}
                   onComplete={async () => {
                     console.log('Quiz completed, refreshing data...');
                     await refreshData();

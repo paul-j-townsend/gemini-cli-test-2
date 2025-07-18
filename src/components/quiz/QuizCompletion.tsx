@@ -17,6 +17,7 @@ interface QuizCompletionProps {
   onRestartQuiz: () => void;
   quizTitle?: string;
   episodeTitle?: string;
+  episodeDuration?: number; // Duration in seconds for CPD calculation
   quizId?: string;
   completion?: QuizCompletionType;
 }
@@ -26,11 +27,20 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
   onRestartQuiz,
   quizTitle,
   episodeTitle,
+  episodeDuration,
   quizId,
   completion
 }) => {
   const { user } = useAuth();
   const [showCertificate, setShowCertificate] = useState(false);
+
+  const calculateCPDHours = () => {
+    if (!episodeDuration) return 1; // Default to 1 hour if duration not available
+    const hours = Math.floor(episodeDuration / 3600);
+    return hours > 0 ? hours : 1; // Minimum 1 hour CPD
+  };
+
+  const cpdHours = calculateCPDHours();
 
   const handleGetCertificate = () => {
     if (completion) {
@@ -73,7 +83,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
               <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              <span className="text-green-700 font-medium">CPD Points Earned</span>
+              <span className="text-green-700 font-medium">{cpdHours} CPD Hour{cpdHours > 1 ? 's' : ''} Earned</span>
             </div>
           )}
         </div>
@@ -92,12 +102,6 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
               {score.percentage}%
             </div>
             <div className="text-sm text-neutral-600 font-medium">Final Score</div>
-          </div>
-          
-          {/* Questions Correct */}
-          <div className="text-center">
-            <div className="text-4xl font-bold text-neutral-800 mb-2">{score.correct}/{score.total}</div>
-            <div className="text-sm text-neutral-600 font-medium">Questions Correct</div>
           </div>
           
           {/* CPD Status */}
@@ -129,7 +133,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
             score.passed ? 'text-green-700' : 'text-orange-700'
           }`}>
             {score.passed 
-              ? 'Your comprehensive understanding of veterinary principles has been validated. This assessment confirms your professional competency and qualifies you for CPD certification.'
+              ? 'Your comprehensive understanding of veterinary principles has been validated. This assessment confirms your professional competency and qualifies you for 1 hour CPD certification.'
               : 'This assessment helps identify areas for continued professional development. Review the explanations and consider additional study to strengthen your veterinary knowledge base.'
             }
           </p>

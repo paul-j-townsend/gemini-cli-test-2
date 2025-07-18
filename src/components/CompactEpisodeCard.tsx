@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
+import { useUserContentProgress } from '../hooks/useUserContentProgress';
 import { 
   Play, 
   Pause, 
@@ -36,6 +37,9 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   const { isQuizCompleted, isQuizPassedWithThreshold } = useQuizCompletion();
   const quizCompleted = isQuizCompleted(episode.content_id);
   const quizPassed = isQuizPassedWithThreshold(episode.content_id, 70);
+  
+  // Track certificate download status
+  const { certificateDownloaded } = useUserContentProgress(episode.content_id);
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const hasAudio = episode.audio_src && episode.audio_src.trim() !== '';
@@ -151,23 +155,16 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
             {/* Episode number badge */}
             {episode.episode_number && (
               <div className="absolute top-3 left-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-                Ep {episode.episode_number}
+                S{episode.season || 1} E{episode.episode_number}
               </div>
             )}
             
-            {/* Quiz completion badge */}
-            {quizCompleted && (
+            {/* Episode completion badge - only show when certificate is downloaded */}
+            {certificateDownloaded && (
               <div className="absolute top-3 right-3">
-                <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg ${
-                  quizPassed 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-orange-500 text-white'
-                }`}>
-                  {quizPassed ? (
-                    <Check size={12} />
-                  ) : (
-                    <AlertCircle size={12} />
-                  )}
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-green-500 text-white">
+                  <Check size={12} />
+                  <span>Complete</span>
                 </div>
               </div>
             )}
@@ -185,12 +182,12 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
             
             {/* Episode meta */}
             <div className="flex items-center justify-between text-xs text-neutral-500 mb-3">
+              {episode.duration && (
+                <span>CPD: {Math.floor(episode.duration / 3600) > 0 ? `${Math.floor(episode.duration / 3600)} hour${Math.floor(episode.duration / 3600) > 1 ? 's' : ''}` : `${Math.floor(episode.duration / 60)} min`}</span>
+              )}
               <span>
                 {episode.published_at && new Date(episode.published_at).toLocaleDateString()}
               </span>
-              {episode.duration && (
-                <span>{formatTime(episode.duration)}</span>
-              )}
             </div>
           </div>
         </div>
