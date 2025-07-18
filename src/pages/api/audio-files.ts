@@ -7,10 +7,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // List all files in the audio bucket podcasts folder
+    // List all files in the audio bucket episodes folder
     const { data, error } = await supabaseAdmin.storage
       .from('audio')
-      .list('podcasts', {
+      .list('episodes', {
         limit: 1000,
         sortBy: { column: 'created_at', order: 'desc' }
       });
@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const audioFiles = audioFilesData.map(file => {
       const { data: { publicUrl } } = supabaseAdmin.storage
         .from('audio')
-        .getPublicUrl(`podcasts/${file.name}`);
+        .getPublicUrl(`episodes/${file.name}`);
       
       // Create a display name from the filename
       const displayName = file.name

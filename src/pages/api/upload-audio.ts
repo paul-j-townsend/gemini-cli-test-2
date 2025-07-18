@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const cleanName = originalName.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_').toLowerCase();
     const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const fileName = `${timestamp}_${cleanName}.${fileExt}`;
-    const filePath = `podcasts/${fileName}`; // Upload to podcasts subfolder
+    const filePath = `episodes/${fileName}`; // Upload to episodes subfolder
 
     // Read file data
     const fileData = fs.readFileSync(file.filepath);

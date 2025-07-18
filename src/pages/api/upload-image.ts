@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const cleanName = originalName.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_').toLowerCase();
     const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const fileName = `${timestamp}_${cleanName}.${fileExt}`;
-    const filePath = `podcast-thumbnails/${fileName}`; // Upload to podcast-thumbnails subfolder
+    const filePath = `thumbnails/${fileName}`; // Upload to thumbnails subfolder
 
     // Read file data
     const fileData = fs.readFileSync(file.filepath);

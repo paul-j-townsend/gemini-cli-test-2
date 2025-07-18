@@ -26,6 +26,7 @@ const nextConfig = {
         port: '54321',
       },
     ],
+    unoptimized: true,
   },
 };
 

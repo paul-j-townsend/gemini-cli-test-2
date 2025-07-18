@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const [podcastThumbnails, articleImages] = await Promise.all([
       supabaseAdmin.storage
         .from('images')
-        .list('podcast-thumbnails', {
+        .list('thumbnails', {
           limit: 1000,
           sortBy: { column: 'created_at', order: 'desc' }
         }),
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Combine files from both folders
     const allFiles = [
-      ...(podcastThumbnails.data || []).map(file => ({ ...file, folder: 'podcast-thumbnails' })),
+      ...(podcastThumbnails.data || []).map(file => ({ ...file, folder: 'thumbnails' })),
       ...(articleImages.data || []).map(file => ({ ...file, folder: 'article-images' }))
     ];
 
