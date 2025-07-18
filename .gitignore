@@ -36,3 +36,12 @@ CLAUDE.md
 */.~lock.*#
 .env.local.production
 .env.local.production.backup
+backup.sql
+.gitignore
+.gitignore
+dump.sql
+check_content_table.sql
+.gitignore
+check_podcast_episodes_table.sql
+create_articles_table.sql
+check_quiz_completions_table.sql
