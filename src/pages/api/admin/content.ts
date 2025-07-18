@@ -31,6 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
+  
+  console.log('Content API GET request - ID:', id, 'Query:', req.query);
 
   if (id) {
     // Get single content item
@@ -57,16 +59,21 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
     // Get answers for all questions
     const questionIds = questions?.map(q => q.id) || [];
-    const { data: answers, error: answersError } = await supabaseAdmin
-      .from('vsk_content_question_answers')
-      .select('*')
-      .in('question_id', questionIds);
+    let answers: any[] = [];
+    if (questionIds.length > 0) {
+      const { data: answersData, error: answersError } = await supabaseAdmin
+        .from('vsk_content_question_answers')
+        .select('*')
+        .in('question_id', questionIds);
 
-    if (answersError) {
-      console.error('Answers fetch error:', answersError);
+      if (answersError) {
+        console.error('Answers fetch error:', answersError);
+      } else {
+        answers = answersData || [];
+      }
     }
 
-    // Transform the data to match the expected format
+    // Transform the data to match the expected content format
     const transformedContent = {
       ...content,
       vsk_content_questions: questions?.map((q: any) => ({
@@ -77,11 +84,19 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(transformedContent);
   } else {
-    // Get all content
-    const { data: content, error } = await supabaseAdmin
+    // Get all content from vsk_content table
+    const { published_only } = req.query;
+    
+    let query = supabaseAdmin
       .from('vsk_content')
       .select('*')
       .order('episode_number', { ascending: true });
+
+    if (published_only === 'true') {
+      query = query.eq('is_published', true);
+    }
+
+    const { data: content, error } = await query;
 
     if (error) {
       return res.status(500).json({ error: 'Failed to fetch content', details: error.message });

@@ -3,7 +3,6 @@ import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useAuth } from '../hooks/useAuth';
 import { formatDuration, calculateUserLevel } from '../utils/progressUtils';
 import { useMemoizedProgressCalculations } from '../utils/performanceUtils';
-import { quizServiceClient } from '../services/quizServiceClient';
 import Certificate from './Certificate';
 import { QuizCompletion } from '../types/database';
 
@@ -17,7 +16,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
   const progressSummary = useMemoizedProgressCalculations(completions);
 
   const uniqueQuizIds = useMemo(() => 
-    Array.from(new Set(completions.map(c => c.content_id))), 
+    Array.from(new Set(completions.map(c => c.quiz_id))), 
     [completions]
   );
 
@@ -27,8 +26,19 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
         const titles: Record<string, string> = {};
         
         await Promise.all(
-          uniqueQuizIds.map(async (quizId) => {
-            titles[quizId] = await quizServiceClient.getQuizTitle(quizId);
+          uniqueQuizIds.map(async (contentId) => {
+            try {
+              const response = await fetch(`/api/admin/content?id=${contentId}`);
+              if (response.ok) {
+                const content = await response.json();
+                titles[contentId] = content.title || content.quiz_title || `Content #${contentId.slice(0, 8)}...`;
+              } else {
+                titles[contentId] = `Content #${contentId.slice(0, 8)}...`;
+              }
+            } catch (error) {
+              console.error('Failed to fetch content title:', error);
+              titles[contentId] = `Content #${contentId.slice(0, 8)}...`;
+            }
           })
         );
         
@@ -318,7 +328,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
               <Certificate
                 completion={showCertificate}
                 userName={user?.name || 'User'}
-                quizTitle={quizTitles[showCertificate.content_id] || 'Quiz'}
+                quizTitle={quizTitles[showCertificate.quiz_id] || 'Quiz'}
                 onDownload={() => setShowCertificate(null)}
               />
             </div>
