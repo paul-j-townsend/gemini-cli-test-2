@@ -385,19 +385,11 @@ const PodcastPlayer = () => {
 
                       {/* CPD Context Indicators */}
                       <div className="flex items-center gap-4 mb-2">
-                        <div className="flex items-center gap-1 text-xs bg-blue-50 px-2 py-1 rounded-full">
-                          <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="text-blue-700 font-medium">
-                            {duration > 0 ? `${Math.ceil(duration / 60)} min` : '30 min'} CPD
-                          </span>
-                        </div>
                         <div className="flex items-center gap-1 text-xs bg-green-50 px-2 py-1 rounded-full">
                           <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-green-700 font-medium">1.0 CPD Points</span>
+                          <span className="text-green-700 font-medium">1 CPD point</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs bg-purple-50 px-2 py-1 rounded-full">
                           <svg className="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -561,7 +553,7 @@ const PodcastPlayer = () => {
                             }`}
                           >
                             <Download size={14} />
-                            {certificateDownloaded ? 'Certificate Downloaded ✓' : !quizPassed ? 'Pass Quiz First' : !reportDownloaded ? 'Download Report First' : 'Download Certificate'}
+                            {certificateDownloaded ? 'Certificate Downloaded ✓' : !quizPassed ? 'Get Certificate (pass quiz first)' : !reportDownloaded ? 'Download Report First' : 'Get Certificate'}
                           </button>
                         </div>
                       </div>
