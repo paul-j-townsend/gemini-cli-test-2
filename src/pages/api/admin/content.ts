@@ -84,12 +84,22 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(transformedContent);
   } else {
-    // Get all content from vsk_content table
+    // Get all content from vsk_content table with series data
     const { published_only } = req.query;
     
     let query = supabaseAdmin
       .from('vsk_content')
-      .select('*')
+      .select(`
+        *,
+        series:vsk_series(
+          id,
+          name,
+          slug,
+          description,
+          thumbnail_path,
+          display_order
+        )
+      `)
       .order('episode_number', { ascending: true });
 
     if (published_only === 'true') {

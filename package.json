@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@supabase/supabase-js": "^2.50.2",
     "@types/formidable": "^3.4.5",
     "@types/lodash.debounce": "^4.0.9",

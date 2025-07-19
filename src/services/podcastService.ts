@@ -46,8 +46,12 @@ export interface PodcastEpisode {
 }
 
 export interface SeriesGroup {
+  id: string | null;
   name: string;
   description: string;
+  slug: string | null;
+  thumbnail_path: string | null;
+  display_order: number;
   episodes: PodcastEpisode[];
   episodeCount: number;
 }
@@ -282,18 +286,29 @@ class PodcastService {
     try {
       const episodes = await this.getPublishedEpisodes(limit);
       
+      // Group episodes by series (including episodes without a series)
       const groupedBySeries = episodes.reduce((acc, episode) => {
-        const seriesName = episode.category || 'General';
-        if (!acc[seriesName]) {
-          acc[seriesName] = [];
+        const seriesId = (episode as any).series_id || 'no-series';
+        const seriesData = (episode as any).series;
+        
+        if (!acc[seriesId]) {
+          acc[seriesId] = {
+            seriesData,
+            episodes: []
+          };
         }
-        acc[seriesName].push(episode);
+        acc[seriesId].episodes.push(episode);
         return acc;
-      }, {} as Record<string, PodcastEpisode[]>);
+      }, {} as Record<string, { seriesData: any; episodes: PodcastEpisode[] }>);
 
-      return Object.entries(groupedBySeries).map(([seriesName, episodes]) => ({
-        name: seriesName,
-        description: this.getSeriesDescription(seriesName),
+      // Convert to SeriesGroup array and sort by display_order
+      const seriesGroups = Object.entries(groupedBySeries).map(([seriesId, { seriesData, episodes }]) => ({
+        id: seriesId === 'no-series' ? null : seriesId,
+        name: seriesData?.name || 'Standalone Episodes',
+        description: seriesData?.description || 'Episodes not assigned to a series',
+        slug: seriesData?.slug || null,
+        thumbnail_path: seriesData?.thumbnail_path || null,
+        display_order: seriesData?.display_order || 999,
         episodes: episodes.sort((a, b) => {
           // Sort by episode number (desc) then by published date (desc)
           if (a.episode_number && b.episode_number) {
@@ -306,6 +321,14 @@ class PodcastService {
         }),
         episodeCount: episodes.length
       }));
+
+      // Sort series by display_order
+      return seriesGroups.sort((a, b) => {
+        if (a.display_order !== b.display_order) {
+          return a.display_order - b.display_order;
+        }
+        return a.name.localeCompare(b.name);
+      });
     } catch (error) {
       console.error('Error fetching episodes by series:', error);
       throw new Error('Failed to fetch episodes by series');
@@ -316,7 +339,13 @@ class PodcastService {
     try {
       const episodes = await this.getPublishedEpisodes();
       return episodes
-        .filter(episode => (episode.category || 'General') === seriesName)
+        .filter(episode => {
+          const seriesData = (episode as any).series;
+          if (seriesName === 'Standalone Episodes') {
+            return !seriesData;
+          }
+          return seriesData?.name === seriesName;
+        })
         .sort((a, b) => {
           if (a.episode_number && b.episode_number) {
             return b.episode_number - a.episode_number;

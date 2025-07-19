@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import fs from 'fs';
 import path from 'path';
 
@@ -47,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const storageKey = `${type === 'image' ? 'thumbnails' : 'episodes'}/${sanitizedFileName}`;
     
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from(bucket)
       .upload(storageKey, fileBuffer, {
         contentType: file.mimetype || 'application/octet-stream',
@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Get public URL
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = supabaseAdmin.storage
       .from(bucket)
       .getPublicUrl(storageKey);
 

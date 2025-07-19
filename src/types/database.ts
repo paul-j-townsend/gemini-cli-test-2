@@ -188,6 +188,31 @@ export interface UserProgressTable {
   updated_at: string;
 }
 
+// Series interface
+export interface Series {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  thumbnail_path: string | null;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SeriesTable {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  thumbnail_path: string | null;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Unified Content (Podcast + Quiz)
 export interface Content {
   id: string;
@@ -219,11 +244,14 @@ export interface Content {
   pass_percentage: number;
   total_questions: number;
   quiz_is_active: boolean;
+  // Series field
+  series_id: string | null;
   // Metadata
   created_at: string;
   updated_at: string;
   // Related data
   vsk_content_questions?: ContentQuestion[];
+  series?: Series; // Joined data
 }
 
 export interface ContentTable {
@@ -254,6 +282,7 @@ export interface ContentTable {
   pass_percentage: number;
   total_questions: number;
   quiz_is_active: boolean;
+  series_id: string | null;
   created_at: string;
   updated_at: string;
 }
