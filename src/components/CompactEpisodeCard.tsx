@@ -33,6 +33,8 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const [scrubPosition, setScrubPosition] = useState(0);
   
   const { isQuizCompleted, isQuizPassedWithThreshold } = useQuizCompletion();
   const quizCompleted = isQuizCompleted(episode.content_id);
@@ -42,6 +44,8 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   const { certificateDownloaded } = useUserContentProgress(episode.content_id);
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
+  const displayPercentage = isScrubbing ? scrubPosition : progressPercentage;
+  const displayTime = isScrubbing ? (scrubPosition / 100) * duration : currentTime;
   const hasAudio = episode.audio_src && episode.audio_src.trim() !== '';
 
   const getThumbnailUrl = (episode: PodcastEpisode): string => {
@@ -70,7 +74,9 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
     };
 
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime || 0);
+      if (!isScrubbing) {
+        setCurrentTime(audio.currentTime || 0);
+      }
     };
 
     const handleLoadStart = () => {
@@ -127,8 +133,95 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
     router.push(`/player?id=${episode.id}`);
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = Math.max(0, Math.min(percentage * duration, duration));
+    
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleScrubberMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsScrubbing(true);
+    const progressBar = e.currentTarget;
+    
+    const handleMouseMove = (event: MouseEvent) => {
+      event.preventDefault();
+      if (!progressBar) return;
+      const rect = progressBar.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const percentage = Math.max(0, Math.min((x / rect.width) * 100, 100));
+      setScrubPosition(percentage);
+    };
+    
+    const handleMouseUp = (event: MouseEvent) => {
+      event.preventDefault();
+      if (!progressBar) return;
+      const rect = progressBar.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(x / rect.width, 1));
+      const newTime = percentage * duration;
+      
+      const audio = audioRef.current;
+      if (audio && duration) {
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+      }
+      
+      setIsScrubbing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleScrubberTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsScrubbing(true);
+    const progressBar = e.currentTarget;
+    
+    const handleTouchMove = (event: TouchEvent) => {
+      event.preventDefault();
+      if (!progressBar || event.touches.length === 0) return;
+      const rect = progressBar.getBoundingClientRect();
+      const x = event.touches[0].clientX - rect.left;
+      const percentage = Math.max(0, Math.min((x / rect.width) * 100, 100));
+      setScrubPosition(percentage);
+    };
+    
+    const handleTouchEnd = (event: TouchEvent) => {
+      event.preventDefault();
+      if (!progressBar || event.changedTouches.length === 0) return;
+      const rect = progressBar.getBoundingClientRect();
+      const x = event.changedTouches[0].clientX - rect.left;
+      const percentage = Math.max(0, Math.min(x / rect.width, 1));
+      const newTime = percentage * duration;
+      
+      const audio = audioRef.current;
+      if (audio && duration) {
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+      }
+      
+      setIsScrubbing(false);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+    
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden">
+    <div className={`bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden ${isScrubbing ? 'select-none' : ''}`}>
       {hasAudio && <audio ref={audioRef} src={episode.audio_src} preload="metadata" />}
       
       <div onClick={handleCardClick} className="relative group cursor-pointer">
@@ -181,13 +274,13 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
             </p>
             
             {/* Episode meta */}
-            <div className="flex items-center justify-between text-xs text-neutral-500 mb-3">
+            <div className="text-xs text-neutral-500 mb-3">
               {episode.duration && (
-                <span>CPD: {Math.floor(episode.duration / 3600) > 0 ? `${Math.floor(episode.duration / 3600)} hour${Math.floor(episode.duration / 3600) > 1 ? 's' : ''}` : `${Math.floor(episode.duration / 60)} min`}</span>
+                <div className="font-bold">CPD: {Math.floor(episode.duration / 3600) > 0 ? `${Math.floor(episode.duration / 3600)} hour${Math.floor(episode.duration / 3600) > 1 ? 's' : ''}` : `${Math.floor(episode.duration / 60)} min`}</div>
               )}
-              <span>
+              <div>
                 {episode.published_at && new Date(episode.published_at).toLocaleDateString()}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -216,19 +309,24 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between text-xs text-neutral-500 mb-1">
-                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(displayTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
               
-              <div className="relative h-1 bg-neutral-200 rounded-full cursor-pointer hover:h-1.5 transition-all duration-200 group">
+              <div 
+                className="relative h-1 bg-neutral-200 rounded-full cursor-pointer hover:h-1.5 transition-all duration-200 group"
+                onClick={handleSeek}
+                onMouseDown={handleScrubberMouseDown}
+                onTouchStart={handleScrubberTouchStart}
+              >
                 <div 
-                  className="absolute top-0 left-0 h-full bg-primary-600 transition-all duration-100 rounded-full"
-                  style={{ width: `${progressPercentage}%` }}
+                  className={`absolute top-0 left-0 h-full bg-primary-600 rounded-full ${isScrubbing ? '' : 'transition-all duration-100'}`}
+                  style={{ width: `${displayPercentage}%` }}
                 />
                 {/* Playhead circle */}
                 <div 
-                  className="absolute top-1/2 transform -translate-y-1/2 w-3 h-3 bg-primary-600 rounded-full border-2 border-white shadow-sm transition-all duration-200 group-hover:w-4 group-hover:h-4 group-hover:shadow-md"
-                  style={{ left: `${progressPercentage}%`, marginLeft: '-6px' }}
+                  className={`absolute top-1/2 transform -translate-y-1/2 bg-primary-600 rounded-full border-2 border-white shadow-sm ${isScrubbing ? 'w-4 h-4 shadow-md' : 'w-3 h-3 group-hover:w-4 group-hover:h-4 group-hover:shadow-md'} ${isScrubbing ? '' : 'transition-all duration-200'}`}
+                  style={{ left: `${displayPercentage}%`, marginLeft: '-6px' }}
                 />
               </div>
             </div>
