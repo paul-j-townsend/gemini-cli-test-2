@@ -494,11 +494,18 @@ export default function ContentManagement() {
           <div className="text-gray-900 font-medium">
             S{content.season}E{content.episode_number}
           </div>
-          {content.featured && (
-            <span className="inline-flex px-1 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-800 mt-1">
-              Featured
-            </span>
-          )}
+          <div className="flex flex-wrap gap-1 mt-1">
+            {content.featured && (
+              <span className="inline-flex px-1 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-800">
+                Featured
+              </span>
+            )}
+            {content.is_published && (
+              <span className="inline-flex px-1 py-0.5 text-xs font-medium rounded bg-green-100 text-green-800">
+                Published
+              </span>
+            )}
+          </div>
         </div>
       ),
     },

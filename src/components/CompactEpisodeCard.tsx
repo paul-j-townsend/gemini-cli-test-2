@@ -128,10 +128,10 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden group cursor-pointer">
+    <div className="bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden">
       {hasAudio && <audio ref={audioRef} src={episode.audio_src} preload="metadata" />}
       
-      <div onClick={handleCardClick} className="relative">
+      <div onClick={handleCardClick} className="relative group cursor-pointer">
         {/* Redesigned layout: horizontal on mobile, vertical on desktop */}
         <div className="flex flex-col">
           {/* Thumbnail - improved aspect ratio */}
@@ -216,14 +216,19 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between text-xs text-neutral-500 mb-1">
-                <span>Preview</span>
                 <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
               </div>
               
-              <div className="relative h-1 bg-neutral-200 rounded-full overflow-hidden">
+              <div className="relative h-1 bg-neutral-200 rounded-full cursor-pointer hover:h-1.5 transition-all duration-200 group">
                 <div 
-                  className="absolute top-0 left-0 h-full bg-primary-600 transition-all duration-100"
+                  className="absolute top-0 left-0 h-full bg-primary-600 transition-all duration-100 rounded-full"
                   style={{ width: `${progressPercentage}%` }}
+                />
+                {/* Playhead circle */}
+                <div 
+                  className="absolute top-1/2 transform -translate-y-1/2 w-3 h-3 bg-primary-600 rounded-full border-2 border-white shadow-sm transition-all duration-200 group-hover:w-4 group-hover:h-4 group-hover:shadow-md"
+                  style={{ left: `${progressPercentage}%`, marginLeft: '-6px' }}
                 />
               </div>
             </div>
