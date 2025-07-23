@@ -89,7 +89,7 @@ class PodcastService {
     if (!content) {
       throw new Error('Content data is required');
     }
-    return {
+    const episode = {
       id: content.id,
       title: content.title,
       description: content.description,
@@ -127,6 +127,12 @@ class PodcastService {
         })) || []
       } : undefined
     };
+    
+    // Preserve series data for grouping
+    (episode as any).series_id = content.series_id;
+    (episode as any).series = content.series;
+    
+    return episode;
   }
 
   async getAllEpisodes(): Promise<PodcastEpisode[]> {
@@ -141,14 +147,38 @@ class PodcastService {
 
   async getPublishedEpisodes(limit?: number): Promise<PodcastEpisode[]> {
     try {
-      const query = new URLSearchParams();
-      if (limit) query.append('limit', limit.toString());
-      query.append('published_only', 'true');
-      
-      const data = await this.fetchContentFromAPI(`/api/admin/content?${query}`);
-      return (data || [])
+      // Direct database access for server-side calls
+      let query = supabaseAdmin
+        .from('vsk_content')
+        .select(`
+          *,
+          series:vsk_series(
+            id,
+            name,
+            slug,
+            description,
+            thumbnail_path,
+            display_order
+          )
+        `)
+        .eq('is_published', true)
+        .order('episode_number', { ascending: true });
+
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Database error:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      const episodes = (data || [])
         .filter((content: any) => content.published_at)
         .map(this.mapContentToEpisode);
+      return episodes;
     } catch (error) {
       console.error('Error fetching published episodes:', error);
       throw new Error('Failed to fetch published episodes');
@@ -362,9 +392,21 @@ class PodcastService {
     }
   }
 
-  // Client-side method for frontend usage
+  // Client-side methods for frontend usage (use API calls)
   async getPublishedEpisodesClient(limit?: number): Promise<PodcastEpisode[]> {
-    return this.getPublishedEpisodes(limit);
+    try {
+      const query = new URLSearchParams();
+      if (limit) query.append('limit', limit.toString());
+      query.append('published_only', 'true');
+      
+      const data = await this.fetchContentFromAPI(`/api/admin/content?${query}`);
+      return (data || [])
+        .filter((content: any) => content.published_at)
+        .map(this.mapContentToEpisode);
+    } catch (error) {
+      console.error('Error fetching published episodes (client):', error);
+      throw new Error('Failed to fetch published episodes');
+    }
   }
 
   async getEpisodeByIdClient(id: string): Promise<PodcastEpisode | null> {
@@ -372,7 +414,56 @@ class PodcastService {
   }
 
   async getEpisodesBySeriesClient(limit?: number): Promise<SeriesGroup[]> {
-    return this.getEpisodesBySeries(limit);
+    try {
+      const episodes = await this.getPublishedEpisodesClient(limit);
+      
+      // Group episodes by series (including episodes without a series)
+      const groupedBySeries = episodes.reduce((acc, episode) => {
+        const seriesId = (episode as any).series_id || 'no-series';
+        const seriesData = (episode as any).series;
+        
+        if (!acc[seriesId]) {
+          acc[seriesId] = {
+            seriesData,
+            episodes: []
+          };
+        }
+        acc[seriesId].episodes.push(episode);
+        return acc;
+      }, {} as Record<string, { seriesData: any; episodes: PodcastEpisode[] }>);
+
+      // Convert to SeriesGroup array and sort by display_order
+      const seriesGroups = Object.entries(groupedBySeries).map(([seriesId, { seriesData, episodes }]) => ({
+        id: seriesId === 'no-series' ? null : seriesId,
+        name: seriesData?.name || 'Standalone Episodes',
+        description: seriesData?.description || 'Episodes not assigned to a series',
+        slug: seriesData?.slug || null,
+        thumbnail_path: seriesData?.thumbnail_path || null,
+        display_order: seriesData?.display_order || 999,
+        episodes: episodes.sort((a, b) => {
+          // Sort by episode number (desc) then by published date (desc)
+          if (a.episode_number && b.episode_number) {
+            return b.episode_number - a.episode_number;
+          }
+          if (a.published_at && b.published_at) {
+            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+          }
+          return 0;
+        }),
+        episodeCount: episodes.length
+      }));
+
+      // Sort series by display_order
+      return seriesGroups.sort((a, b) => {
+        if (a.display_order !== b.display_order) {
+          return a.display_order - b.display_order;
+        }
+        return a.name.localeCompare(b.name);
+      });
+    } catch (error) {
+      console.error('Error fetching episodes by series (client):', error);
+      throw new Error('Failed to fetch episodes by series');
+    }
   }
 }
 
