@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
-import SeriesGroup from '@/components/SeriesGroup';
+import MasonryEpisodeCard from '@/components/MasonryEpisodeCard';
 import Layout from '@/components/Layout';
-import { podcastService, SeriesGroup as SeriesGroupType } from '@/services/podcastService';
+import { podcastService, SeriesGroup as SeriesGroupType, PodcastEpisode } from '@/services/podcastService';
 import { supabase } from '@/lib/supabase';
 
 interface Episode {
@@ -21,8 +21,22 @@ interface Episode {
 
 const Podcasts = () => {
   const [seriesData, setSeriesData] = useState<SeriesGroupType[]>([]);
+  const [allEpisodes, setAllEpisodes] = useState<PodcastEpisode[]>([]);
+  const [selectedSeriesFilter, setSelectedSeriesFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Color palette for series badges
+  const seriesColors = [
+    '#3B82F6', // blue
+    '#10B981', // emerald
+    '#F59E0B', // amber
+    '#EF4444', // red
+    '#8B5CF6', // violet
+    '#06B6D4', // cyan
+    '#F97316', // orange
+    '#84CC16', // lime
+  ];
 
   useEffect(() => {
     fetchEpisodes();
@@ -45,7 +59,24 @@ const Podcasts = () => {
       
       const seriesGroups = await podcastService.getEpisodesBySeriesClient();
       
+      // Flatten all episodes into a single array
+      const flatEpisodes = seriesGroups.flatMap(series => 
+        series.episodes.map(episode => ({
+          ...episode,
+          seriesName: series.name
+        }))
+      );
+      
+      // Sort by published date (newest first)
+      const sortedEpisodes = flatEpisodes.sort((a, b) => {
+        if (a.published_at && b.published_at) {
+          return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+        }
+        return 0;
+      });
+      
       setSeriesData(seriesGroups);
+      setAllEpisodes(sortedEpisodes);
     } catch (err) {
       console.error('Error fetching episodes:', err);
       setError('Failed to load episodes. Please try again later.');
@@ -53,6 +84,17 @@ const Podcasts = () => {
       setLoading(false);
     }
   };
+
+  // Get series color by index
+  const getSeriesColor = (seriesName: string) => {
+    const index = seriesData.findIndex(series => series.name === seriesName);
+    return seriesColors[index % seriesColors.length];
+  };
+
+  // Filter episodes based on selected series
+  const filteredEpisodes = selectedSeriesFilter === 'all' 
+    ? allEpisodes 
+    : allEpisodes.filter(episode => episode.seriesName === selectedSeriesFilter);
 
   return (
     <Layout>
@@ -125,7 +167,7 @@ const Podcasts = () => {
         </div>
       </section>
 
-      {/* Episodes by Series Section */}
+      {/* Episodes Masonry Section */}
       <section className="py-16 lg:py-24">
         <div className="container-wide">
           <div className="text-center mb-12 animate-fade-in-up">
@@ -133,10 +175,47 @@ const Podcasts = () => {
               Latest Episodes
             </h2>
             <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Explore our comprehensive collection of veterinary education series, 
-              each designed to enhance your professional development.
+              Explore our comprehensive collection of veterinary education episodes 
+              from all series in one continuous feed.
             </p>
           </div>
+
+          {/* Series Filter */}
+          {seriesData.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              <button
+                onClick={() => setSelectedSeriesFilter('all')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  selectedSeriesFilter === 'all'
+                    ? 'bg-primary-600 text-white shadow-lg'
+                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                }`}
+              >
+                All Series ({allEpisodes.length})
+              </button>
+              {seriesData.map(series => (
+                <button
+                  key={series.name}
+                  onClick={() => setSelectedSeriesFilter(series.name)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    selectedSeriesFilter === series.name
+                      ? 'text-white shadow-lg'
+                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  }`}
+                  style={selectedSeriesFilter === series.name ? 
+                    { backgroundColor: getSeriesColor(series.name) } : 
+                    {}
+                  }
+                >
+                  <div 
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: getSeriesColor(series.name) }}
+                  />
+                  {series.name} ({series.episodeCount})
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
             {loading ? (
@@ -154,21 +233,22 @@ const Podcasts = () => {
                   Try Again
                 </button>
               </div>
-            ) : seriesData.length === 0 ? (
+            ) : filteredEpisodes.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-neutral-600">No episodes available yet.</p>
                 <p className="text-sm text-neutral-500 mt-2">Check back soon for new content.</p>
               </div>
             ) : (
-              seriesData.map((series, index) => (
-                <SeriesGroup 
-                  key={series.name}
-                  title={series.name}
-                  description={series.description}
-                  episodes={series.episodes}
-                  defaultExpanded={index === 0}
-                />
-              ))
+              <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
+                {filteredEpisodes.map((episode) => (
+                  <MasonryEpisodeCard 
+                    key={episode.id} 
+                    episode={episode} 
+                    seriesName={episode.seriesName}
+                    seriesColor={getSeriesColor(episode.seriesName)}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </div>
