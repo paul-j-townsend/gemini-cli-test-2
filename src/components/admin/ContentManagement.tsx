@@ -86,6 +86,7 @@ interface ContentFormData {
   quiz_category: string;
   pass_percentage: number; // TODO: Remove pass_percentage functionality completely
   quiz_is_active: boolean;
+  series_id: string;
   questions: ContentQuestion[];
 }
 
@@ -110,6 +111,51 @@ const formatDuration = (seconds: number): string => {
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   }
   return `${minutes}:00`;
+};
+
+const getThumbnailUrl = (content: Content): string => {
+  // If there's a direct image_url (external URL), use it
+  if (content.image_url && content.image_url.trim() !== '') {
+    return content.image_url;
+  }
+  
+  // If there's a thumbnail_path (Supabase storage), get the public URL
+  if (content.thumbnail_path && content.thumbnail_path.trim() !== '') {
+    try {
+      const { data } = supabase.storage
+        .from('images')
+        .getPublicUrl(content.thumbnail_path);
+      return data.publicUrl || 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+    } catch (error) {
+      console.warn('Error getting thumbnail URL:', error);
+      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+    }
+  }
+  
+  // Default fallback image
+  return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+};
+
+const getFormThumbnailUrl = (formData: ContentFormData): string => {
+  // If there's a direct image_url (external URL), use it
+  if (formData.image_url && formData.image_url.trim() !== '') {
+    return formData.image_url;
+  }
+  
+  // If there's a thumbnail_path (Supabase storage), get the public URL
+  if (formData.thumbnail_path && formData.thumbnail_path.trim() !== '') {
+    try {
+      const { data } = supabase.storage
+        .from('images')
+        .getPublicUrl(formData.thumbnail_path);
+      return data.publicUrl || '';
+    } catch (error) {
+      console.warn('Error getting form thumbnail URL:', error);
+      return '';
+    }
+  }
+  
+  return '';
 };
 
 const ensureQuestionDefaults = (question: ContentQuestion, questionNumber: number): ContentQuestion => ({
@@ -152,6 +198,7 @@ const createInitialFormData = (episodeNumber: number = 1): ContentFormData => ({
   quiz_category: 'general',
   pass_percentage: 70, // TODO: Remove pass_percentage functionality completely
   quiz_is_active: true,
+  series_id: '',
   questions: []
 });
 
@@ -166,6 +213,7 @@ export default function ContentManagement() {
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [availableKeywords, setAvailableKeywords] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [availableSeries, setAvailableSeries] = useState<{id: string; name: string}[]>([]);
 
   const {
     data: formData,
@@ -192,6 +240,7 @@ export default function ContentManagement() {
   useEffect(() => {
     fetchContent();
     fetchKeywords();
+    fetchSeries();
   }, []);
 
   // Clean up selected categories when available keywords change
@@ -238,6 +287,21 @@ export default function ContentManagement() {
         'Emergency Care',
         'Ethics'
       ]);
+    }
+  };
+
+  const fetchSeries = async () => {
+    try {
+      const response = await fetch('/api/admin/series');
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableSeries(data.map((series: any) => ({
+          id: series.id,
+          name: series.name
+        })));
+      }
+    } catch (err) {
+      console.error('Failed to fetch series:', err);
     }
   };
 
@@ -316,6 +380,7 @@ export default function ContentManagement() {
         quiz_category: fullContentItem.quiz_category || 'general',
         pass_percentage: fullContentItem.pass_percentage, // TODO: Remove pass_percentage functionality completely
         quiz_is_active: fullContentItem.quiz_is_active,
+        series_id: fullContentItem.series_id || '',
         questions: (fullContentItem.vsk_content_questions || []).map((q, index) => ensureQuestionDefaults(q, index + 1))
       });
       
@@ -471,7 +536,7 @@ export default function ContentManagement() {
         <div className="w-12 h-12 relative">
           {content.thumbnail_path || content.image_url ? (
             <Image
-              src={content.image_url || `/api/storage/images/${content.thumbnail_path}` || ''}
+              src={getThumbnailUrl(content)}
               alt={content.title}
               width={48}
               height={48}
@@ -994,6 +1059,27 @@ CREATE TABLE vsk_content_question_answers (
                   )}
                 </div>
 
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Series
+                  </label>
+                  <select
+                    value={formData.series_id}
+                    onChange={(e) => handleChange('series_id', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  >
+                    <option value="">No Series (Standalone Episode)</option>
+                    {availableSeries.map((series) => (
+                      <option key={series.id} value={series.id}>
+                        {series.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-600">
+                    Assign this content to a series for better organization
+                  </p>
+                </div>
+
                 <FileUploadField
                   label="Preview Audio"
                   type="audio"
@@ -1013,7 +1099,7 @@ CREATE TABLE vsk_content_question_answers (
                 <FileUploadField
                   label="Thumbnail Image"
                   type="image"
-                  value={formData.image_url || (formData.thumbnail_path ? `/api/storage/images/${formData.thumbnail_path}` : '')}
+                  value={getFormThumbnailUrl(formData)}
                   onChange={(url, _path) => {
                     handleChange('thumbnail_path', _path);
                     handleChange('image_url', url);
