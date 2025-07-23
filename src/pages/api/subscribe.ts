@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Store in Supabase (you can create a subscribers table)
     const { data, error } = await supabaseAdmin
-      .from('subscribers')
+      .from('vsk_subscribers')
       .insert([
         { 
           email, 

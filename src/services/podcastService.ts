@@ -85,7 +85,7 @@ class PodcastService {
     if (!content) {
       throw new Error('Content data is required');
     }
-    return {
+    const episode = {
       id: content.id,
       title: content.title,
       description: content.description,
@@ -123,6 +123,14 @@ class PodcastService {
         })) || []
       } : undefined
     };
+    
+    // Preserve series data for grouping
+    if (content.series) {
+      (episode as any).series = content.series;
+      (episode as any).series_id = content.series_id;
+    }
+    
+    return episode;
   }
 
   async getAllEpisodes(): Promise<PodcastEpisode[]> {
@@ -282,30 +290,52 @@ class PodcastService {
     try {
       const episodes = await this.getPublishedEpisodes(limit);
       
+      // Group episodes by series (including episodes without a series)
       const groupedBySeries = episodes.reduce((acc, episode) => {
-        const seriesName = episode.category || 'General';
-        if (!acc[seriesName]) {
-          acc[seriesName] = [];
+        const seriesId = (episode as any).series_id || 'no-series';
+        const seriesData = (episode as any).series;
+        
+        if (!acc[seriesId]) {
+          acc[seriesId] = {
+            seriesData,
+            episodes: []
+          };
         }
-        acc[seriesName].push(episode);
+        acc[seriesId].episodes.push(episode);
         return acc;
-      }, {} as Record<string, PodcastEpisode[]>);
+      }, {} as Record<string, { seriesData: any; episodes: PodcastEpisode[] }>);
 
-      return Object.entries(groupedBySeries).map(([seriesName, episodes]) => ({
-        name: seriesName,
-        description: this.getSeriesDescription(seriesName),
-        episodes: episodes.sort((a, b) => {
-          // Sort by episode number (desc) then by published date (desc)
-          if (a.episode_number && b.episode_number) {
-            return b.episode_number - a.episode_number;
-          }
-          if (a.published_at && b.published_at) {
-            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
-          }
-          return 0;
-        }),
-        episodeCount: episodes.length
-      }));
+      // Convert to SeriesGroup array and sort by display_order
+      const seriesGroups = Object.entries(groupedBySeries).map(([seriesId, { seriesData, episodes }]) => {
+        const group = {
+          name: seriesData?.name || 'Standalone Episodes',
+          description: seriesData?.description || 'Episodes not assigned to a series',
+          episodes: episodes.sort((a, b) => {
+            // Sort by episode number (desc) then by published date (desc)
+            if (a.episode_number && b.episode_number) {
+              return b.episode_number - a.episode_number;
+            }
+            if (a.published_at && b.published_at) {
+              return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+            }
+            return 0;
+          }),
+          episodeCount: episodes.length
+        };
+        // Add display_order for sorting
+        (group as any).display_order = seriesData?.display_order || 999;
+        return group;
+      });
+
+      // Sort series by display_order
+      return seriesGroups.sort((a, b) => {
+        const aOrder = (a as any).display_order || 999;
+        const bOrder = (b as any).display_order || 999;
+        if (aOrder !== bOrder) {
+          return aOrder - bOrder;
+        }
+        return a.name.localeCompare(b.name);
+      });
     } catch (error) {
       console.error('Error fetching episodes by series:', error);
       throw new Error('Failed to fetch episodes by series');
