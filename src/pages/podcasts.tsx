@@ -5,23 +5,13 @@ import Layout from '@/components/Layout';
 import { podcastService, SeriesGroup as SeriesGroupType, PodcastEpisode } from '@/services/podcastService';
 import { supabase } from '@/lib/supabase';
 
-interface Episode {
-  id: string;
-  title: string;
-  description: string;
-  audio_src: string | null;
-  thumbnail: string;
-  content_id: string;
-  episode_number?: number;
-  season?: number;
-  published_at?: string;
-  duration?: number;
-  series?: string;
+interface Episode extends PodcastEpisode {
+  seriesName: string;
 }
 
 const Podcasts = () => {
   const [seriesData, setSeriesData] = useState<SeriesGroupType[]>([]);
-  const [allEpisodes, setAllEpisodes] = useState<PodcastEpisode[]>([]);
+  const [allEpisodes, setAllEpisodes] = useState<Episode[]>([]);
   const [selectedSeriesFilter, setSelectedSeriesFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,9 +81,21 @@ const Podcasts = () => {
     return seriesColors[index % seriesColors.length];
   };
 
+  // Group episodes by series for "All Series" view
+  const groupedEpisodes = selectedSeriesFilter === 'all' 
+    ? seriesData.map(series => ({
+        ...series,
+        color: getSeriesColor(series.name),
+        episodes: series.episodes.map(episode => ({
+          ...episode,
+          seriesName: series.name
+        }))
+      }))
+    : [];
+
   // Filter episodes based on selected series
   const filteredEpisodes = selectedSeriesFilter === 'all' 
-    ? allEpisodes 
+    ? [] // We'll use groupedEpisodes instead
     : allEpisodes.filter(episode => episode.seriesName === selectedSeriesFilter);
 
   return (
@@ -209,7 +211,11 @@ const Podcasts = () => {
                 >
                   <div 
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: getSeriesColor(series.name) }}
+                    style={{ 
+                      backgroundColor: selectedSeriesFilter === series.name 
+                        ? 'white' 
+                        : getSeriesColor(series.name) 
+                    }}
                   />
                   {series.name} ({series.episodeCount})
                 </button>
@@ -233,21 +239,66 @@ const Podcasts = () => {
                   Try Again
                 </button>
               </div>
+            ) : selectedSeriesFilter === 'all' ? (
+              // Grouped view for "All Series"
+              <div className="space-y-12">
+                {groupedEpisodes.map((series) => (
+                  <div key={series.name} className="animate-fade-in-up">
+                    {/* Series Header */}
+                    <div className="flex items-center gap-4 mb-6">
+                      <div 
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: series.color }}
+                      />
+                      <h3 className="text-2xl font-bold text-neutral-900">{series.name}</h3>
+                      <div className="flex-1 h-px bg-neutral-200"></div>
+                      <span className="text-sm text-neutral-500">{series.episodes.length} episodes</span>
+                    </div>
+                    
+                    {/* Series Episodes */}
+                    <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
+                      {series.episodes.map((episode) => (
+                        <MasonryEpisodeCard 
+                          key={episode.id} 
+                          episode={episode} 
+                          seriesName={series.name}
+                          seriesColor={series.color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : filteredEpisodes.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-neutral-600">No episodes available yet.</p>
                 <p className="text-sm text-neutral-500 mt-2">Check back soon for new content.</p>
               </div>
             ) : (
-              <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
-                {filteredEpisodes.map((episode) => (
-                  <MasonryEpisodeCard 
-                    key={episode.id} 
-                    episode={episode} 
-                    seriesName={episode.seriesName}
-                    seriesColor={getSeriesColor(episode.seriesName)}
+              // Single series view
+              <div className="animate-fade-in-up">
+                {/* Selected Series Header */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div 
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: getSeriesColor(selectedSeriesFilter) }}
                   />
-                ))}
+                  <h3 className="text-2xl font-bold text-neutral-900">{selectedSeriesFilter}</h3>
+                  <div className="flex-1 h-px bg-neutral-200"></div>
+                  <span className="text-sm text-neutral-500">{filteredEpisodes.length} episodes</span>
+                </div>
+                
+                {/* Series Episodes */}
+                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
+                  {filteredEpisodes.map((episode) => (
+                    <MasonryEpisodeCard 
+                      key={episode.id} 
+                      episode={episode} 
+                      seriesName={episode.seriesName}
+                      seriesColor={getSeriesColor(episode.seriesName)}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>
