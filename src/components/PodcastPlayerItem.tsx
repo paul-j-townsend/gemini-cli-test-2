@@ -231,10 +231,10 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
     }
 
     try {
-      if (isPlaying) {
-        audio.pause();
+    if (isPlaying) {
+      audio.pause();
         setIsPlaying(false);
-      } else {
+    } else {
         setError(null);
         await audio.play();
         setIsPlaying(true);
@@ -365,6 +365,14 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
               <div className="w-2 h-2 bg-white rounded-full animate-bounce-soft"></div>
             </div>
           )}
+          {/* Preview/Full Version Indicator */}
+          {podcast.full_audio_src && (
+            <div className={`absolute -top-1 -left-1 text-white text-xs font-bold px-2 py-1 rounded-full shadow-medium ${
+              isFullVersion ? 'bg-primary-500' : 'bg-amber-500'
+            }`}>
+              {isFullVersion ? 'FULL' : 'PREVIEW'}
+            </div>
+          )}
         </div>
         
         <div className="flex-grow min-w-0 w-full sm:w-auto">
@@ -375,11 +383,43 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
               </h3>
               <p className="text-sm text-neutral-600 line-clamp-3 sm:line-clamp-2 leading-relaxed mb-2 text-center sm:text-left">
                 {podcast.description}
+                {!isFullVersion && podcast.full_audio_src && (
+                  <span className="inline-block ml-2 text-xs text-amber-600 font-medium">
+                    (Preview - {formatTime(duration)})
+                  </span>
+                )}
               </p>
-              <div className="flex justify-center sm:justify-start">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
+                {/* Preview/Full Version Toggle */}
+                {podcast.full_audio_src && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setIsFullVersion(!isFullVersion)}
+                      className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                        isFullVersion 
+                          ? 'bg-primary-100 text-primary-700 border border-primary-200 hover:bg-primary-200' 
+                          : 'bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200'
+                      }`}
+                    >
+                      {isFullVersion ? (
+                        <>
+                          <Settings size={12} />
+                          <span>Switch to Preview</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play size={12} />
+                          <span>Switch to Full</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+                
+                {/* Open in Full Player Link */}
                 <Link 
                   href={`/player?id=${podcast.id}`}
-                  className="inline-flex items-center space-x-1 text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                  className="inline-flex items-center space-x-1 text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors hover:underline"
                 >
                   <ExternalLink size={12} />
                   <span>Open in Full Player</span>
@@ -420,14 +460,14 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           </div>
           
           <div className="relative">
-            <input
-              type="range"
-              min="0"
+          <input
+            type="range"
+            min="0"
               max={duration || 0}
-              value={currentTime}
-              onChange={handleScrubberChange}
-              onMouseDown={handleScrubberMouseDown}
-              onMouseUp={handleScrubberMouseUp}
+            value={currentTime}
+            onChange={handleScrubberChange}
+            onMouseDown={handleScrubberMouseDown}
+            onMouseUp={handleScrubberMouseUp}
               onTouchStart={handleScrubberMouseDown}
               onTouchEnd={handleScrubberMouseUp}
               className="audio-player-progress w-full cursor-pointer"
@@ -575,48 +615,48 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       <div className="pt-6 border-t border-neutral-200/80 flex flex-col gap-3 sm:gap-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
         {hasAudio ? (
           /* Show audio-related actions if audio exists */
-          !hasAccessedFull ? (
-            <button 
-              onClick={handleListenToFull}
-              className="btn-primary w-full flex items-center justify-center gap-2"
-              disabled={!podcast.full_audio_src}
-            >
-              <Play size={20} />
-              Listen to Full Version
-            </button>
-          ) : (
-            /* Show Quiz and Certificate buttons after accessing full version */
-            <>
-              {showQuiz ? (
-                <button 
-                  onClick={() => setShowQuiz(false)}
-                  className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
-                >
-                  <X size={20} />
-                  Close Quiz
-                </button>
-              ) : (
-                <button 
-                  onClick={() => setShowQuiz(true)}
-                  className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
-                >
-                  <Settings size={20} />
-                  Take Quiz
-                </button>
-              )}
+          <>
+            {/* Open Full Version Button - Show when in preview mode */}
+            {podcast.full_audio_src && !isFullVersion && (
               <button 
-                disabled={!quizPassed}
-                className={`w-full sm:w-auto flex-1 flex items-center justify-center gap-2 ${
-                  quizPassed 
-                    ? 'btn-primary' 
-                    : 'btn-secondary opacity-50 cursor-not-allowed'
-                }`}
+                onClick={() => setIsFullVersion(true)}
+                className="btn-primary w-full flex items-center justify-center gap-2"
               >
-                <Download size={20} />
-                {quizPassed ? 'Get Certificate' : 'Pass Quiz to Get Certificate'}
+                <Play size={20} />
+                Open Full Version ({formatTime(duration)})
               </button>
-            </>
-          )
+            )}
+            
+            {/* Quiz and Certificate buttons */}
+            {showQuiz ? (
+              <button 
+                onClick={() => setShowQuiz(false)}
+                className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
+              >
+                <X size={20} />
+                Close Quiz
+              </button>
+            ) : (
+              <button 
+                onClick={() => setShowQuiz(true)}
+                className="btn-secondary w-full sm:w-auto flex-1 flex items-center justify-center gap-2"
+              >
+                <Settings size={20} />
+                Take Quiz
+              </button>
+            )}
+            <button 
+              disabled={!quizPassed}
+              className={`w-full sm:w-auto flex-1 flex items-center justify-center gap-2 ${
+                quizPassed 
+                  ? 'btn-primary' 
+                  : 'btn-secondary opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <Download size={20} />
+              {quizPassed ? 'Get Certificate' : 'Pass Quiz to Get Certificate'}
+            </button>
+          </>
         ) : (
           /* Show quiz-only actions if no audio */
           <>

@@ -68,11 +68,32 @@ export const useMemoizedProgressCalculations = (
     );
     const totalTimeSpent = completions.reduce((sum, c) => sum + (c.time_spent || 0), 0);
 
+    // Calculate total CPD hours from passed quizzes
+    const totalCPDHours = completions
+      .filter(c => c.passed)
+      .reduce((total, completion) => {
+        // Use episode duration if available, otherwise estimate based on typical podcast length
+        const episodeDuration = completion.episode_duration || 0;
+        let hours = 0;
+        
+        if (episodeDuration > 0) {
+          // Convert seconds to hours, minimum 0.5 hours
+          hours = Math.max(0.5, episodeDuration / 3600);
+        } else {
+          // Estimate based on typical veterinary podcast length
+          // Most veterinary podcasts are 30-45 minutes, so use 0.75 hours (45 minutes) as default
+          hours = 0.75;
+        }
+        
+        return total + hours;
+      }, 0);
+
     return {
       totalQuizzes,
       totalPassed,
       averageScore,
       totalTimeSpent,
+      totalCPDHours,
       streakDays: calculateStreakDays(completions),
       recentActivity: completions.slice(-5).reverse(),
       achievements: calculateAchievements(completions)

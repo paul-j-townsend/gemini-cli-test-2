@@ -142,7 +142,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
           <div className="text-3xl font-bold text-primary-600 mb-2">
             {progressSummary?.totalQuizzes || 0}
@@ -152,16 +152,9 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
         
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
           <div className="text-3xl font-bold text-green-600 mb-2">
-            {progressSummary?.totalPassed || 0}
+            {(progressSummary?.totalCPDHours || 0).toFixed(1)}
           </div>
-          <p className="text-neutral-600">Quizzes Passed</p>
-        </div>
-        
-        <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
-          <div className="text-3xl font-bold text-blue-600 mb-2">
-            {progressSummary?.averageScore || 0}%
-          </div>
-          <p className="text-neutral-600">Average Score</p>
+          <p className="text-neutral-600">CPD Hours Earned</p>
         </div>
         
         <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
@@ -207,7 +200,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <p className={`text-sm font-medium ${completion.passed ? 'text-green-600' : 'text-red-600'}`}>
-                        {completion.percentage}%
+                        {completion.passed ? 'Completed' : 'Incomplete'}
                       </p>
                     </div>
                     {completion.passed && (

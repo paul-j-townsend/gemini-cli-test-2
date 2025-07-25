@@ -116,8 +116,8 @@ const Podcasts = () => {
           <div className="text-center animate-fade-in-up">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
               Expert <span className="text-gradient-primary">Veterinary</span> Podcasts
-            </h1>
-            
+        </h1>
+
             <p className="text-lg lg:text-xl text-neutral-600 max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               Stay ahead with cutting-edge insights, expert interviews and practical guidance 
               from leading veterinary professionals. Enhance your practice with evidence-based content.
@@ -328,7 +328,7 @@ const Podcasts = () => {
           <p className="text-sm text-neutral-400 mt-4">
             Free forever. Unsubscribe anytime.
           </p>
-        </div>
+    </div>
       </section>
     </Layout>
   );

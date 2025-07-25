@@ -76,7 +76,7 @@ const Badges = () => {
         },
         {
           name: 'Quiz Wiz',
-          description: 'Scored 100% on any quiz.',
+          description: 'Completed any quiz successfully.',
           icon: <BrainIcon />,
           color: 'purple',
         },

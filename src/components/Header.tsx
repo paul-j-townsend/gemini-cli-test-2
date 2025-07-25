@@ -45,11 +45,11 @@ const Header = () => {
               </div>
               <div>
                 <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gradient-primary">
-                  Vet Sidekick
+          Vet Sidekick
                 </h1>
                 <p className="text-xs text-neutral-500 -mt-1">Professional CPD</p>
               </div>
-            </Link>
+        </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-1">
@@ -77,7 +77,7 @@ const Header = () => {
                     <span className={`absolute bottom-0 left-1/2 h-0.5 bg-gradient-primary transition-all duration-300 transform -translate-x-1/2 ${
                       isActive ? 'w-8' : 'w-0 group-hover:w-8'
                     }`}></span>
-                  </Link>
+          </Link>
                 );
               })}
             </div>
@@ -136,15 +136,15 @@ const Header = () => {
                     onFocus={(e) => e.currentTarget.style.outline = 'none'}
                   >
                     {item.label}
-                  </Link>
+          </Link>
                 );
               })}
 
 
             </div>
-          </div>
-        </nav>
-      </header>
+        </div>
+      </nav>
+    </header>
     </>
   );
 };

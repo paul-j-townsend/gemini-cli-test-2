@@ -342,7 +342,7 @@ const PodcastPlayer = () => {
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h6m-6 4h6m4 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="font-medium">Listen</span>
+                          <span className="font-medium">Listen to podcast</span>
                           {hasListened && <Check size={10} />}
                         </div>
                         <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,7 +354,7 @@ const PodcastPlayer = () => {
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="font-medium">Report</span>
+                          <span className="font-medium">Download Report</span>
                           {reportDownloaded && <Check size={10} />}
                         </div>
                         <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,7 +366,7 @@ const PodcastPlayer = () => {
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                           </svg>
-                          <span className="font-medium">Quiz</span>
+                          <span className="font-medium">Take Quiz</span>
                           {progressQuizCompleted && <Check size={10} />}
                         </div>
                         <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -378,42 +378,21 @@ const PodcastPlayer = () => {
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="font-medium">Certificate</span>
+                          <span className="font-medium">Download certificate</span>
                           {certificateDownloaded && <Check size={10} />}
                         </div>
                       </div>
 
                       {/* CPD Context Indicators */}
                       <div className="flex items-center gap-4 mb-2">
-                        <div className="flex items-center gap-1 text-xs bg-green-50 px-2 py-1 rounded-full">
-                          <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-2 text-sm bg-green-100 px-3 py-2 rounded-lg border border-green-200 shadow-sm">
+                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-green-700 font-medium">1 CPD hour</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs bg-purple-50 px-2 py-1 rounded-full">
-                          <svg className="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                          </svg>
-                          <span className="text-purple-700 font-medium">Certificate Available</span>
+                          <span className="text-green-800 font-semibold">1 CPD hour completed!</span>
                         </div>
                       </div>
 
-                      {/* Quiz Status - Compact with Celebration */}
-                      {episode.content_id && quizCompleted && (
-                        <div className={`flex items-center gap-1 mb-2 animate-pulse ${quizPassed ? 'animate-bounce' : ''}`}>
-                          <div className={`w-3 h-3 rounded-full flex items-center justify-center transition-all duration-500 ${
-                            quizPassed ? 'bg-green-100 animate-pulse' : 'bg-orange-100'
-                          }`}>
-                            <Check size={8} className={quizPassed ? 'text-green-600' : 'text-orange-600'} />
-                          </div>
-                          <span className={`text-xs font-medium transition-colors duration-300 ${
-                            quizPassed ? 'text-green-700' : 'text-orange-700'
-                          }`}>
-                            Quiz {quizPassed ? 'Passed! 🎉' : 'Failed'} - {quizPercentage}%
-                          </span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Audio Controls - All in Compact Area */}
@@ -522,7 +501,7 @@ const PodcastPlayer = () => {
                           className="w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:shadow-xl transform hover:scale-[1.02]"
                         >
                           <FileText size={18} />
-                          {reportDownloaded ? 'Report Downloaded ✓' : 'Download Report'}
+                          {reportDownloaded ? 'Download Report ✓' : 'Download Report'}
                         </button>
                         
                         {/* 2. Start Quiz */}
@@ -536,7 +515,7 @@ const PodcastPlayer = () => {
                           }`}
                         >
                           <HelpCircle size={18} />
-                          {!hasListened ? 'Listen to Episode First' : (quizCompleted ? 'Retake CPD Quiz' : 'Start CPD Quiz')}
+                          {!hasListened ? 'Listen to Episode First' : (quizCompleted ? 'Take CPD Quiz' : 'Start CPD Quiz')}
                           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                           </svg>

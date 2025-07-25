@@ -94,14 +94,14 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
         score.passed ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' : 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200'
       }`}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {/* Score Display */}
+          {/* Completion Status */}
           <div className="text-center">
             <div className={`text-6xl font-bold mb-2 ${
               score.passed ? 'text-green-600' : 'text-orange-600'
             }`}>
-              {score.percentage}%
+              {score.passed ? '✓' : '○'}
             </div>
-            <div className="text-sm text-neutral-600 font-medium">Final Score</div>
+            <div className="text-sm text-neutral-600 font-medium">Status</div>
           </div>
           
           {/* CPD Status */}
@@ -140,7 +140,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
         </div>
         
         <div className="mt-4 text-xs text-neutral-500 font-medium text-center">
-          Veterinary Professional Standard: {score.passed ? 'Met ✓' : 'Requires 70%+ for CPD validation'}
+          Veterinary Professional Standard: {score.passed ? 'Met ✓' : 'Requires completion for CPD validation'}
         </div>
       </div>
       
