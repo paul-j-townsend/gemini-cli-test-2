@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useUserContentProgress } from '../hooks/useUserContentProgress';
 import { 
   Play, 
   Pause, 
   Check,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  ShoppingCart
 } from 'lucide-react';
 
 import { PodcastEpisode } from '@/services/podcastService';
@@ -35,10 +34,6 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   const [error, setError] = useState<string | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubPosition, setScrubPosition] = useState(0);
-  
-  const { isQuizCompleted, isQuizPassedWithThreshold } = useQuizCompletion();
-  const quizCompleted = isQuizCompleted(episode.content_id);
-  const quizPassed = isQuizPassedWithThreshold(episode.content_id, 70);
   
   // Track certificate download status
   const { certificateDownloaded } = useUserContentProgress(episode.content_id);
@@ -131,6 +126,14 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
 
   const handleCardClick = () => {
     router.push(`/player?id=${episode.id}`);
+  };
+
+  const handlePurchase = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement purchase logic - redirect to payment/subscription page
+    console.log('Purchase CPD for episode:', episode.title);
+    // For now, we can redirect to a contact page or subscription page
+    window.open('mailto:support@vetsidekick.com?subject=CPD Purchase Inquiry&body=I would like to purchase CPD access for: ' + encodeURIComponent(episode.title), '_blank');
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -252,15 +255,23 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
               </div>
             )}
             
-            {/* Episode completion badge - only show when certificate is downloaded */}
-            {certificateDownloaded && (
-              <div className="absolute top-3 right-3">
+            {/* Episode completion/purchase badge */}
+            <div className="absolute top-3 right-3">
+              {certificateDownloaded ? (
                 <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-green-500 text-white">
                   <Check size={12} />
                   <span>Complete</span>
                 </div>
-              </div>
-            )}
+              ) : (
+                <button
+                  onClick={handlePurchase}
+                  className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+                >
+                  <ShoppingCart size={12} />
+                  <span>Purchase CPD</span>
+                </button>
+              )}
+            </div>
           </div>
           
           {/* Content */}
@@ -289,7 +300,10 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
       {/* Preview player section */}
       {hasAudio && (
         <div className="px-4 pb-4 border-t border-neutral-100">
-          <div className="flex items-center gap-3 pt-3">
+          <div className="text-xs font-medium text-neutral-500 pt-3 pb-2">
+            Podcast preview
+          </div>
+          <div className="flex items-center gap-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();

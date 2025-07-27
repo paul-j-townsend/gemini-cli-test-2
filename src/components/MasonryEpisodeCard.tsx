@@ -8,7 +8,8 @@ import {
   Pause, 
   Check,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  ShoppingCart
 } from 'lucide-react';
 
 import { PodcastEpisode } from '@/services/podcastService';
@@ -137,6 +138,14 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
     router.push(`/player?id=${episode.id}`);
   };
 
+  const handlePurchase = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement purchase logic - redirect to payment/subscription page
+    console.log('Purchase CPD for episode:', episode.title);
+    // For now, we can redirect to a contact page or subscription page
+    window.open('mailto:support@vetsidekick.com?subject=CPD Purchase Inquiry&body=I would like to purchase CPD access for: ' + encodeURIComponent(episode.title), '_blank');
+  };
+
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const audio = audioRef.current;
     if (!audio || !duration) return;
@@ -215,14 +224,22 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
               </div>
             )}
             
-            {certificateDownloaded && (
-              <div className="absolute top-3 right-3">
+            <div className="absolute top-3 right-3">
+              {certificateDownloaded ? (
                 <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-green-500 text-white">
                   <Check size={12} />
                   <span>Complete</span>
                 </div>
-              </div>
-            )}
+              ) : (
+                <button
+                  onClick={handlePurchase}
+                  className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+                >
+                  <ShoppingCart size={12} />
+                  <span>Purchase CPD</span>
+                </button>
+              )}
+            </div>
           </div>
           
           <div className="p-4 flex-1">
