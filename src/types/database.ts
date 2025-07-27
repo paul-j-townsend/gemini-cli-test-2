@@ -9,11 +9,14 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   avatar?: string;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
   last_login_at?: string;
   email_verified: boolean;
   preferences?: UserPreferences;
+  auth_provider?: 'email' | 'google' | 'facebook' | null;
+  supabase_auth_id?: string | null;
 }
 
 export interface UserPreferences {
@@ -58,11 +61,14 @@ export interface UsersTable {
   role: UserRole;
   status: UserStatus;
   avatar: string | null;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
   last_login_at: string | null;
   email_verified: boolean;
   preferences: UserPreferences | null;
+  auth_provider: 'email' | 'google' | 'facebook' | null;
+  supabase_auth_id: string | null;
 }
 
 export interface UserSessionsTable {

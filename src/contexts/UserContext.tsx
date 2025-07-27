@@ -3,6 +3,7 @@ import { User } from '../types/database';
 import { userService } from '../services/userService';
 import { hasPermission, hasResourcePermission, isAdmin, canManageUsers, canManageContent } from '../utils/permissions';
 import type { Permission, Resource } from '../utils/permissions';
+import { supabase } from '@/lib/supabase';
 
 interface UserContextType {
   user: User | null;
@@ -31,22 +32,71 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load default user from database on app start
-    const loadDefaultUser = async () => {
+    // Check for existing Supabase session on app start
+    const initializeAuth = async () => {
       try {
-        const defaultUser = await userService.findUserById('fed2a63e-196d-43ff-9ebc-674db34e72a7'); // Super admin by default
-        if (defaultUser) {
-          setUser(defaultUser);
-          await userService.updateLastLogin(defaultUser.id);
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          // User is authenticated with Supabase, find their profile
+          let user = await userService.findUserByEmail(session.user.email || '');
+          
+          if (!user) {
+            // Create user profile if doesn't exist
+            const newUser = {
+              email: session.user.email || '',
+              name: session.user.user_metadata?.full_name || 
+                    session.user.user_metadata?.name || 
+                    session.user.email?.split('@')[0] || 'User',
+              role: 'user' as const,
+              status: 'active' as const,
+              email_verified: true,
+              auth_provider: 'google' as const,
+              supabase_auth_id: session.user.id,
+              avatar_url: session.user.user_metadata?.avatar_url || null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            };
+            
+            user = await userService.createUser(newUser);
+          }
+          
+          if (user) {
+            setUser(user);
+            await userService.updateLastLogin(user.id);
+          }
+        } else {
+          // No Supabase session, no user
+          setUser(null);
         }
       } catch (error) {
-        console.error('Failed to load default user:', error);
+        console.error('Failed to initialize auth:', error);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadDefaultUser();
+    initializeAuth();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // User signed in, update user context
+        let user = await userService.findUserByEmail(session.user.email || '');
+        if (user) {
+          setUser(user);
+          await userService.updateLastLogin(user.id);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        // User signed out, fall back to default user or clear user
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Permission checking methods
@@ -95,8 +145,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   };
 
   const logout = async (): Promise<void> => {
-    setUser(null);
-    // In a real app, you'd also invalidate sessions here
+    try {
+      // Sign out from Supabase Auth
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still clear user even if logout fails
+      setUser(null);
+    }
   };
 
   const refreshUser = async (): Promise<void> => {

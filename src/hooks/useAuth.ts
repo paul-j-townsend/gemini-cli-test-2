@@ -1,6 +1,7 @@
 import { useUser } from '../contexts/UserContext';
 import { UserRole } from '../types/database';
 import type { Permission, Resource } from '../utils/permissions';
+import { supabase } from '@/lib/supabase';
 
 export const useAuth = () => {
   const { 
@@ -45,6 +46,34 @@ export const useAuth = () => {
     logout,
     refreshUser,
     
+    // OAuth methods
+    signInWithGoogle: async () => {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    
+    signInWithFacebook: async () => {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    
+    getSupabaseSession: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+    
     // Quick permission checks
     canRead: (resource?: Resource) => 
       resource ? hasResourcePermission(resource, 'read') : hasPermission('read'),
@@ -63,6 +92,9 @@ export const useAuth = () => {
     getUserStatus: () => user?.status || 'inactive',
     isUserActive: () => user?.status === 'active',
     isUserVerified: () => user?.email_verified || false,
+    getUserAvatar: () => user?.avatar_url || user?.avatar || null,
+    getAuthProvider: () => user?.auth_provider || null,
+    isOAuthUser: () => user?.auth_provider === 'google' || user?.auth_provider === 'facebook',
   };
 };
 
