@@ -1,0 +1,248 @@
+# TypeScript Patterns and Best Practices
+
+## Service Layer Patterns
+
+### Service Class Structure
+
+```typescript
+// Interface for service methods
+export interface UserContentProgress {
+  id?: string;
+  user_id: string;
+  content_id: string;
+  has_listened: boolean;
+  listen_progress_percentage: number;
+  // ... other properties
+}
+
+// Service class with error handling
+class UserContentProgressService {
+  async methodName(params): Promise<ResultType | null> {
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('table_name')
+        .select('*')
+        .eq('field', value)
+        .single();
+
+      if (error) {
+        console.error('Service error:', error);
+        return null;
+      }
+
+      return data as ResultType;
+    } catch (error) {
+      console.error('Exception in methodName:', error);
+      return null;
+    }
+  }
+}
+
+// Export singleton instance
+export const serviceInstance = new ServiceClass();
+```
+
+### Key Service Files
+
+- **User Progress**: [src/services/userContentProgressService.ts](mdc:src/services/userContentProgressService.ts)
+- **Quiz Service**: [src/services/quizCompletionService.ts](mdc:src/services/quizCompletionService.ts)
+- **Podcast Service**: [src/services/podcastService.ts](mdc:src/services/podcastService.ts)
+
+## API Route Patterns
+
+### Standard API Handler
+
+```typescript
+import { NextApiRequest, NextApiResponse } from 'next';
+import { serviceInstance } from '@/services/serviceName';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    switch (req.method) {
+      case 'GET':
+        return await getHandler(req, res);
+      case 'POST':
+        return await postHandler(req, res);
+      default:
+        res.setHeader('Allow', ['GET', 'POST']);
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
+  } catch (error) {
+    console.error('API error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+```
+
+### Key API Files
+
+- **User Progress API**: [src/pages/api/user-content-progress.ts](mdc:src/pages/api/user-content-progress.ts)
+- **Quiz API**: [src/pages/api/quiz-completion-service.ts](mdc:src/pages/api/quiz-completion-service.ts)
+
+## Database Integration
+
+### Supabase Client Usage
+
+```typescript
+// Admin client for server-side operations
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+// Query pattern with error handling
+const { data, error } = await supabaseAdmin
+  .from('table_name')
+  .select('*')
+  .eq('field', value)
+  .single();
+
+if (error) {
+  console.error('Database error:', error);
+  return null;
+}
+
+return data as TypeName;
+```
+
+### Upsert Pattern
+
+```typescript
+// For user progress updates
+const { data, error } = await supabaseAdmin
+  .from('vsk_user_content_progress')
+  .upsert({
+    user_id: userId,
+    content_id: contentId,
+    field_name: value
+  }, {
+    onConflict: 'user_id,content_id'
+  })
+  .select()
+  .single();
+```
+
+## Error Handling Patterns
+
+### Service Layer Error Handling
+
+```typescript
+async methodName(params): Promise<ResultType | null> {
+  try {
+    // Database operation
+    const { data, error } = await supabaseAdmin
+      .from('table')
+      .select('*')
+      .eq('field', value)
+      .single();
+
+    if (error) {
+      console.error('Service error:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+      return null;
+    }
+
+    return data as ResultType;
+  } catch (error) {
+    console.error('Exception in methodName:', error);
+    return null;
+  }
+}
+```
+
+### API Route Error Handling
+
+```typescript
+try {
+  // API logic
+  const result = await serviceInstance.methodName(params);
+  
+  if (!result) {
+    return res.status(500).json({ message: 'Service returned null result' });
+  }
+  
+  return res.status(200).json(result);
+} catch (error) {
+  console.error('API error:', error);
+  return res.status(500).json({ message: 'Internal server error' });
+}
+```
+
+## Type Definitions
+
+### Database Types
+
+```typescript
+// Match database schema exactly
+export interface UserContentProgress {
+  id?: string;
+  user_id: string;
+  content_id: string;
+  has_listened: boolean;
+  listen_progress_percentage: number;
+  listened_at?: string;
+  quiz_completed: boolean;
+  quiz_completed_at?: string;
+  report_downloaded: boolean;
+  report_downloaded_at?: string;
+  certificate_downloaded: boolean;
+  certificate_downloaded_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+```
+
+### API Request/Response Types
+
+```typescript
+// API request body
+interface UpdateProgressRequest {
+  userId: string;
+  contentId: string;
+  action: 'listen_progress' | 'quiz_completed' | 'report_downloaded' | 'certificate_downloaded';
+  data?: any;
+}
+
+// API response
+interface ApiResponse<T> {
+  data?: T;
+  message?: string;
+  error?: string;
+}
+```
+
+## Best Practices
+
+### Naming Conventions
+
+- **Services**: `camelCase` with `Service` suffix
+- **Interfaces**: `PascalCase` with descriptive names
+- **API Routes**: `kebab-case` file names
+- **Database Tables**: `vsk_` prefix for VetSideKick tables
+
+### File Organization
+
+- **Services**: `src/services/` - Business logic
+- **API Routes**: `src/pages/api/` - HTTP endpoints
+- **Types**: `src/types/` - TypeScript interfaces
+- **Lib**: `src/lib/` - Utility functions and clients
+
+### Import Patterns
+
+```typescript
+// Service imports
+import { serviceInstance } from '@/services/serviceName';
+
+// Database client imports
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+// Type imports
+import { UserContentProgress } from '@/types/database';
+```
+
+description:
+globs:
+alwaysApply: false
+---

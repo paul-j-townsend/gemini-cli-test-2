@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -253,6 +253,13 @@ const PodcastPlayer = () => {
     console.log('Report downloaded and marked in database');
   };
 
+  // Memoize quiz completion callback to prevent infinite re-renders
+  const handleQuizComplete = useCallback(async () => {
+    console.log('Quiz completed, refreshing data...');
+    await refreshData();
+    await markQuizCompleted();
+  }, [refreshData, markQuizCompleted]);
+
   if (loading) {
     return (
       <Layout>
@@ -384,14 +391,16 @@ const PodcastPlayer = () => {
                       </div>
 
                       {/* CPD Context Indicators */}
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="flex items-center gap-2 text-sm bg-green-100 px-3 py-2 rounded-lg border border-green-200 shadow-sm">
-                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="text-green-800 font-semibold">1 CPD hour completed!</span>
+                      {quizPassed && (
+                        <div className="flex items-center gap-4 mb-2">
+                          <div className="flex items-center gap-2 text-sm bg-green-100 px-3 py-2 rounded-lg border border-green-200 shadow-sm">
+                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-green-800 font-semibold">1 CPD hour completed!</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                     </div>
 
@@ -507,15 +516,17 @@ const PodcastPlayer = () => {
                         {/* 2. Start Quiz */}
                         <button
                           onClick={() => setShowQuiz(true)}
-                          disabled={!hasListened}
+                          disabled={!hasListened || !reportDownloaded}
                           className={`w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
-                            hasListened 
+                            hasListened && reportDownloaded
                               ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white hover:shadow-xl transform hover:scale-[1.02]' 
                               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           }`}
                         >
                           <HelpCircle size={18} />
-                          {!hasListened ? 'Listen to Episode First' : (quizCompleted ? 'Take CPD Quiz' : 'Start CPD Quiz')}
+                          {!hasListened ? 'Listen to Episode First' : 
+                           !reportDownloaded ? 'Download Report First' :
+                           (quizCompleted ? 'Take CPD Quiz' : 'Start CPD Quiz')}
                           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                           </svg>
@@ -567,11 +578,7 @@ const PodcastPlayer = () => {
                   quizId={episode.content_id} 
                   episodeTitle={episode.title} 
                   episodeDuration={episode.duration}
-                  onComplete={async () => {
-                    console.log('Quiz completed, refreshing data...');
-                    await refreshData();
-                    await markQuizCompleted();
-                  }}
+                  onComplete={handleQuizComplete}
                 />
               </div>
             </div>

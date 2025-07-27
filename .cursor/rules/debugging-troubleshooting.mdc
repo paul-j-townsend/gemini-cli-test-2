@@ -1,0 +1,157 @@
+# Debugging and Troubleshooting Guide
+
+## Common Issues and Solutions
+
+### Database Migration Issues
+
+#### PGRST204 Error: Column Not Found
+
+**Error**: `Could not find the 'certificate_downloaded' column of 'vsk_user_content_progress' in the schema cache`
+
+**Solution**:
+
+1. Check if Supabase containers are healthy: `docker ps`
+2. Restart containers: `supabase stop && supabase start`
+3. Re-run migration: `supabase db reset --local`
+4. Verify migration applied: Check [20250725122500_add_certificate_columns.sql](mdc:supabase/migrations/20250725122500_add_certificate_columns.sql)
+
+#### Container Health Issues
+
+**Error**: `supabase_storage_gemini-cli-test-2 container is not ready: unhealthy`
+
+**Solution**:
+
+```bash
+# Check container status
+docker ps
+
+# Restart specific container
+docker restart supabase_storage_gemini-cli-test-2
+
+# Or restart all Supabase containers
+supabase stop
+supabase start
+```
+
+### API Error Debugging
+
+#### Certificate Download 500 Error
+
+**Location**: [src/pages/api/user-content-progress.ts](mdc:src/pages/api/user-content-progress.ts) line 75
+
+**Debug Steps**:
+
+1. Check browser Network tab for request details
+2. Verify migration applied successfully
+3. Check service method: [userContentProgressService.ts](mdc:src/services/userContentProgressService.ts) line 134
+4. Look for PGRST204 errors in server logs
+
+#### Upload API Issues
+
+**Location**: [src/pages/api/upload.ts](mdc:src/pages/api/upload.ts)
+
+**Common Issues**:
+
+- Bucket not found: Check Supabase storage configuration
+- File size limits: Check upload size restrictions
+- Authentication: Verify service role key
+
+### Development Workflow
+
+#### Local Development
+
+```bash
+# Start development server
+npm run dev
+
+# Check for port conflicts
+lsof -i :3000
+lsof -i :3001
+
+# Restart with different port
+PORT=3001 npm run dev
+```
+
+#### Database Operations
+
+```bash
+# Reset local database
+supabase db reset --local
+
+# Apply specific migration
+supabase db push
+
+# Check migration status
+supabase db diff
+
+# View logs
+supabase logs
+```
+
+### Error Logging Patterns
+
+#### Service Layer Logging
+
+```typescript
+// In [userContentProgressService.ts](mdc:src/services/userContentProgressService.ts)
+console.log('markCertificateDownloaded called with:', { userId, contentId });
+console.log('Update data:', updateData);
+console.error('Supabase error in markCertificateDownloaded:', error);
+console.error('Error details:', {
+  code: error.code,
+  message: error.message,
+  details: error.details,
+  hint: error.hint
+});
+```
+
+#### API Route Logging
+
+```typescript
+// In API routes
+console.log('updateProgress called with:', { userId, contentId, action, data });
+console.error('Error fetching user content progress:', error);
+```
+
+### Testing Strategies
+
+#### Manual Testing
+
+1. **Certificate Download**: Test via browser dev tools
+2. **API Endpoints**: Use Postman or browser Network tab
+3. **Database Queries**: Use Supabase Studio or psql
+
+#### Debug Tools
+
+- **Browser Dev Tools**: Network tab for API calls
+- **Server Logs**: Check terminal for Next.js logs
+- **Supabase Logs**: `supabase logs` for database issues
+- **Docker Logs**: `docker logs container_name` for container issues
+
+### Common Fixes
+
+#### Migration Issues
+
+1. Ensure containers are healthy
+2. Restart Supabase: `supabase stop && supabase start`
+3. Re-run migration: `supabase db reset --local`
+4. Verify schema: Check table structure in Supabase Studio
+
+#### API 500 Errors
+
+1. Check server logs for detailed error messages
+2. Verify database schema matches code expectations
+3. Test database connection and permissions
+4. Check environment variables are set correctly
+
+#### File Upload Issues
+
+1. Verify Supabase storage buckets exist
+2. Check file size limits
+3. Verify authentication tokens
+4. Check storage permissions
+description:
+globs:
+alwaysApply: false
+
+---

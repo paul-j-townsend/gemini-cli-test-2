@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS vsk_content (
   pass_percentage INTEGER DEFAULT 80,
   total_questions INTEGER DEFAULT 0,
   quiz_is_active BOOLEAN DEFAULT true,
+  series_id UUID,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -56,6 +57,13 @@ CREATE TABLE IF NOT EXISTS vsk_content_question_answers (
   UNIQUE(question_id, answer_letter)
 );
 
+-- Create storage buckets
+INSERT INTO storage.buckets (id, name, public)
+VALUES 
+  ('images', 'images', true),
+  ('audio', 'audio', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_vsk_content_slug ON vsk_content(slug);
 CREATE INDEX IF NOT EXISTS idx_vsk_content_published ON vsk_content(is_published);
@@ -77,3 +85,80 @@ CREATE POLICY "Allow all operations" ON vsk_content_questions FOR ALL USING (tru
 
 DROP POLICY IF EXISTS "Allow all operations" ON vsk_content_question_answers;
 CREATE POLICY "Allow all operations" ON vsk_content_question_answers FOR ALL USING (true);
+
+-- Create storage policies for images bucket
+CREATE POLICY "Allow public image uploads" ON storage.objects
+FOR INSERT WITH CHECK (bucket_id = 'images');
+
+CREATE POLICY "Allow public image downloads" ON storage.objects
+FOR SELECT USING (bucket_id = 'images');
+
+CREATE POLICY "Allow public image updates" ON storage.objects
+FOR UPDATE USING (bucket_id = 'images') WITH CHECK (bucket_id = 'images');
+
+CREATE POLICY "Allow public image deletes" ON storage.objects
+FOR DELETE USING (bucket_id = 'images');
+
+-- Create storage policies for audio bucket
+CREATE POLICY "Allow public audio uploads" ON storage.objects
+FOR INSERT WITH CHECK (bucket_id = 'audio');
+
+CREATE POLICY "Allow public audio downloads" ON storage.objects
+FOR SELECT USING (bucket_id = 'audio');
+
+CREATE POLICY "Allow public audio updates" ON storage.objects
+FOR UPDATE USING (bucket_id = 'audio') WITH CHECK (bucket_id = 'audio');
+
+CREATE POLICY "Allow public audio deletes" ON storage.objects
+FOR DELETE USING (bucket_id = 'audio');
+
+-- Create user content progress table
+CREATE TABLE IF NOT EXISTS vsk_user_content_progress (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID NOT NULL,
+    content_id UUID NOT NULL,
+    
+    -- Progress tracking
+    has_listened BOOLEAN DEFAULT false,
+    listen_progress_percentage INTEGER DEFAULT 0 CHECK (listen_progress_percentage >= 0 AND listen_progress_percentage <= 100),
+    listened_at TIMESTAMP WITH TIME ZONE,
+    
+    quiz_completed BOOLEAN DEFAULT false,
+    quiz_completed_at TIMESTAMP WITH TIME ZONE,
+    
+    report_downloaded BOOLEAN DEFAULT false,
+    report_downloaded_at TIMESTAMP WITH TIME ZONE,
+    
+    certificate_downloaded BOOLEAN DEFAULT false,
+    certificate_downloaded_at TIMESTAMP WITH TIME ZONE,
+    
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Ensure one record per user per content
+    UNIQUE(user_id, content_id)
+);
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_vsk_user_content_progress_user_id ON vsk_user_content_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_vsk_user_content_progress_content_id ON vsk_user_content_progress(content_id);
+CREATE INDEX IF NOT EXISTS idx_vsk_user_content_progress_has_listened ON vsk_user_content_progress(has_listened);
+CREATE INDEX IF NOT EXISTS idx_vsk_user_content_progress_quiz_completed ON vsk_user_content_progress(quiz_completed);
+
+-- Enable Row Level Security for progress table
+ALTER TABLE vsk_user_content_progress ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policies for progress table
+CREATE POLICY "Users can view their own progress" ON vsk_user_content_progress
+    FOR SELECT USING (auth.uid()::text = user_id::text);
+
+CREATE POLICY "Users can insert their own progress" ON vsk_user_content_progress
+    FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
+
+CREATE POLICY "Users can update their own progress" ON vsk_user_content_progress
+    FOR UPDATE USING (auth.uid()::text = user_id::text);
+
+-- Allow service role to do everything on progress table
+CREATE POLICY "Service role can do everything on progress" ON vsk_user_content_progress
+    FOR ALL USING (auth.role() = 'service_role');

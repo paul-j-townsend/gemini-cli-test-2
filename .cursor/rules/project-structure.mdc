@@ -1,0 +1,54 @@
+# VetSideKick Project Structure Guide
+
+This is a Next.js 14 application with Supabase backend, focused on veterinary education content delivery.
+
+## Core Architecture
+
+### Frontend Structure
+
+- **Entry Point**: [src/pages/_app.tsx](mdc:src/pages/_app.tsx) - Main app wrapper
+- **Home Page**: [src/pages/index.tsx](mdc:src/pages/index.tsx) - Landing page
+- **Content Player**: [src/pages/player.tsx](mdc:src/pages/player.tsx) - Main content consumption interface
+- **Admin Panel**: [src/pages/admin.tsx](mdc:src/pages/admin.tsx) - Content management interface
+
+### API Routes
+
+- **User Progress**: [src/pages/api/user-content-progress.ts](mdc:src/pages/api/user-content-progress.ts) - Handles user progress tracking
+- **Quiz System**: [src/pages/api/quiz-completion-service.ts](mdc:src/pages/api/quiz-completion-service.ts) - Quiz completion tracking
+- **Upload APIs**: [src/pages/api/upload.ts](mdc:src/pages/api/upload.ts), [src/pages/api/upload-audio.ts](mdc:src/pages/api/upload-audio.ts) - File upload handling
+
+### Services Layer
+
+- **User Progress Service**: [src/services/userContentProgressService.ts](mdc:src/services/userContentProgressService.ts) - Core progress tracking logic
+- **Quiz Service**: [src/services/quizCompletionService.ts](mdc:src/services/quizCompletionService.ts) - Quiz management
+- **Podcast Service**: [src/services/podcastService.ts](mdc:src/services/podcastService.ts) - Audio content management
+
+### Database Layer
+
+- **Supabase Admin**: [src/lib/supabase-admin.ts](mdc:src/lib/supabase-admin.ts) - Server-side database client
+- **Supabase Client**: [src/lib/supabase.ts](mdc:src/lib/supabase.ts) - Client-side database access
+
+### Database Schema
+
+- **Migrations**: [supabase/migrations/](mdc:supabase/migrations/) - Database schema changes
+- **Latest Migration**: [supabase/migrations/20250725122500_add_certificate_columns.sql](mdc:supabase/migrations/20250725122500_add_certificate_columns.sql) - Certificate tracking columns
+
+## Key Features
+
+- **Content Progress Tracking**: Users can track listening progress, quiz completion, and certificate downloads
+- **Quiz System**: Interactive quizzes with completion tracking
+- **Certificate System**: Downloadable certificates for completed content
+- **Admin Content Management**: Upload and manage audio content, articles, and quizzes
+- **User Progress Dashboard**: Track learning progress across all content
+
+## Development Workflow
+
+- **Local Development**: `npm run dev` starts the Next.js development server
+- **Database Migrations**: Use `supabase db reset --local` to apply migrations
+- **API Testing**: Test endpoints via browser or tools like Postman
+- **Error Handling**: Check browser console and server logs for debugging
+description:
+globs:
+alwaysApply: false
+
+---

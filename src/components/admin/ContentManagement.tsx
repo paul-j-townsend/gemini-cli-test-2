@@ -417,6 +417,7 @@ export default function ContentManagement() {
         duration: data.duration || null,
         quiz_title: data.quiz_title || data.title + ' Quiz',
         category: selectedCategories.filter(cat => availableKeywords.includes(cat)).join(', '),
+        series_id: data.series_id || null,
         questions: data.questions
       };
 

@@ -1,0 +1,127 @@
+# API Development Guidelines
+
+## API Route Structure
+
+### Standard API Pattern
+
+```typescript
+import { NextApiRequest, NextApiResponse } from 'next';
+import { serviceName } from '@/services/serviceName';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    switch (req.method) {
+      case 'GET':
+        return await getHandler(req, res);
+      case 'POST':
+        return await postHandler(req, res);
+      default:
+        res.setHeader('Allow', ['GET', 'POST']);
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
+  } catch (error) {
+    console.error('API error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+```
+
+### Key API Routes
+
+- **User Progress**: [src/pages/api/user-content-progress.ts](mdc:src/pages/api/user-content-progress.ts)
+- **Quiz Completion**: [src/pages/api/quiz-completion-service.ts](mdc:src/pages/api/quiz-completion-service.ts)
+- **Upload Handlers**: [src/pages/api/upload.ts](mdc:src/pages/api/upload.ts), [src/pages/api/upload-audio.ts](mdc:src/pages/api/upload-audio.ts)
+
+## Service Layer Pattern
+
+### Service Structure
+
+```typescript
+interface ServiceInterface {
+  // Define interface for service methods
+}
+
+class ServiceClass {
+  async methodName(params): Promise<ResultType | null> {
+    try {
+      // Implementation
+      return result;
+    } catch (error) {
+      console.error('Service error:', error);
+      return null;
+    }
+  }
+}
+
+export const serviceInstance = new ServiceClass();
+```
+
+### Key Services
+
+- **User Progress**: [src/services/userContentProgressService.ts](mdc:src/services/userContentProgressService.ts)
+- **Quiz Service**: [src/services/quizCompletionService.ts](mdc:src/services/quizCompletionService.ts)
+- **Podcast Service**: [src/services/podcastService.ts](mdc:src/services/podcastService.ts)
+
+## Error Handling
+
+### Common Error Patterns
+
+- **Database Errors**: Handle Supabase errors with proper logging
+- **Validation Errors**: Return 400 for invalid input
+- **Not Found**: Return 404 with appropriate message
+- **Server Errors**: Log details, return 500 with generic message
+
+### Logging Best Practices
+
+```typescript
+// Log request details
+console.log('API called with:', { param1, param2 });
+
+// Log errors with context
+console.error('Service error:', error);
+console.error('Error details:', {
+  code: error.code,
+  message: error.message,
+  details: error.details
+});
+```
+
+## Database Integration
+
+### Supabase Admin Client
+
+- **File**: [src/lib/supabase-admin.ts](mdc:src/lib/supabase-admin.ts)
+- **Usage**: Server-side operations with full permissions
+- **Pattern**: Use for all API database operations
+
+### Query Patterns
+
+```typescript
+// Upsert pattern for user progress
+const { data, error } = await supabaseAdmin
+  .from('table_name')
+  .upsert(updateData, {
+    onConflict: 'user_id,content_id'
+  })
+  .select()
+  .single();
+```
+
+## Testing and Debugging
+
+### API Testing
+
+- Use browser dev tools to test endpoints
+- Check Network tab for request/response details
+- Use Postman or similar for complex testing
+
+### Common Debug Points
+
+- **Certificate Download**: Check [user-content-progress.ts](mdc:src/pages/api/user-content-progress.ts) line 75
+- **Quiz Completion**: Check [quiz-completion-service.ts](mdc:src/pages/api/quiz-completion-service.ts)
+- **Upload Issues**: Check [upload.ts](mdc:src/pages/api/upload.ts) for file handling
+description:
+globs:
+alwaysApply: false
+
+---

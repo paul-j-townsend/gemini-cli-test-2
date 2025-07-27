@@ -1,0 +1,71 @@
+# Supabase Database Guidelines
+
+## Database Schema Management
+
+### Migration Files
+
+- **Location**: [supabase/migrations/](mdc:supabase/migrations/) - All database schema changes
+- **Naming**: Use timestamp prefix (YYYYMMDDHHMMSS) for migration files
+- **Example**: [20250725122500_add_certificate_columns.sql](mdc:supabase/migrations/20250725122500_add_certificate_columns.sql)
+
+### Key Tables
+
+- **vsk_user_content_progress**: Tracks user progress on content (listening, quizzes, certificates)
+- **vsk_content**: Main content table for articles, podcasts, etc.
+- **vsk_quiz_completions**: Quiz completion records
+- **vsk_series**: Content series organization
+
+### Database Operations
+
+#### Running Migrations
+
+```bash
+# Reset local database and apply all migrations
+supabase db reset --local
+
+# Apply new migrations only
+supabase db push
+
+# Check migration status
+supabase db diff
+```
+
+#### Common Issues
+
+- **Container Health**: Ensure Supabase containers are healthy before running migrations
+- **Schema Cache**: Supabase may cache schema - restart containers if columns not found
+- **Foreign Keys**: Check for FK constraint issues when modifying tables
+
+### Service Layer Integration
+
+#### User Progress Service
+
+- **File**: [src/services/userContentProgressService.ts](mdc:src/services/userContentProgressService.ts)
+- **Key Methods**:
+  - `getProgress()` - Fetch user progress for specific content
+  - `updateListenProgress()` - Update listening progress
+  - `markQuizCompleted()` - Mark quiz as completed
+  - `markCertificateDownloaded()` - Mark certificate as downloaded
+
+#### API Integration
+
+- **File**: [src/pages/api/user-content-progress.ts](mdc:src/pages/api/user-content-progress.ts)
+- **Actions**: `listen_progress`, `quiz_completed`, `report_downloaded`, `certificate_downloaded`
+
+### Error Handling
+
+- **PGRST204**: Column not found in schema cache - restart containers
+- **PGRST116**: No rows returned - handle gracefully with default values
+- **22P02**: Invalid UUID format - validate input parameters
+
+### Best Practices
+
+- Always use `IF NOT EXISTS` for adding columns in migrations
+- Include comments on new columns for documentation
+- Test migrations on local before applying to production
+- Use upsert operations for user progress to handle both insert and update
+description:
+globs:
+alwaysApply: false
+
+---

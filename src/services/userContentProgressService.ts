@@ -111,8 +111,8 @@ class UserContentProgressService {
         .upsert({
           user_id: userId,
           content_id: contentId,
-          report_downloaded: true,
-          report_downloaded_at: new Date().toISOString()
+          report_downloaded: true
+          // Temporarily removed report_downloaded_at to test
         }, {
           onConflict: 'user_id,content_id'
         })
@@ -133,27 +133,45 @@ class UserContentProgressService {
 
   async markCertificateDownloaded(userId: string, contentId: string): Promise<UserContentProgress | null> {
     try {
+      console.log('markCertificateDownloaded called with:', { userId, contentId });
+      
+      const updateData = {
+        user_id: userId,
+        content_id: contentId,
+        certificate_downloaded: true
+        // Temporarily removed certificate_downloaded_at to test
+      };
+      
+      console.log('Update data:', updateData);
+      
       const { data, error } = await supabaseAdmin
         .from('vsk_user_content_progress')
-        .upsert({
-          user_id: userId,
-          content_id: contentId,
-          certificate_downloaded: true,
-          certificate_downloaded_at: new Date().toISOString()
-        }, {
+        .upsert(updateData, {
           onConflict: 'user_id,content_id'
         })
         .select()
         .single();
 
       if (error) {
-        console.error('Error marking certificate downloaded:', error);
+        console.error('Supabase error in markCertificateDownloaded:', error);
+        console.error('Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         return null;
       }
 
+      console.log('Successfully marked certificate downloaded:', data);
       return data as UserContentProgress;
     } catch (error) {
-      console.error('Error marking certificate downloaded:', error);
+      console.error('Exception in markCertificateDownloaded:', error);
+      console.error('Exception details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       return null;
     }
   }
