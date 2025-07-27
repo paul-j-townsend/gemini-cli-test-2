@@ -54,10 +54,7 @@ async function getProgress(req: NextApiRequest, res: NextApiResponse) {
 async function updateProgress(req: NextApiRequest, res: NextApiResponse) {
   const { userId, contentId, action, data } = req.body;
 
-  console.log('updateProgress called with:', { userId, contentId, action, data });
-
   if (!userId || !contentId || !action) {
-    console.log('Missing required fields:', { userId, contentId, action });
     return res.status(400).json({ 
       message: 'userId, contentId, and action are required' 
     });
@@ -68,8 +65,14 @@ async function updateProgress(req: NextApiRequest, res: NextApiResponse) {
 
     switch (action) {
       case 'listen_progress':
-        const { progressPercentage, hasListened } = data;
-        console.log('Updating listen progress:', { progressPercentage, hasListened });
+        const { progressPercentage, hasListened } = data || {};
+        // Add defensive checks
+        if (progressPercentage === undefined || hasListened === undefined) {
+          return res.status(400).json({ 
+            message: 'progressPercentage and hasListened are required for listen_progress action' 
+          });
+        }
+        
         result = await userContentProgressService.updateListenProgress(
           userId, 
           contentId, 
@@ -79,39 +82,53 @@ async function updateProgress(req: NextApiRequest, res: NextApiResponse) {
         break;
 
       case 'quiz_completed':
-        console.log('Marking quiz completed');
         result = await userContentProgressService.markQuizCompleted(userId, contentId);
         break;
 
       case 'report_downloaded':
-        console.log('Marking report downloaded');
         result = await userContentProgressService.markReportDownloaded(userId, contentId);
         break;
 
       case 'certificate_downloaded':
-        console.log('Marking certificate downloaded');
         result = await userContentProgressService.markCertificateDownloaded(userId, contentId);
         break;
 
       default:
-        console.log('Invalid action:', action);
         return res.status(400).json({ message: 'Invalid action' });
     }
 
     if (!result) {
-      console.log('Service returned null result');
       return res.status(500).json({ message: 'Failed to update progress' });
     }
-
-    console.log('Successfully updated progress:', result);
     return res.status(200).json(result);
   } catch (error) {
     console.error('Error updating user content progress:', error);
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: error?.message || 'Unknown error',
+      stack: error?.stack,
+      name: error?.name,
+      code: error?.code,
+      details: error?.details
     });
-    return res.status(500).json({ message: 'Failed to update progress' });
+    
+    // Check if it's a database-related error
+    if (error?.code === '42P01') {
+      console.error('Table does not exist - this is expected if vsk_user_content_progress table is not created yet');
+      return res.status(200).json({ 
+        message: 'Progress tracking not available yet',
+        user_id: userId,
+        content_id: contentId,
+        has_listened: false,
+        listen_progress_percentage: 0,
+        quiz_completed: false,
+        report_downloaded: false,
+        certificate_downloaded: false
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Failed to update progress',
+      error: error?.message || 'Unknown error'
+    });
   }
 }

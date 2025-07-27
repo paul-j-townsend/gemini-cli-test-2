@@ -25,7 +25,6 @@ const getSupabaseInstance = (): SupabaseClient => {
   }
 
   // Create new client only if none exists
-  console.log('Creating new Supabase main client')
   const client = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       storageKey: 'vsk-main-auth-v4', // Main client storage key

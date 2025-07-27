@@ -32,9 +32,16 @@ const Podcasts = () => {
     fetchEpisodes();
   }, []);
 
+  const getDefaultThumbnailUrl = (): string => {
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl('thumbnails/1753642620645-zoonoses-s1e2.png');
+    return data.publicUrl;
+  };
+
   const getThumbnailUrl = (thumbnailPath: string): string => {
     if (!thumbnailPath) {
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
     const { data } = supabase.storage
       .from('images')
@@ -245,14 +252,21 @@ const Podcasts = () => {
                 {groupedEpisodes.map((series) => (
                   <div key={series.name} className="animate-fade-in-up">
                     {/* Series Header */}
-                    <div className="flex items-center gap-4 mb-6">
-                      <div 
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: series.color }}
-                      />
-                      <h3 className="text-2xl font-bold text-neutral-900">{series.name}</h3>
-                      <div className="flex-1 h-px bg-neutral-200"></div>
-                      <span className="text-sm text-neutral-500">{series.episodes.length} episodes</span>
+                    <div className="mb-6">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div 
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: series.color }}
+                        />
+                        <h3 className="text-2xl font-bold text-neutral-900">{series.name}</h3>
+                        <div className="flex-1 h-px bg-neutral-200"></div>
+                        <span className="text-sm text-neutral-500">{series.episodes.length} episodes</span>
+                      </div>
+                      {series.description && (
+                        <p className="text-neutral-600 text-sm leading-relaxed ml-8">
+                          {series.description}
+                        </p>
+                      )}
                     </div>
                     
                     {/* Series Episodes */}
@@ -278,14 +292,24 @@ const Podcasts = () => {
               // Single series view
               <div className="animate-fade-in-up">
                 {/* Selected Series Header */}
-                <div className="flex items-center gap-4 mb-8">
-                  <div 
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: getSeriesColor(selectedSeriesFilter) }}
-                  />
-                  <h3 className="text-2xl font-bold text-neutral-900">{selectedSeriesFilter}</h3>
-                  <div className="flex-1 h-px bg-neutral-200"></div>
-                  <span className="text-sm text-neutral-500">{filteredEpisodes.length} episodes</span>
+                <div className="mb-8">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div 
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: getSeriesColor(selectedSeriesFilter) }}
+                    />
+                    <h3 className="text-2xl font-bold text-neutral-900">{selectedSeriesFilter}</h3>
+                    <div className="flex-1 h-px bg-neutral-200"></div>
+                    <span className="text-sm text-neutral-500">{filteredEpisodes.length} episodes</span>
+                  </div>
+                  {(() => {
+                    const selectedSeries = seriesData.find(series => series.name === selectedSeriesFilter);
+                    return selectedSeries?.description && (
+                      <p className="text-neutral-600 text-sm leading-relaxed ml-8">
+                        {selectedSeries.description}
+                      </p>
+                    );
+                  })()}
                 </div>
                 
                 {/* Series Episodes */}

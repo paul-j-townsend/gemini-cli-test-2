@@ -113,6 +113,13 @@ const formatDuration = (seconds: number): string => {
   return `${minutes}:00`;
 };
 
+const getDefaultThumbnailUrl = (): string => {
+  const { data } = supabase.storage
+    .from('images')
+    .getPublicUrl('thumbnails/1753642620645-zoonoses-s1e2.png');
+  return data.publicUrl;
+};
+
 const getThumbnailUrl = (content: Content): string => {
   // If there's a direct image_url (external URL), use it
   if (content.image_url && content.image_url.trim() !== '') {
@@ -125,15 +132,15 @@ const getThumbnailUrl = (content: Content): string => {
       const { data } = supabase.storage
         .from('images')
         .getPublicUrl(content.thumbnail_path);
-      return data.publicUrl || 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return data.publicUrl || getDefaultThumbnailUrl();
     } catch (error) {
       console.warn('Error getting thumbnail URL:', error);
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
   }
   
   // Default fallback image
-  return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+  return getDefaultThumbnailUrl();
 };
 
 const getFormThumbnailUrl = (formData: ContentFormData): string => {
@@ -148,14 +155,14 @@ const getFormThumbnailUrl = (formData: ContentFormData): string => {
       const { data } = supabase.storage
         .from('images')
         .getPublicUrl(formData.thumbnail_path);
-      return data.publicUrl || '';
+      return data.publicUrl || getDefaultThumbnailUrl();
     } catch (error) {
       console.warn('Error getting form thumbnail URL:', error);
-      return '';
+      return getDefaultThumbnailUrl();
     }
   }
   
-  return '';
+  return getDefaultThumbnailUrl();
 };
 
 const ensureQuestionDefaults = (question: ContentQuestion, questionNumber: number): ContentQuestion => ({
@@ -535,19 +542,13 @@ export default function ContentManagement() {
       label: 'Image',
       render: (content) => (
         <div className="w-12 h-12 relative">
-          {content.thumbnail_path || content.image_url ? (
-            <Image
-              src={getThumbnailUrl(content)}
-              alt={content.title}
-              width={48}
-              height={48}
-              className="rounded-lg object-cover"
-            />
-          ) : (
-            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-gray-400 text-xs">No Image</span>
-            </div>
-          )}
+          <Image
+            src={getThumbnailUrl(content)}
+            alt={content.title}
+            width={48}
+            height={48}
+            className="rounded-lg object-cover"
+          />
         </div>
       ),
     },

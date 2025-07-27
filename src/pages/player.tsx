@@ -74,7 +74,25 @@ const PodcastPlayer = () => {
   const quizPercentage = episode?.content_id ? getQuizPercentage(episode.content_id) : 0;
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
-  const currentAudioSrc = episode?.full_audio_src || episode?.audio_src;
+  const getDefaultAudioUrl = (): string => {
+    const { data } = supabase.storage
+      .from('audio')
+      .getPublicUrl('episodes/1753642561183-walkalone.mp3');
+    return data.publicUrl;
+  };
+
+  const getAudioUrl = (episode: PodcastEpisode | null): string => {
+    if (!episode) return getDefaultAudioUrl();
+    if (episode.full_audio_src && episode.full_audio_src.trim() !== '') {
+      return episode.full_audio_src;
+    }
+    if (episode.audio_src && episode.audio_src.trim() !== '') {
+      return episode.audio_src;
+    }
+    return getDefaultAudioUrl();
+  };
+
+  const currentAudioSrc = getAudioUrl(episode);
 
   // Fetch episode data with complete quiz information
   useEffect(() => {
@@ -105,7 +123,7 @@ const PodcastPlayer = () => {
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !currentAudioSrc) return;
+    if (!audio) return;
 
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
     const handleTimeUpdate = () => {
@@ -150,7 +168,7 @@ const PodcastPlayer = () => {
   // Play/pause handlers
   const handlePlayPause = () => {
     const audio = audioRef.current;
-    if (!audio || !currentAudioSrc) return;
+    if (!audio) return;
 
     if (isPlaying) {
       audio.pause();
@@ -202,9 +220,16 @@ const PodcastPlayer = () => {
     setShowSettings(false);
   };
 
+  const getDefaultThumbnailUrl = (): string => {
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl('thumbnails/1753642620645-zoonoses-s1e2.png');
+    return data.publicUrl;
+  };
+
   const getThumbnailUrl = (thumbnailPath: string): string => {
     if (!thumbnailPath) {
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600&h=600&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
     const { data } = supabase.storage.from('images').getPublicUrl(thumbnailPath);
     return data.publicUrl;
@@ -458,7 +483,7 @@ const PodcastPlayer = () => {
 
                           <button
                             onClick={handlePlayPause}
-                            disabled={!currentAudioSrc}
+                            disabled={false}
                             className="p-2 rounded-full bg-primary-600 hover:bg-primary-700 text-white transition-colors disabled:opacity-50"
                           >
                             {isPlaying ? <Pause size={16} /> : <Play size={16} />}
@@ -556,7 +581,7 @@ const PodcastPlayer = () => {
         </div>
 
         {/* Audio Element */}
-        {currentAudioSrc && <audio ref={audioRef} src={currentAudioSrc} preload="metadata" />}
+        <audio ref={audioRef} src={currentAudioSrc} preload="metadata" />
 
         {/* Quiz Modal */}
         {showQuiz && episode?.content_id && (

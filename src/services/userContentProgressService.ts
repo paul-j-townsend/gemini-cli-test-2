@@ -66,14 +66,19 @@ class UserContentProgressService {
 
       if (error) {
         console.error('Error updating listen progress:', error);
+        console.error('Error code:', error.code);
+        console.error('Error details:', error.details);
         console.error('Update data was:', { user_id: userId, content_id: contentId, ...updateData });
-        return null;
+        
+        // Re-throw error so API can handle it properly
+        throw error;
       }
 
       return data as UserContentProgress;
     } catch (error) {
       console.error('Exception in updateListenProgress:', error);
-      return null;
+      // Re-throw error so API can handle it properly
+      throw error;
     }
   }
 

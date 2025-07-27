@@ -41,20 +41,42 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const displayPercentage = isScrubbing ? scrubPosition : progressPercentage;
   const displayTime = isScrubbing ? (scrubPosition / 100) * duration : currentTime;
-  const hasAudio = episode.audio_src && episode.audio_src.trim() !== '';
+  
+  const getDefaultAudioUrl = (): string => {
+    const { data } = supabase.storage
+      .from('audio')
+      .getPublicUrl('episodes/1753642561183-walkalone.mp3');
+    return data.publicUrl;
+  };
+
+  const getAudioUrl = (episode: PodcastEpisode): string => {
+    if (episode.audio_src && episode.audio_src.trim() !== '') {
+      return episode.audio_src;
+    }
+    return getDefaultAudioUrl();
+  };
+
+  const hasAudio = true;
+
+  const getDefaultThumbnailUrl = (): string => {
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl('thumbnails/1753642620645-zoonoses-s1e2.png');
+    return data.publicUrl;
+  };
 
   const getThumbnailUrl = (episode: PodcastEpisode): string => {
     if (!episode || !episode.thumbnail_path || episode.thumbnail_path.trim() === '') {
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
     try {
       const { data } = supabase.storage
         .from('images')
         .getPublicUrl(episode.thumbnail_path);
-      return data.publicUrl || 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return data.publicUrl || getDefaultThumbnailUrl();
     } catch (error) {
       console.warn('Error getting thumbnail URL:', error);
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
   };
 
@@ -225,7 +247,7 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
 
   return (
     <div className={`bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden ${isScrubbing ? 'select-none' : ''}`}>
-      {hasAudio && <audio ref={audioRef} src={episode.audio_src} preload="metadata" />}
+      {hasAudio && <audio ref={audioRef} src={getAudioUrl(episode)} preload="metadata" />}
       
       <div onClick={handleCardClick} className="relative group cursor-pointer">
         {/* Redesigned layout: horizontal on mobile, vertical on desktop */}
@@ -355,15 +377,6 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
         </div>
       )}
       
-      {/* No audio message */}
-      {!hasAudio && (
-        <div className="px-4 pb-4 border-t border-neutral-100">
-          <div className="pt-3 text-xs text-amber-600 flex items-center gap-1">
-            <AlertCircle size={12} />
-            Audio preview not available
-          </div>
-        </div>
-      )}
     </div>
   );
 };

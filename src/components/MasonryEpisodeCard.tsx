@@ -51,20 +51,54 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const displayPercentage = isScrubbing ? scrubPosition : progressPercentage;
   const displayTime = isScrubbing ? (scrubPosition / 100) * duration : currentTime;
+  
+  const getDefaultAudioUrl = (): string => {
+    // Try to get from Supabase storage first, fallback to a sample audio
+    try {
+      const { data } = supabase.storage
+        .from('audio')
+        .getPublicUrl('episodes/1753642561183-walkalone.mp3');
+      return data.publicUrl;
+    } catch (error) {
+      // Fallback to a basic audio file (or return null to disable audio)
+      return 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+XzyGcpBi+R2O/IfykELnDH89uQOwkUaLTt6alZEwlCpOjvx2chBzaA0fPMeiYGK33O8tmNOwkXaLjn7KdYEwpAn+jvyGcjCC5+1fTMeSQELnDJ8N2QQAoTYrPt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwkXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/Ifykf';
+    }
+  };
+
+  const getAudioUrl = (episode: PodcastEpisode): string => {
+    if (episode.audio_src && episode.audio_src.trim() !== '') {
+      return episode.audio_src;
+    }
+    return getDefaultAudioUrl();
+  };
+
   const hasAudio = episode.audio_src && episode.audio_src.trim() !== '';
+
+  const getDefaultThumbnailUrl = (): string => {
+    // Try to get from Supabase storage first, fallback to placeholder
+    try {
+      const { data } = supabase.storage
+        .from('images')
+        .getPublicUrl('thumbnails/1753642620645-zoonoses-s1e2.png');
+      return data.publicUrl;
+    } catch (error) {
+      // Fallback to a reliable placeholder image
+      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+    }
+  };
 
   const getThumbnailUrl = (episode: PodcastEpisode): string => {
     if (!episode || !episode.thumbnail_path || episode.thumbnail_path.trim() === '') {
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
     try {
       const { data } = supabase.storage
         .from('images')
         .getPublicUrl(episode.thumbnail_path);
-      return data.publicUrl || 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return data.publicUrl || getDefaultThumbnailUrl();
     } catch (error) {
       console.warn('Error getting thumbnail URL:', error);
-      return 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=300&h=300&fit=crop&crop=center';
+      return getDefaultThumbnailUrl();
     }
   };
 
@@ -198,7 +232,7 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
 
   return (
     <div className={`mb-6 break-inside-avoid bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden ${isScrubbing ? 'select-none' : ''}`}>
-      {hasAudio && <audio ref={audioRef} src={episode.audio_src} preload="metadata" />}
+      {hasAudio && <audio ref={audioRef} src={getAudioUrl(episode)} preload="metadata" />}
       
       <div onClick={handleCardClick} className="relative group cursor-pointer">
         <div className="flex flex-col">
@@ -258,6 +292,7 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
             <h3 className="font-semibold text-lg text-neutral-900 mb-2 line-clamp-2">
               {episode.title}
             </h3>
+            
             
             <p className="text-sm text-neutral-600 mb-3 line-clamp-3">
               {episode.description}
@@ -327,14 +362,6 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
         </div>
       )}
       
-      {!hasAudio && (
-        <div className="px-4 pb-4 border-t border-neutral-100">
-          <div className="pt-3 text-xs text-amber-600 flex items-center gap-1">
-            <AlertCircle size={12} />
-            Audio preview not available
-          </div>
-        </div>
-      )}
     </div>
   );
 };
