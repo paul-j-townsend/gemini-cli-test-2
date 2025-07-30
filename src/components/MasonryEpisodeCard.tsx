@@ -3,13 +3,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useUserContentProgress } from '../hooks/useUserContentProgress';
+import PurchaseCPDButton from './payments/PurchaseCPDButton';
 import { 
   Play, 
   Pause, 
   Check,
   AlertCircle,
   ExternalLink,
-  ShoppingCart
 } from 'lucide-react';
 
 import { PodcastEpisode } from '@/services/podcastService';
@@ -61,7 +61,7 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
       return data.publicUrl;
     } catch (error) {
       // Fallback to a basic audio file (or return null to disable audio)
-      return 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+XzyGcpBi+R2O/IfykELnDH89uQOwkUaLTt6alZEwlCpOjvx2chBzaA0fPMeiYGK33O8tmNOwkXaLjn7KdYEwpAn+jvyGcjCC5+1fTMeSQELnDJ8N2QQAoTYrPt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwkXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/IfykEJHfH8N+QOwoXY7ft7KdYEwtGn+LXzGcpBi6Rze/IfykELnDJ8N2QQAoTYrTt66hVFgpFouTywGApBj+S2O/Ifykf';
+      return "/audio/walkalone.mp3";
     }
   };
 
@@ -169,15 +169,7 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
   };
 
   const handleCardClick = () => {
-    router.push(`/player?id=${episode.id}`);
-  };
-
-  const handlePurchase = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // TODO: Implement purchase logic - redirect to payment/subscription page
-    console.log('Purchase CPD for episode:', episode.title);
-    // For now, we can redirect to a contact page or subscription page
-    window.open('mailto:support@vetsidekick.com?subject=CPD Purchase Inquiry&body=I would like to purchase CPD access for: ' + encodeURIComponent(episode.title), '_blank');
+    router.push(`/player?id=${episode.content_id}`);
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -265,13 +257,13 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
                   <span>Complete</span>
                 </div>
               ) : (
-                <button
-                  onClick={handlePurchase}
-                  className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors"
-                >
-                  <ShoppingCart size={12} />
-                  <span>Purchase CPD</span>
-                </button>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PurchaseCPDButton 
+                    contentId={episode.content_id}
+                    contentTitle={episode.title}
+                    variant="compact"
+                  />
+                </div>
               )}
             </div>
           </div>

@@ -11,11 +11,14 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('Upload API called with method:', req.method);
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    console.log('Starting file upload process...');
     const form = formidable({
       uploadDir: '/tmp',
       keepExtensions: true,
@@ -47,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const storageKey = `${type === 'image' ? 'thumbnails' : 'episodes'}/${sanitizedFileName}`;
     
     // Upload to Supabase Storage
+    console.log(`Uploading to bucket: ${bucket}, key: ${storageKey}, size: ${fileBuffer.length}`);
     const { data, error } = await supabaseAdmin.storage
       .from(bucket)
       .upload(storageKey, fileBuffer, {
@@ -56,7 +60,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (error) {
       console.error('Supabase upload error:', error);
-      return res.status(500).json({ error: 'Failed to upload file' });
+      return res.status(500).json({ 
+        error: 'Failed to upload file', 
+        supabaseError: error.message 
+      });
     }
 
     // Get public URL
@@ -80,6 +87,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error) {
     console.error('Upload error:', error);
-    return res.status(500).json({ error: 'Upload failed' });
+    return res.status(500).json({ 
+      error: 'Upload failed', 
+      details: error instanceof Error ? error.message : 'Unknown error' 
+    });
   }
 }

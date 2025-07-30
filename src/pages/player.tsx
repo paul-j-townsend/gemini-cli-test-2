@@ -4,9 +4,11 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Layout from '@/components/Layout';
 import Quiz from '@/components/Quiz';
+import PaywallWrapper from '@/components/payments/PaywallWrapper';
 import { supabase } from '@/lib/supabase';
 import { useQuizCompletion } from '@/hooks/useQuizCompletion';
 import { useUserContentProgress } from '@/hooks/useUserContentProgress';
+import { useUser } from '@/contexts/UserContext';
 import { podcastService, PodcastEpisode } from '@/services/podcastService';
 import { ReportGenerator } from '@/services/reportGenerator';
 import { 
@@ -53,6 +55,9 @@ const PodcastPlayer = () => {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  // User context for payment access
+  const { hasFullCPDAccess } = useUser();
+  
   // Quiz completion state
   const { isQuizCompleted, isQuizPassedWithThreshold, getQuizPercentage, refreshData } = useQuizCompletion();
   
@@ -75,10 +80,8 @@ const PodcastPlayer = () => {
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const getDefaultAudioUrl = (): string => {
-    const { data } = supabase.storage
-      .from('audio')
-      .getPublicUrl('episodes/1753642561183-walkalone.mp3');
-    return data.publicUrl;
+    // Use a local audio file as fallback
+    return '/audio/walkalone.mp3';
   };
 
   const getAudioUrl = (episode: PodcastEpisode | null): string => {
@@ -238,6 +241,13 @@ const PodcastPlayer = () => {
   const downloadCertificate = async () => {
     if (!quizPassed || !episode) return;
     
+    // Check if user has paid access to this content
+    const hasAccess = await hasFullCPDAccess(episode.content_id);
+    if (!hasAccess) {
+      alert('Please purchase this CPD content to download the certificate.');
+      return;
+    }
+    
     const reportData = {
       episode: {
         title: episode.title,
@@ -264,6 +274,13 @@ const PodcastPlayer = () => {
 
   const downloadReport = async () => {
     if (!episode) return;
+    
+    // Check if user has paid access to this content
+    const hasAccess = await hasFullCPDAccess(episode.content_id);
+    if (!hasAccess) {
+      alert('Please purchase this CPD content to download the report.');
+      return;
+    }
     
     // Create a temporary link to download the dummy PDF
     const link = document.createElement('a');
@@ -599,12 +616,20 @@ const PodcastPlayer = () => {
                 </button>
               </div>
               <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-6">
-                <Quiz 
-                  quizId={episode.content_id} 
-                  episodeTitle={episode.title} 
-                  episodeDuration={episode.duration}
-                  onComplete={handleQuizComplete}
-                />
+                <PaywallWrapper
+                  contentId={episode.content_id}
+                  contentTitle={episode.title}
+                  contentType="quiz"
+                  showPreview={true}
+                  previewMessage={`Complete the quiz for "${episode.title}" to test your knowledge and earn CPD credits.`}
+                >
+                  <Quiz 
+                    quizId={episode.content_id} 
+                    episodeTitle={episode.title} 
+                    episodeDuration={episode.duration}
+                    onComplete={handleQuizComplete}
+                  />
+                </PaywallWrapper>
               </div>
             </div>
           </div>

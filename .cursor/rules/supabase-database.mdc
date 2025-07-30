@@ -60,6 +60,7 @@ supabase db diff
 
 ### Best Practices
 
+- Never call supabase db reset unless I explicitly write ‘reset everything.’ Use supabase db push for schema sync. My .env file defines the current target environment
 - Always use `IF NOT EXISTS` for adding columns in migrations
 - Include comments on new columns for documentation
 - Test migrations on local before applying to production

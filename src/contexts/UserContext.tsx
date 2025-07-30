@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '../types/database';
+import { User, ContentPurchase, Subscription, PaymentSummary } from '../types/database';
 import { userService } from '../services/userService';
+import { accessControlService } from '../services/accessControlService';
 import { hasPermission, hasResourcePermission, isAdmin, canManageUsers, canManageContent } from '../utils/permissions';
 import type { Permission, Resource } from '../utils/permissions';
 import { supabase } from '@/lib/supabase';
@@ -19,6 +20,16 @@ interface UserContextType {
   login: (email: string) => Promise<User | null>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  // Payment-related methods
+  hasFullCPDAccess: (contentId: string) => Promise<boolean>;
+  hasSeriesAccess: (seriesId: string) => Promise<boolean>;
+  hasActiveSubscription: () => Promise<boolean>;
+  getUserPaymentSummary: () => Promise<PaymentSummary | null>;
+  refreshPaymentStatus: () => Promise<void>;
+  // Payment state
+  accessibleContentIds: string[];
+  paymentSummary: PaymentSummary | null;
+  isPaymentLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -30,6 +41,10 @@ interface UserProviderProps {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Payment state
+  const [accessibleContentIds, setAccessibleContentIds] = useState<string[]>([]);
+  const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   useEffect(() => {
     // Check for existing Supabase session on app start
@@ -169,6 +184,87 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   };
 
+  // Payment-related methods
+  const hasFullCPDAccess = async (contentId: string): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      return await accessControlService.hasFullCPDAccessClient(user.id, contentId);
+    } catch (error) {
+      console.error('Error checking CPD access:', error);
+      return false;
+    }
+  };
+
+  const hasSeriesAccess = async (seriesId: string): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      return await accessControlService.hasSeriesAccess(user.id, seriesId);
+    } catch (error) {
+      console.error('Error checking series access:', error);
+      return false;
+    }
+  };
+
+  const hasActiveSubscription = async (): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      return await accessControlService.hasActiveSubscription(user.id);
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+      return false;
+    }
+  };
+
+  const getUserPaymentSummary = async (): Promise<PaymentSummary | null> => {
+    if (!user) return null;
+    
+    try {
+      const summary = await accessControlService.getUserPaymentSummary(user.id);
+      return {
+        totalPurchases: summary.totalPurchases,
+        totalSpent: summary.totalSpent,
+        hasActiveSubscription: summary.hasActiveSubscription,
+        subscriptionStatus: summary.subscriptionStatus,
+        purchasedContentIds: summary.purchasedContentIds,
+      };
+    } catch (error) {
+      console.error('Error getting payment summary:', error);
+      return null;
+    }
+  };
+
+  const refreshPaymentStatus = async (): Promise<void> => {
+    if (!user) return;
+    
+    setIsPaymentLoading(true);
+    try {
+      // Get accessible content IDs
+      const contentIds = await accessControlService.getUserAccessibleContentClient(user.id);
+      setAccessibleContentIds(contentIds);
+
+      // Get payment summary
+      const summary = await getUserPaymentSummary();
+      setPaymentSummary(summary);
+    } catch (error) {
+      console.error('Error refreshing payment status:', error);
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  // Load payment data when user changes
+  useEffect(() => {
+    if (user) {
+      refreshPaymentStatus();
+    } else {
+      setAccessibleContentIds([]);
+      setPaymentSummary(null);
+    }
+  }, [user?.id]);
+
   return (
     <UserContext.Provider value={{ 
       user, 
@@ -181,7 +277,17 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       canManageContent: checkCanManageContent,
       login,
       logout,
-      refreshUser
+      refreshUser,
+      // Payment methods
+      hasFullCPDAccess,
+      hasSeriesAccess,
+      hasActiveSubscription,
+      getUserPaymentSummary,
+      refreshPaymentStatus,
+      // Payment state
+      accessibleContentIds,
+      paymentSummary,
+      isPaymentLoading,
     }}>
       {children}
     </UserContext.Provider>

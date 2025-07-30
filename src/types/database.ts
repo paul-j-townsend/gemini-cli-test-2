@@ -252,6 +252,10 @@ export interface Content {
   quiz_is_active: boolean;
   // Series field
   series_id: string | null;
+  // Payment fields
+  price_cents: number | null;
+  stripe_price_id: string | null;
+  is_purchasable: boolean;
   // Metadata
   created_at: string;
   updated_at: string;
@@ -289,6 +293,10 @@ export interface ContentTable {
   total_questions: number;
   quiz_is_active: boolean;
   series_id: string | null;
+  // Payment fields
+  price_cents: number | null;
+  stripe_price_id: string | null;
+  is_purchasable: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -372,5 +380,116 @@ export function hasValidContentStructure(obj: any): boolean {
     obj.total_questions >= 0 &&
     obj.pass_percentage >= 0 &&
     obj.pass_percentage <= 100
+  );
+}
+
+// Payment-related types
+
+export type PurchaseStatus = 'completed' | 'refunded' | 'disputed' | 'pending';
+export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing';
+
+// Content purchases interface
+export interface ContentPurchase {
+  id: string;
+  user_id: string;
+  content_id: string;
+  stripe_payment_intent_id: string | null;
+  stripe_checkout_session_id: string | null;
+  amount_paid_cents: number;
+  currency: string;
+  purchased_at: string;
+  status: PurchaseStatus;
+  refunded_at: string | null;
+  refund_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ContentPurchaseTable {
+  id: string;
+  user_id: string;
+  content_id: string;
+  stripe_payment_intent_id: string | null;
+  stripe_checkout_session_id: string | null;
+  amount_paid_cents: number;
+  currency: string;
+  purchased_at: string;
+  status: PurchaseStatus;
+  refunded_at: string | null;
+  refund_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Subscription interface
+export interface Subscription {
+  id: string;
+  user_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  status: SubscriptionStatus;
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  canceled_at: string | null;
+  trial_start: string | null;
+  trial_end: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubscriptionTable {
+  id: string;
+  user_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  status: SubscriptionStatus;
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  canceled_at: string | null;
+  trial_start: string | null;
+  trial_end: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Extended User interface to include payment information
+export interface UserWithPayments extends User {
+  purchases?: ContentPurchase[];
+  subscription?: Subscription | null;
+  hasActiveSubscription?: boolean;
+}
+
+// Payment-related utility types
+export interface PaymentSummary {
+  totalPurchases: number;
+  totalSpent: number;
+  hasActiveSubscription: boolean;
+  subscriptionStatus: SubscriptionStatus | null;
+  purchasedContentIds: string[];
+}
+
+// Type guards for payment types
+export function isValidPurchase(obj: any): obj is ContentPurchase {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof obj.id === 'string' &&
+    typeof obj.user_id === 'string' &&
+    typeof obj.content_id === 'string' &&
+    typeof obj.amount_paid_cents === 'number' &&
+    ['completed', 'refunded', 'disputed', 'pending'].includes(obj.status)
+  );
+}
+
+export function isValidSubscription(obj: any): obj is Subscription {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof obj.id === 'string' &&
+    typeof obj.user_id === 'string' &&
+    typeof obj.stripe_subscription_id === 'string' &&
+    ['active', 'canceled', 'past_due', 'unpaid', 'incomplete', 'incomplete_expired', 'trialing'].includes(obj.status)
   );
 }

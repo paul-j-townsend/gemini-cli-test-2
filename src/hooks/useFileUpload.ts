@@ -144,7 +144,7 @@ export const useFileUpload = (options: FileUploadOptions): FileUploadHook => {
       formData.append('type', type);
 
       // Upload file with progress tracking
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/upload-test', {
         method: 'POST',
         body: formData,
       });
