@@ -248,7 +248,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         totalPurchases: summary.totalPurchases,
         totalSpent: summary.totalSpent,
         hasActiveSubscription: summary.hasActiveSubscription,
-        subscriptionStatus: summary.subscriptionStatus,
+        subscriptionStatus: summary.subscriptionStatus as SubscriptionStatus | null,
         purchasedContentIds: summary.purchasedContentIds,
       };
     } catch (error) {

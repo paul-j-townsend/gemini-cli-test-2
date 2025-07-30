@@ -45,3 +45,4 @@ check_content_table.sql
 check_podcast_episodes_table.sql
 create_articles_table.sql
 check_quiz_completions_table.sql
+tsconfig.tsbuildinfo

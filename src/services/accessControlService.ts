@@ -119,7 +119,7 @@ export class AccessControlService {
       }
 
       // Remove duplicates
-      return [...new Set(accessibleContentIds)];
+      return Array.from(new Set(accessibleContentIds));
     } catch (error) {
       console.error('Error getting accessible content:', error);
       return [];

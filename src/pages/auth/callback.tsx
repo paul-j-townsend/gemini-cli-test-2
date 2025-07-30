@@ -36,7 +36,7 @@ const AuthCallback = () => {
               role: 'user' as const,
               status: 'active' as const,
               email_verified: true,
-              auth_provider: 'google',
+              auth_provider: 'google' as const,
               supabase_auth_id: session.user.id,
               avatar_url: session.user.user_metadata?.avatar_url || null,
               created_at: new Date().toISOString(),
@@ -47,7 +47,7 @@ const AuthCallback = () => {
           } else {
             // Update existing user with OAuth info
             user = await userService.updateUser(user.id, {
-              auth_provider: 'google',
+              auth_provider: 'google' as const,
               supabase_auth_id: session.user.id,
               email_verified: true,
               avatar_url: session.user.user_metadata?.avatar_url || user.avatar_url,

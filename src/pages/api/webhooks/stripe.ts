@@ -91,8 +91,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Processing invoice payment succeeded:', invoice.id);
         
         // For subscription renewals, we might want to update subscription status
-        if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+        if ((invoice as any).subscription) {
+          const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
           await paymentService.processSubscriptionEvent(subscription, 'subscription.renewed');
         }
         break;
@@ -103,8 +103,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Processing invoice payment failed:', invoice.id);
         
         // Handle failed subscription payments
-        if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+        if ((invoice as any).subscription) {
+          const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
           await paymentService.processSubscriptionEvent(subscription, 'subscription.payment_failed');
         }
         break;
