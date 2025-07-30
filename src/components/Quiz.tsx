@@ -138,7 +138,6 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, episodeDur
           question={currentQuestion}
           showExplanation={showExplanation}
           lastAttempt={lastAttempt}
-          hasMultipleCorrectAnswers={isMultipleChoice}
         />
         
         <AnswerOptions 
