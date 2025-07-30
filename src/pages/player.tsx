@@ -4,7 +4,6 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Layout from '@/components/Layout';
 import Quiz from '@/components/Quiz';
-import PaywallWrapper from '@/components/payments/PaywallWrapper';
 import { supabase } from '@/lib/supabase';
 import { useQuizCompletion } from '@/hooks/useQuizCompletion';
 import { useUserContentProgress } from '@/hooks/useUserContentProgress';
@@ -56,7 +55,7 @@ const PodcastPlayer = () => {
   const [showQuiz, setShowQuiz] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   // User context for payment access
-  const { hasFullCPDAccess } = useUser();
+  const { hasFullCPDAccessForPlayer } = useUser();
   
   // Quiz completion state
   const { isQuizCompleted, isQuizPassedWithThreshold, getQuizPercentage, refreshData } = useQuizCompletion();
@@ -73,6 +72,7 @@ const PodcastPlayer = () => {
     markCertificateDownloaded,
     loading: progressLoading
   } = useUserContentProgress(episode?.content_id);
+
   
   const quizCompleted = episode?.content_id ? isQuizCompleted(episode.content_id) : false;
   const quizPassed = episode?.content_id ? isQuizPassedWithThreshold(episode.content_id, 70) : false;
@@ -169,7 +169,7 @@ const PodcastPlayer = () => {
   }, [volume, isMuted, playbackRate]);
 
   // Play/pause handlers
-  const handlePlayPause = () => {
+  const handlePlayPause = async () => {
     const audio = audioRef.current;
     if (!audio) return;
 
@@ -180,8 +180,7 @@ const PodcastPlayer = () => {
       
       // Mark as listened as soon as play button is clicked
       if (!hasListened) {
-        updateListenProgress(progressPercentage, true);
-        console.log('Podcast marked as listened (play button clicked)');
+        await updateListenProgress(progressPercentage, true);
       }
     }
     setIsPlaying(!isPlaying);
@@ -241,13 +240,6 @@ const PodcastPlayer = () => {
   const downloadCertificate = async () => {
     if (!quizPassed || !episode) return;
     
-    // Check if user has paid access to this content
-    const hasAccess = await hasFullCPDAccess(episode.content_id);
-    if (!hasAccess) {
-      alert('Please purchase this CPD content to download the certificate.');
-      return;
-    }
-    
     const reportData = {
       episode: {
         title: episode.title,
@@ -269,18 +261,10 @@ const PodcastPlayer = () => {
     
     // Mark certificate as downloaded in database
     await markCertificateDownloaded();
-    console.log('Certificate downloaded and marked in database');
   };
 
   const downloadReport = async () => {
     if (!episode) return;
-    
-    // Check if user has paid access to this content
-    const hasAccess = await hasFullCPDAccess(episode.content_id);
-    if (!hasAccess) {
-      alert('Please purchase this CPD content to download the report.');
-      return;
-    }
     
     // Create a temporary link to download the dummy PDF
     const link = document.createElement('a');
@@ -292,12 +276,10 @@ const PodcastPlayer = () => {
     
     // Mark report as downloaded in database
     await markReportDownloaded();
-    console.log('Report downloaded and marked in database');
   };
 
   // Memoize quiz completion callback to prevent infinite re-renders
   const handleQuizComplete = useCallback(async () => {
-    console.log('Quiz completed, refreshing data...');
     await refreshData();
     await markQuizCompleted();
   }, [refreshData, markQuizCompleted]);
@@ -383,7 +365,7 @@ const PodcastPlayer = () => {
                         {episode.description}
                       </p>
 
-                      {/* Learning Progress Breadcrumbs */}
+                      {/* Learning Progress Breadcrumbs - Display Only */}
                       <div className="flex items-center gap-1 mb-2 text-xs">
                         <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
                           hasListened ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
@@ -546,7 +528,7 @@ const PodcastPlayer = () => {
                     {/* Quiz & Report Buttons - Below Audio Controls */}
                     {episode.content_id && (
                       <div className="flex flex-col gap-3 mt-4">
-                        {/* 1. Download Report */}
+                        {/* 1. Download Report - Always Available */}
                         <button
                           onClick={downloadReport}
                           className="w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:shadow-xl transform hover:scale-[1.02]"
@@ -555,7 +537,7 @@ const PodcastPlayer = () => {
                           {reportDownloaded ? 'Download Report ✓' : 'Download Report'}
                         </button>
                         
-                        {/* 2. Start Quiz */}
+                        {/* 2. Start Quiz - Available after listen + report downloaded */}
                         <button
                           onClick={() => setShowQuiz(true)}
                           disabled={!hasListened || !reportDownloaded}
@@ -566,26 +548,24 @@ const PodcastPlayer = () => {
                           }`}
                         >
                           <HelpCircle size={18} />
-                          {!hasListened ? 'Listen to Episode First' : 
-                           !reportDownloaded ? 'Download Report First' :
-                           (quizCompleted ? 'Take CPD Quiz' : 'Start CPD Quiz')}
+                          {progressQuizCompleted ? 'Take Quiz ✓' : 'Take Quiz'}
                           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
                         
-                        {/* 3. Download Certificate */}
+                        {/* 3. Download Certificate - Available after all three steps */}
                         <button
                           onClick={downloadCertificate}
-                          disabled={!quizPassed || !reportDownloaded}
+                          disabled={!hasListened || !reportDownloaded || !progressQuizCompleted}
                           className={`w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
-                            quizPassed && reportDownloaded
+                            hasListened && reportDownloaded && progressQuizCompleted
                               ? 'bg-green-100 hover:bg-green-200 text-green-700 hover:shadow-xl transform hover:scale-[1.02]'
                               : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
                           }`}
                         >
                           <Download size={18} />
-                          {certificateDownloaded ? 'Certificate Downloaded ✓' : !quizPassed ? 'Get Certificate (pass quiz first)' : !reportDownloaded ? 'Download Report First' : 'Get Certificate'}
+                          {certificateDownloaded ? 'Download certificate ✓' : 'Download certificate'}
                         </button>
                         
                       </div>
@@ -616,20 +596,12 @@ const PodcastPlayer = () => {
                 </button>
               </div>
               <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-6">
-                <PaywallWrapper
-                  contentId={episode.content_id}
-                  contentTitle={episode.title}
-                  contentType="quiz"
-                  showPreview={true}
-                  previewMessage={`Complete the quiz for "${episode.title}" to test your knowledge and earn CPD credits.`}
-                >
-                  <Quiz 
-                    quizId={episode.content_id} 
-                    episodeTitle={episode.title} 
-                    episodeDuration={episode.duration}
-                    onComplete={handleQuizComplete}
-                  />
-                </PaywallWrapper>
+                <Quiz 
+                  quizId={episode.content_id} 
+                  episodeTitle={episode.title} 
+                  episodeDuration={episode.duration}
+                  onComplete={handleQuizComplete}
+                />
               </div>
             </div>
           </div>

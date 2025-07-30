@@ -51,6 +51,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     console.log(`Uploading to bucket: ${bucket}, key: ${storageKey}, size: ${fileBuffer.length}`);
     
+    // First ensure buckets exist
+    const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets();
+    if (bucketsError) {
+      console.error('Cannot list buckets - storage may not be properly configured:', bucketsError);
+    } else {
+      console.log('Available buckets:', buckets.map(b => b.name));
+    }
+    
     // Try direct upload without listing buckets first
     const { data, error } = await supabaseAdmin.storage
       .from(bucket)
@@ -61,9 +69,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (error) {
       console.error('Supabase upload error:', error);
-      return res.status(500).json({ 
-        error: 'Failed to upload file', 
-        supabaseError: error.message 
+      
+      // If Supabase fails, fall back to local storage
+      console.log('Falling back to local storage...');
+      const publicDir = path.join(process.cwd(), 'public', 'uploads');
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir, { recursive: true });
+      }
+
+      const localFileName = sanitizedFileName;
+      const localFilePath = path.join(publicDir, localFileName);
+      
+      // Save to local directory
+      fs.writeFileSync(localFilePath, fileBuffer);
+      
+      // Clean up temp file
+      fs.unlinkSync(file.filepath);
+
+      const publicUrl = `/uploads/${localFileName}`;
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          url: publicUrl,
+          path: `local/${localFileName}`,
+          filename: sanitizedFileName,
+          type: file.mimetype,
+          size: file.size
+        },
+        fallback: true,
+        supabaseError: error.message
       });
     }
 

@@ -2,13 +2,15 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import LogoSvg from './LogoSvg';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
 
 import { navigationItems } from '../config/navigation';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
 
   return (
     <>
@@ -80,6 +82,14 @@ const Header = () => {
           </Link>
                 );
               })}
+              
+              {/* User Info */}
+              {user && (
+                <div className="ml-4 flex items-center space-x-2 px-3 py-2 bg-primary-50 rounded-lg">
+                  <User size={16} className="text-primary-600" />
+                  <span className="text-sm font-medium text-primary-700">{user.name}</span>
+                </div>
+              )}
             </div>
 
 
@@ -140,6 +150,15 @@ const Header = () => {
                 );
               })}
 
+              {/* User Info - Mobile */}
+              {user && (
+                <div className="px-4 py-3 mt-4 border-t border-neutral-200">
+                  <div className="flex items-center space-x-2 px-3 py-2 bg-primary-50 rounded-lg">
+                    <User size={16} className="text-primary-600" />
+                    <span className="text-sm font-medium text-primary-700">{user.name}</span>
+                  </div>
+                </div>
+              )}
 
             </div>
         </div>

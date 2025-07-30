@@ -3,7 +3,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useUserContentProgress } from '../hooks/useUserContentProgress';
+import { useUser } from '@/contexts/UserContext';
 import PurchaseCPDButton from './payments/PurchaseCPDButton';
+import PurchaseModal from './PurchaseModal';
 import { 
   Play, 
   Pause, 
@@ -41,16 +43,43 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubPosition, setScrubPosition] = useState(0);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   
   const { isQuizCompleted, isQuizPassedWithThreshold } = useQuizCompletion();
   const quizCompleted = isQuizCompleted(episode.content_id);
   const quizPassed = isQuizPassedWithThreshold(episode.content_id, 70);
   
   const { certificateDownloaded } = useUserContentProgress(episode.content_id);
+  const { user, hasFullCPDAccess } = useUser();
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const displayPercentage = isScrubbing ? scrubPosition : progressPercentage;
   const displayTime = isScrubbing ? (scrubPosition / 100) * duration : currentTime;
+
+  // Check if user has access to this content
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!user) {
+        setHasAccess(false);
+        setIsCheckingAccess(false);
+        return;
+      }
+
+      try {
+        const access = await hasFullCPDAccess(episode.content_id);
+        setHasAccess(access);
+      } catch (error) {
+        console.error('Error checking access:', error);
+        setHasAccess(false);
+      } finally {
+        setIsCheckingAccess(false);
+      }
+    };
+
+    checkAccess();
+  }, [user, episode.content_id, hasFullCPDAccess]);
   
   const getDefaultAudioUrl = (): string => {
     // Try to get from Supabase storage first, fallback to a sample audio
@@ -169,6 +198,19 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
   };
 
   const handleCardClick = () => {
+    if (hasAccess) {
+      // User has purchased, go to player
+      router.push(`/player?id=${episode.content_id}`);
+    } else {
+      // User hasn't purchased, show purchase modal
+      setShowPurchaseModal(true);
+    }
+  };
+
+  const handlePurchaseComplete = () => {
+    // Refresh access status after purchase
+    setHasAccess(true);
+    // Navigate to player
     router.push(`/player?id=${episode.content_id}`);
   };
 
@@ -244,13 +286,8 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
               </div>
             </div>
             
-            {episode.episode_number && (
-              <div className="absolute top-3 left-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-                S{episode.season || 1} E{episode.episode_number}
-              </div>
-            )}
             
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 left-3">
               {certificateDownloaded ? (
                 <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-green-500 text-white">
                   <Check size={12} />
@@ -354,6 +391,13 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
         </div>
       )}
       
+      {/* Purchase Modal */}
+      <PurchaseModal
+        episode={episode}
+        isOpen={showPurchaseModal}
+        onClose={() => setShowPurchaseModal(false)}
+        onPurchaseComplete={handlePurchaseComplete}
+      />
     </div>
   );
 };
