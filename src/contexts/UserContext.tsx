@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, ContentPurchase, Subscription, PaymentSummary } from '../types/database';
+import { User, ContentPurchase, Subscription, PaymentSummary, SubscriptionStatus } from '../types/database';
 import { userService } from '../services/userService';
 import { accessControlService } from '../services/accessControlService';
 import { hasPermission, hasResourcePermission, isAdmin, canManageUsers, canManageContent } from '../utils/permissions';
