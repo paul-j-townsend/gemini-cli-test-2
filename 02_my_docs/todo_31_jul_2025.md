@@ -7,7 +7,7 @@
 
 ## 🛠️ General Tasks
 
-- [ ] **Fix:** Pass offer price (not full price) to Stripe
+- [x] **Fix:** Pass offer price (not full price) to Stripe
 - [ ] **Fix:** Purchase CPD Content panel is cut off
 - [ ] **Feature:** Remove migration tab
 - [ ] **Feature:** Move purchase button to a more prominent position
