@@ -9,14 +9,15 @@ const globalForSupabase = globalThis as unknown as {
 }
 
 // Create singleton client to prevent multiple GoTrueClient instances
-export const supabase = globalForSupabase.supabaseInstance ?? createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storageKey: 'vsk-main-auth-v3', // Fixed key as per CLAUDE.md
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-});
+if (!globalForSupabase.supabaseInstance) {
+  globalForSupabase.supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      storageKey: 'vsk-main-auth-v3', // Fixed key as per CLAUDE.md
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  });
+}
 
-// Store singleton in all environments to prevent multiple instances
-globalForSupabase.supabaseInstance = supabase;
+export const supabase = globalForSupabase.supabaseInstance;

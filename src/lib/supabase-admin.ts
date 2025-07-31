@@ -9,14 +9,15 @@ const globalForSupabaseAdmin = globalThis as unknown as {
 }
 
 // Create admin client singleton
-export const supabaseAdmin = globalForSupabaseAdmin.supabaseAdminInstance ?? createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    storageKey: 'vsk-admin-simple',
-    autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false,
-  }
-});
+if (!globalForSupabaseAdmin.supabaseAdminInstance) {
+  globalForSupabaseAdmin.supabaseAdminInstance = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      storageKey: 'vsk-admin-simple',
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    }
+  });
+}
 
-// Store singleton in all environments to prevent multiple instances
-globalForSupabaseAdmin.supabaseAdminInstance = supabaseAdmin;
+export const supabaseAdmin = globalForSupabaseAdmin.supabaseAdminInstance;
