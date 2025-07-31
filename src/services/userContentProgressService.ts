@@ -99,13 +99,13 @@ class UserContentProgressService {
 
       if (error) {
         console.error('Error marking quiz completed:', error);
-        return null;
+        throw error;
       }
 
       return data as UserContentProgress;
     } catch (error) {
       console.error('Error marking quiz completed:', error);
-      return null;
+      throw error;
     }
   }
 
@@ -116,8 +116,8 @@ class UserContentProgressService {
         .upsert({
           user_id: userId,
           content_id: contentId,
-          report_downloaded: true
-          // Temporarily removed report_downloaded_at to test
+          report_downloaded: true,
+          report_downloaded_at: new Date().toISOString()
         }, {
           onConflict: 'user_id,content_id'
         })
@@ -126,28 +126,24 @@ class UserContentProgressService {
 
       if (error) {
         console.error('Error marking report downloaded:', error);
-        return null;
+        throw error;
       }
 
       return data as UserContentProgress;
     } catch (error) {
       console.error('Error marking report downloaded:', error);
-      return null;
+      throw error;
     }
   }
 
   async markCertificateDownloaded(userId: string, contentId: string): Promise<UserContentProgress | null> {
     try {
-      console.log('markCertificateDownloaded called with:', { userId, contentId });
-      
       const updateData = {
         user_id: userId,
         content_id: contentId,
-        certificate_downloaded: true
-        // Temporarily removed certificate_downloaded_at to test
+        certificate_downloaded: true,
+        certificate_downloaded_at: new Date().toISOString()
       };
-      
-      console.log('Update data:', updateData);
       
       const { data, error } = await supabaseAdmin
         .from('vsk_user_content_progress')
@@ -158,26 +154,14 @@ class UserContentProgressService {
         .single();
 
       if (error) {
-        console.error('Supabase error in markCertificateDownloaded:', error);
-        console.error('Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        return null;
+        console.error('Error marking certificate downloaded:', error);
+        throw error;
       }
 
-      console.log('Successfully marked certificate downloaded:', data);
       return data as UserContentProgress;
     } catch (error) {
-      console.error('Exception in markCertificateDownloaded:', error);
-      console.error('Exception details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-      return null;
+      console.error('Error marking certificate downloaded:', error);
+      throw error;
     }
   }
 

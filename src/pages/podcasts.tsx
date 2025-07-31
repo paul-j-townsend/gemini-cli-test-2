@@ -260,7 +260,7 @@ const Podcasts = () => {
                         />
                         <h3 className="text-2xl font-bold text-neutral-900">{series.name}</h3>
                         <div className="flex-1 h-px bg-neutral-200"></div>
-                        <span className="text-sm text-neutral-500">{series.episodes.length} episodes</span>
+                        <span className="text-sm text-neutral-500">{series.episodes.length} episode{series.episodes.length !== 1 ? 's' : ''}</span>
                       </div>
                       {series.description && (
                         <p className="text-neutral-600 text-sm leading-relaxed ml-8">
@@ -270,7 +270,7 @@ const Podcasts = () => {
                     </div>
                     
                     {/* Series Episodes */}
-                    <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                       {series.episodes.map((episode) => (
                         <MasonryEpisodeCard 
                           key={episode.id} 
@@ -300,7 +300,7 @@ const Podcasts = () => {
                     />
                     <h3 className="text-2xl font-bold text-neutral-900">{selectedSeriesFilter}</h3>
                     <div className="flex-1 h-px bg-neutral-200"></div>
-                    <span className="text-sm text-neutral-500">{filteredEpisodes.length} episodes</span>
+                    <span className="text-sm text-neutral-500">{filteredEpisodes.length} episode{filteredEpisodes.length !== 1 ? 's' : ''}</span>
                   </div>
                   {(() => {
                     const selectedSeries = seriesData.find(series => series.name === selectedSeriesFilter);
@@ -313,7 +313,7 @@ const Podcasts = () => {
                 </div>
                 
                 {/* Series Episodes */}
-                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredEpisodes.map((episode) => (
                     <MasonryEpisodeCard 
                       key={episode.id} 

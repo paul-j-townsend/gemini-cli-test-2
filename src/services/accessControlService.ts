@@ -175,20 +175,29 @@ export class AccessControlService {
     }
   }
 
-  // Client-side version - for development, assume access is granted if user is authenticated
+  // Client-side version - for development, use consistent logic with server
   async hasFullCPDAccessClient(userId: string, contentId: string): Promise<boolean> {
-    // In development, only grant access for specific scenarios to avoid showing "Owned" everywhere
-    // Check if we're on the player page by looking at the current URL
-    if (typeof window !== 'undefined' && window.location.pathname === '/player') {
-      // On player page, grant access for authenticated users
-      if (userId && contentId) {
+    // In development, check actual content purchase status to maintain consistency
+    // This prevents purchase modal errors when user actually has access
+    try {
+      // Use API route to avoid RLS issues with direct client queries
+      const response = await fetch(`/api/payments/verify-access?userId=${userId}&contentId=${contentId}`);
+      if (response.ok) {
+        const { hasAccess } = await response.json();
+        return hasAccess;
+      }
+
+      // Fallback: For development, if user is authenticated, assume they have subscription access
+      if (userId) {
         return true;
       }
+
+      return false;
+    } catch (error) {
+      console.error('Error checking client access:', error);
+      // Fallback for development
+      return !!userId;
     }
-    
-    // For podcast panels and other pages, don't grant automatic access
-    // This prevents showing "Owned" pills incorrectly
-    return false;
   }
 
   // Client-side version of hasActiveSubscription - avoids RLS issues
@@ -233,7 +242,14 @@ export class AccessControlService {
     // In development, if user is authenticated, grant access to all content
     if (userId) {
       try {
-        // Just get all published content without checking subscriptions/purchases
+        // Use API route to get accessible content without RLS issues
+        const response = await fetch(`/api/payments/user-purchases?userId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          return data.accessibleContentIds || [];
+        }
+
+        // Fallback: Just get all published content without checking subscriptions/purchases
         const { data: allContent } = await supabase
           .from('vsk_content')
           .select('id')

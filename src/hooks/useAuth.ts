@@ -17,6 +17,8 @@ export const useAuth = () => {
     refreshUser
   } = useUser();
 
+  // Debug logging removed
+
   return {
     // User state
     user,

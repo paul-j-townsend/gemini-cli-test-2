@@ -8,6 +8,8 @@ export const useUserContentProgress = (contentId?: string) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Debug logging removed
+
   // Load progress when user or contentId changes
   useEffect(() => {
     if (user?.id && contentId) {
@@ -46,7 +48,12 @@ export const useUserContentProgress = (contentId?: string) => {
   };
 
   const updateProgress = async (action: string, data?: any) => {
-    if (!user?.id || !contentId) return false;
+    if (!user?.id || !contentId) {
+      console.error('Missing user ID or content ID:', { userId: user?.id, contentId });
+      return false;
+    }
+
+    console.log('Updating progress:', { userId: user.id, contentId, action, data });
 
     try {
       const response = await fetch('/api/user-content-progress', {
@@ -63,6 +70,8 @@ export const useUserContentProgress = (contentId?: string) => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API response not ok:', response.status, errorText);
         throw new Error('Failed to update progress');
       }
 

@@ -16,8 +16,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'DELETE':
         await handleDelete(req, res);
         break;
+      case 'PATCH':
+        await handleRestore(req, res);
+        break;
       default:
-        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
+        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
         res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
@@ -30,17 +33,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.query;
+  const { id, include_deleted } = req.query;
   
   console.log('Content API GET request - ID:', id, 'Query:', req.query);
 
   if (id) {
     // Get single content item
-    const { data: content, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('vsk_content')
       .select('*')
-      .eq('id', id)
-      .single();
+      .eq('id', id);
+
+    // By default, exclude soft-deleted content unless explicitly requested
+    if (include_deleted !== 'true') {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: content, error } = await query.single();
 
     if (error) {
       return res.status(404).json({ error: 'Content not found', details: error.message });
@@ -85,7 +94,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(transformedContent);
   } else {
     // Get all content from vsk_content table with series data
-    const { published_only } = req.query;
+    const { published_only, include_deleted } = req.query;
     
     let query = supabaseAdmin
       .from('vsk_content')
@@ -101,6 +110,11 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
         )
       `)
       .order('episode_number', { ascending: true });
+
+    // By default, exclude soft-deleted content unless explicitly requested
+    if (include_deleted !== 'true') {
+      query = query.is('deleted_at', null);
+    }
 
     if (published_only === 'true') {
       query = query.eq('is_published', true);
@@ -124,13 +138,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   // Extract questions from the content data
   const { questions: inputQuestions, ...mainContentData } = contentData;
 
+  // Process datetime fields - convert empty strings to null
+  const processedContentData = {
+    ...mainContentData,
+    published_at: mainContentData.published_at || null,
+    special_offer_start_date: mainContentData.special_offer_start_date || null,
+    special_offer_end_date: mainContentData.special_offer_end_date || null,
+    total_questions: inputQuestions?.length || 0
+  };
+
   // Insert the main content record
   const { data: newContent, error: contentError } = await supabaseAdmin
     .from('vsk_content')
-    .insert([{
-      ...mainContentData,
-      total_questions: inputQuestions?.length || 0
-    }])
+    .insert([processedContentData])
     .select()
     .single();
 
@@ -356,20 +376,117 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleDelete(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
+  const { permanent, reason } = req.body || {};
 
   if (!id) {
     return res.status(400).json({ error: 'Content ID is required' });
   }
 
-  // Delete content (questions and answers will be cascade deleted)
+  // First, get the current content to preserve title/description
+  const { data: currentContent, error: fetchError } = await supabaseAdmin
+    .from('vsk_content')
+    .select('title, description, deleted_at')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) {
+    return res.status(404).json({ error: 'Content not found', details: fetchError.message });
+  }
+
+  if (permanent === true) {
+    // Hard delete - only for admin cleanup, removes everything including user progress
+    // First delete user progress records
+    const { error: progressError } = await supabaseAdmin
+      .from('vsk_user_content_progress')
+      .delete()
+      .eq('content_id', id);
+
+    if (progressError) {
+      return res.status(500).json({ error: 'Failed to delete user progress', details: progressError.message });
+    }
+
+    // Then delete the content
+    const { error } = await supabaseAdmin
+      .from('vsk_content')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return res.status(500).json({ error: 'Failed to permanently delete content', details: error.message });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Content permanently deleted (including all user progress)' 
+    });
+  } else {
+    // Check if already soft deleted
+    if (currentContent.deleted_at) {
+      return res.status(400).json({ error: 'Content is already deleted' });
+    }
+    
+    // Soft delete - preserve user progress and historical data
+    const { error } = await supabaseAdmin
+      .from('vsk_content')
+      .update({
+        deleted_at: new Date().toISOString(),
+        deletion_reason: reason || null,
+        archived_title: currentContent.title,
+        archived_description: currentContent.description,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) {
+      return res.status(500).json({ error: 'Failed to delete content', details: error.message });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Content deleted successfully (user progress preserved)' 
+    });
+  }
+}
+
+async function handleRestore(req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Content ID is required' });
+  }
+
+  // Check if content exists and is deleted
+  const { data: content, error: fetchError } = await supabaseAdmin
+    .from('vsk_content')
+    .select('id, title, deleted_at')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) {
+    return res.status(404).json({ error: 'Content not found', details: fetchError.message });
+  }
+
+  if (!content.deleted_at) {
+    return res.status(400).json({ error: 'Content is not deleted' });
+  }
+
+  // Restore content by clearing deletion fields
   const { error } = await supabaseAdmin
     .from('vsk_content')
-    .delete()
+    .update({
+      deleted_at: null,
+      deleted_by: null,
+      deletion_reason: null,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id);
 
   if (error) {
-    return res.status(500).json({ error: 'Failed to delete content', details: error.message });
+    return res.status(500).json({ error: 'Failed to restore content', details: error.message });
   }
 
-  return res.status(200).json({ success: true, message: 'Content deleted successfully' });
+  return res.status(200).json({ 
+    success: true, 
+    message: 'Content restored successfully' 
+  });
 }

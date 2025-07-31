@@ -12,7 +12,10 @@ const PurchaseSuccessPage: React.FC = () => {
 
   useEffect(() => {
     const handlePurchaseSuccess = async () => {
-      if (!contentId || !user) return;
+      if (!contentId || !user) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         // Refresh payment status to get latest access
@@ -32,13 +35,13 @@ const PurchaseSuccessPage: React.FC = () => {
     };
 
     handlePurchaseSuccess();
-  }, [contentId, user, refreshPaymentStatus]);
+  }, [contentId, user?.id]);
 
   const handleGoToContent = () => {
     if (contentId) {
-      router.push(`/player?id=${contentId}`);
+      window.location.href = `/player?id=${contentId}`;
     } else {
-      router.push('/');
+      window.location.href = '/';
     }
   };
 

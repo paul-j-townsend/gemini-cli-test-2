@@ -125,6 +125,8 @@ export interface QuizCompletionTable {
   answers: ContentAnswer[];
   passed: boolean;
   attempts: number;
+  quiz_title?: string; // Preserved title for historical reference
+  content_title?: string; // Preserved content title for historical reference
 }
 
 // Legacy aliases for backward compatibility

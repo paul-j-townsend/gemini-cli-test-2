@@ -25,19 +25,35 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
       if (uniqueQuizIds.length > 0) {
         const titles: Record<string, string> = {};
         
+        // First, try to get titles from preserved quiz completion data
+        const preservedTitles: Record<string, string> = {};
+        completions.forEach(completion => {
+          const contentId = completion.quiz_id || completion.content_id;
+          if (contentId && (completion.quiz_title || completion.content_title)) {
+            preservedTitles[contentId] = completion.quiz_title || completion.content_title || '';
+          }
+        });
+        
         await Promise.all(
           uniqueQuizIds.map(async (contentId) => {
             try {
-              const response = await fetch(`/api/admin/content?id=${contentId}`);
+              const response = await fetch(`/api/admin/content?id=${contentId}&include_deleted=true`);
               if (response.ok) {
                 const content = await response.json();
-                titles[contentId] = content.title || content.quiz_title || `Content #${contentId.slice(0, 8)}...`;
+                const title = content.title || content.quiz_title || `Content #${contentId.slice(0, 8)}...`;
+                const isDeleted = content.deleted_at ? ' (Deleted)' : '';
+                titles[contentId] = title + isDeleted;
+              } else if (response.status === 404) {
+                // Use preserved title if available, otherwise fallback
+                titles[contentId] = preservedTitles[contentId] 
+                  ? `${preservedTitles[contentId]} (Permanently Deleted)`
+                  : `Deleted Content #${contentId.slice(0, 8)}...`;
               } else {
-                titles[contentId] = `Content #${contentId.slice(0, 8)}...`;
+                titles[contentId] = preservedTitles[contentId] || `Content #${contentId.slice(0, 8)}...`;
               }
             } catch (error) {
               console.error('Failed to fetch content title:', error);
-              titles[contentId] = `Content #${contentId.slice(0, 8)}...`;
+              titles[contentId] = preservedTitles[contentId] || `Content #${contentId.slice(0, 8)}...`;
             }
           })
         );
@@ -47,7 +63,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
     };
 
     loadQuizTitles();
-  }, [uniqueQuizIds]);
+  }, [uniqueQuizIds, completions]);
 
   const handleDeleteCompletion = useCallback(async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this quiz completion? This action cannot be undone.')) {

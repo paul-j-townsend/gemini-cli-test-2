@@ -496,13 +496,25 @@ export default function ContentManagement() {
   });
 
   const handleDeleteContent = async (contentItem: Content) => {
-    if (!confirm('Are you sure you want to delete this content? This will also delete all associated quiz questions.')) {
-      return;
+    const reason = prompt(
+      `Are you sure you want to delete "${contentItem.title}"?\n\n` +
+      'This will hide the content from users but preserve all user progress data.\n' +
+      'Optional: Enter a reason for deletion:'
+    );
+    
+    if (reason === null) {
+      return; // User cancelled
     }
 
     try {
       const response = await fetch(`/api/admin/content?id=${contentItem.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reason: reason.trim() || null
+        })
       });
 
       if (!response.ok) {
@@ -510,6 +522,8 @@ export default function ContentManagement() {
         throw new Error(errorData.error || 'Failed to delete content');
       }
 
+      const result = await response.json();
+      console.log('Delete result:', result.message);
       await fetchContent();
     } catch (err) {
       setError(`Failed to delete content: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -1181,11 +1195,18 @@ CREATE TABLE vsk_content_question_answers (
                     <Input
                       label="Price (£)"
                       type="number"
-                      step="0.01"
-                      min="0"
-                      value={(formData.price_cents / 100).toFixed(2)}
+                      step={0.01}
+                      min={0}
+                      value={formData.price_cents === 0 ? '' : (formData.price_cents / 100).toString()}
                       onChange={(value) => {
-                        const numValue = parseFloat(value || '0');
+                        if (value === '' || value === null || value === undefined) {
+                          handleChange('price_cents', 0);
+                          return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) {
+                          return;
+                        }
                         const centsValue = Math.round(numValue * 100);
                         handleChange('price_cents', centsValue);
                       }}
@@ -1206,11 +1227,18 @@ CREATE TABLE vsk_content_question_answers (
                       <Input
                         label="Special Offer Price (£)"
                         type="number"
-                        step="0.01"
-                        min="0"
-                        value={(formData.special_offer_price_cents / 100).toFixed(2)}
+                        step={0.01}
+                        min={0}
+                        value={formData.special_offer_price_cents === 0 ? '' : (formData.special_offer_price_cents / 100).toString()}
                         onChange={(value) => {
-                          const numValue = parseFloat(value || '0');
+                          if (value === '' || value === null || value === undefined) {
+                            handleChange('special_offer_price_cents', 0);
+                            return;
+                          }
+                          const numValue = parseFloat(value);
+                          if (isNaN(numValue)) {
+                            return;
+                          }
                           const centsValue = Math.round(numValue * 100);
                           handleChange('special_offer_price_cents', centsValue);
                         }}

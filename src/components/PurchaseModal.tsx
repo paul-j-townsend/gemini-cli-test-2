@@ -128,19 +128,23 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     setIsLoading(true);
 
     try {
+      const requestBody = {
+        contentId: episode.content_id,
+        userId: user.id,
+        type: 'content_purchase',
+        priceCents: getCurrentPrice(),
+        successUrl: `${window.location.origin}/purchase-success?contentId=${episode.content_id}`,
+        cancelUrl: `${window.location.origin}/purchase-cancelled?contentId=${episode.content_id}`,
+      };
+      
+      console.log('Purchase request:', requestBody);
+      
       const response = await fetch('/api/payments/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          contentId: episode.content_id,
-          userId: user.id,
-          type: 'content_purchase',
-          priceCents: getCurrentPrice(),
-          successUrl: `${window.location.origin}/purchase-success?contentId=${episode.content_id}`,
-          cancelUrl: `${window.location.origin}/purchase-cancelled?contentId=${episode.content_id}`,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -157,7 +161,23 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
     } catch (error) {
       console.error('Error creating checkout:', error);
-      alert(error instanceof Error ? error.message : 'Failed to start checkout process');
+      
+      let errorMessage = 'Failed to start checkout process';
+      if (error instanceof Error) {
+        if (error.message.includes('already has access')) {
+          errorMessage = 'You already have access to this content. Please refresh the page.';
+          // Refresh payment status to update UI
+          refreshPaymentStatus?.();
+        } else if (error.message.includes('not purchasable')) {
+          errorMessage = 'This content is not available for purchase at this time.';
+        } else if (error.message.includes('price not set')) {
+          errorMessage = 'Content pricing information is not available. Please try again later.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }

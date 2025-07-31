@@ -16,17 +16,20 @@ export class PaymentService {
       // Get content details
       const { data: content, error: contentError } = await supabaseAdmin
         .from('vsk_content')
-        .select('id, title, price_cents, stripe_price_id')
+        .select('id, title, price_cents, stripe_price_id, is_purchasable')
         .eq('id', contentId)
-        .eq('is_purchasable', true)
         .single();
 
       if (contentError || !content) {
-        throw new Error('Content not found or not purchasable');
+        throw new Error(`Content not found: ${contentError?.message || 'Content does not exist'}`);
       }
 
-      if (!content.price_cents) {
-        throw new Error('Content price not set');
+      if (!content.is_purchasable) {
+        throw new Error('Content is not available for purchase');
+      }
+
+      if (!content.price_cents || content.price_cents <= 0) {
+        throw new Error('Content price not set or invalid');
       }
 
       // Get or create Stripe customer
