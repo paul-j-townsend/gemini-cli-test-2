@@ -256,6 +256,12 @@ export interface Content {
   price_cents: number | null;
   stripe_price_id: string | null;
   is_purchasable: boolean;
+  // Special offer pricing fields
+  special_offer_price_cents: number | null;
+  special_offer_active: boolean;
+  special_offer_start_date: string | null;
+  special_offer_end_date: string | null;
+  special_offer_description: string | null;
   // Metadata
   created_at: string;
   updated_at: string;
@@ -297,6 +303,12 @@ export interface ContentTable {
   price_cents: number | null;
   stripe_price_id: string | null;
   is_purchasable: boolean;
+  // Special offer pricing fields
+  special_offer_price_cents: number | null;
+  special_offer_active: boolean;
+  special_offer_start_date: string | null;
+  special_offer_end_date: string | null;
+  special_offer_description: string | null;
   created_at: string;
   updated_at: string;
 }

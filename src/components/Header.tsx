@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import LogoSvg from './LogoSvg';
 import { Menu, X, User } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { HeaderUserSwitcher } from './HeaderUserSwitcher';
 
 import { navigationItems } from '../config/navigation';
 
@@ -85,9 +86,12 @@ const Header = () => {
               
               {/* User Info */}
               {user && (
-                <div className="ml-4 flex items-center space-x-2 px-3 py-2 bg-primary-50 rounded-lg">
-                  <User size={16} className="text-primary-600" />
-                  <span className="text-sm font-medium text-primary-700">{user.name}</span>
+                <div className="ml-4 flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 px-3 py-2 bg-primary-50 rounded-lg">
+                    <User size={16} className="text-primary-600" />
+                    <span className="text-sm font-medium text-primary-700">{user.name}</span>
+                  </div>
+                  <HeaderUserSwitcher />
                 </div>
               )}
             </div>
@@ -152,11 +156,12 @@ const Header = () => {
 
               {/* User Info - Mobile */}
               {user && (
-                <div className="px-4 py-3 mt-4 border-t border-neutral-200">
+                <div className="px-4 py-3 mt-4 border-t border-neutral-200 space-y-3">
                   <div className="flex items-center space-x-2 px-3 py-2 bg-primary-50 rounded-lg">
                     <User size={16} className="text-primary-600" />
                     <span className="text-sm font-medium text-primary-700">{user.name}</span>
                   </div>
+                  <HeaderUserSwitcher />
                 </div>
               )}
 

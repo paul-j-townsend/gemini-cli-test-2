@@ -58,6 +58,16 @@ interface Content {
   pass_percentage: number; // TODO: Remove pass_percentage functionality completely
   total_questions: number;
   quiz_is_active: boolean;
+  // Payment fields
+  price_cents: number | null;
+  stripe_price_id: string | null;
+  is_purchasable: boolean;
+  // Special offer pricing fields
+  special_offer_price_cents: number | null;
+  special_offer_active: boolean;
+  special_offer_start_date: string | null;
+  special_offer_end_date: string | null;
+  special_offer_description: string | null;
   created_at: string;
   updated_at: string;
   vsk_content_questions?: ContentQuestion[];
@@ -87,6 +97,15 @@ interface ContentFormData {
   pass_percentage: number; // TODO: Remove pass_percentage functionality completely
   quiz_is_active: boolean;
   series_id: string;
+  // Payment fields
+  price_cents: number;
+  is_purchasable: boolean;
+  // Special offer pricing fields
+  special_offer_price_cents: number;
+  special_offer_active: boolean;
+  special_offer_start_date: string;
+  special_offer_end_date: string;
+  special_offer_description: string;
   questions: ContentQuestion[];
 }
 
@@ -206,6 +225,15 @@ const createInitialFormData = (episodeNumber: number = 1): ContentFormData => ({
   pass_percentage: 70, // TODO: Remove pass_percentage functionality completely
   quiz_is_active: true,
   series_id: '',
+  // Payment fields
+  price_cents: 999, // Default £9.99
+  is_purchasable: true,
+  // Special offer pricing fields
+  special_offer_price_cents: 0,
+  special_offer_active: false,
+  special_offer_start_date: '',
+  special_offer_end_date: '',
+  special_offer_description: '',
   questions: []
 });
 
@@ -388,6 +416,15 @@ export default function ContentManagement() {
         pass_percentage: fullContentItem.pass_percentage, // TODO: Remove pass_percentage functionality completely
         quiz_is_active: fullContentItem.quiz_is_active,
         series_id: fullContentItem.series_id || '',
+        // Payment fields
+        price_cents: fullContentItem.price_cents || 999,
+        is_purchasable: fullContentItem.is_purchasable !== false,
+        // Special offer pricing fields
+        special_offer_price_cents: fullContentItem.special_offer_price_cents || 0,
+        special_offer_active: fullContentItem.special_offer_active || false,
+        special_offer_start_date: fullContentItem.special_offer_start_date ? fullContentItem.special_offer_start_date.slice(0, 16) : '',
+        special_offer_end_date: fullContentItem.special_offer_end_date ? fullContentItem.special_offer_end_date.slice(0, 16) : '',
+        special_offer_description: fullContentItem.special_offer_description || '',
         questions: (fullContentItem.vsk_content_questions || []).map((q, index) => ensureQuestionDefaults(q, index + 1))
       });
       
@@ -638,6 +675,26 @@ export default function ContentManagement() {
               Audio
             </span>
           )}
+        </div>
+      ),
+    },
+    {
+      key: 'price_cents',
+      label: 'Pricing',
+      sortable: true,
+      render: (content) => (
+        <div className="text-sm">
+          <div className="font-medium text-gray-900">
+            £{((content.price_cents || 0) / 100).toFixed(2)}
+          </div>
+          {content.special_offer_active && content.special_offer_price_cents && (
+            <div className="text-xs text-green-600 font-medium">
+              Special: £{(content.special_offer_price_cents / 100).toFixed(2)}
+            </div>
+          )}
+          <div className="text-xs text-gray-500">
+            {content.is_purchasable ? 'Purchasable' : 'Free'}
+          </div>
         </div>
       ),
     },
@@ -1116,6 +1173,81 @@ CREATE TABLE vsk_content_question_answers (
                   required
                   error={errors.published_at}
                 />
+
+                <div className="border-t pt-4">
+                  <h4 className="text-md font-medium text-gray-900 mb-4">Pricing & Purchase</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Price (£)"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={(formData.price_cents / 100).toFixed(2)}
+                      onChange={(value) => {
+                        const numValue = parseFloat(value || '0');
+                        const centsValue = Math.round(numValue * 100);
+                        handleChange('price_cents', centsValue);
+                      }}
+                      placeholder="9.99"
+                    />
+                    
+                    <Checkbox
+                      label="Available for Purchase"
+                      checked={formData.is_purchasable}
+                      onChange={(checked) => handleChange('is_purchasable', checked)}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h5 className="text-sm font-medium text-gray-900 mb-3">Special Offer Settings</h5>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <Input
+                        label="Special Offer Price (£)"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={(formData.special_offer_price_cents / 100).toFixed(2)}
+                        onChange={(value) => {
+                          const numValue = parseFloat(value || '0');
+                          const centsValue = Math.round(numValue * 100);
+                          handleChange('special_offer_price_cents', centsValue);
+                        }}
+                        placeholder="7.99"
+                      />
+                      
+                      <Checkbox
+                        label="Special Offer Active"
+                        checked={formData.special_offer_active}
+                        onChange={(checked) => handleChange('special_offer_active', checked)}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <Input
+                        label="Offer Start Date"
+                        type="datetime-local"
+                        value={formData.special_offer_start_date}
+                        onChange={(value) => handleChange('special_offer_start_date', value)}
+                      />
+                      
+                      <Input
+                        label="Offer End Date"
+                        type="datetime-local"
+                        value={formData.special_offer_end_date}
+                        onChange={(value) => handleChange('special_offer_end_date', value)}
+                      />
+                    </div>
+                    
+                    <Input
+                      label="Offer Description"
+                      value={formData.special_offer_description}
+                      onChange={(value) => handleChange('special_offer_description', value)}
+                      placeholder="Limited Time Offer"
+                    />
+                  </div>
+                </div>
 
                 <div className="border-t pt-4">
                   <h4 className="text-md font-medium text-gray-900 mb-4">Quiz Settings</h4>

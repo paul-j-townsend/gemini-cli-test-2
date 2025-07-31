@@ -19,6 +19,16 @@ export interface PodcastEpisode {
   is_published?: boolean;
   category?: string; // Added category field
   content_id: string; // Changed from quiz_id to content_id
+  // Payment fields
+  price_cents?: number | null;
+  stripe_price_id?: string | null;
+  is_purchasable?: boolean;
+  // Special offer pricing fields
+  special_offer_price_cents?: number | null;
+  special_offer_active?: boolean;
+  special_offer_start_date?: string | null;
+  special_offer_end_date?: string | null;
+  special_offer_description?: string | null;
   quiz?: {
     id: string;
     title: string;
@@ -107,6 +117,16 @@ class PodcastService {
       is_published: content.is_published,
       category: content.category || 'General', // Map category field
       content_id: content.id, // Map content id to content_id
+      // Payment fields
+      price_cents: content.price_cents,
+      stripe_price_id: content.stripe_price_id,
+      is_purchasable: content.is_purchasable,
+      // Special offer pricing fields
+      special_offer_price_cents: content.special_offer_price_cents,
+      special_offer_active: content.special_offer_active,
+      special_offer_start_date: content.special_offer_start_date,
+      special_offer_end_date: content.special_offer_end_date,
+      special_offer_description: content.special_offer_description,
       quiz: content.questions && content.questions.length > 0 ? {
         id: content.id,
         title: content.title,

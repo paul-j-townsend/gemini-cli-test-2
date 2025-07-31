@@ -77,6 +77,42 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     }
   };
 
+  const formatPrice = (cents: number): string => {
+    return `£${(cents / 100).toFixed(2)}`;
+  };
+
+  const getCurrentPrice = (): number => {
+    // Check if special offer is active and within date range
+    if (episode.special_offer_active && episode.special_offer_price_cents) {
+      const now = new Date();
+      const startDate = episode.special_offer_start_date ? new Date(episode.special_offer_start_date) : null;
+      const endDate = episode.special_offer_end_date ? new Date(episode.special_offer_end_date) : null;
+      
+      // If dates are set, check if we're within the offer period
+      const withinDateRange = (!startDate || now >= startDate) && (!endDate || now <= endDate);
+      
+      if (withinDateRange) {
+        return episode.special_offer_price_cents;
+      }
+    }
+    
+    return episode.price_cents || 999; // Default to £9.99 if no price set
+  };
+
+  const getRegularPrice = (): number => {
+    return episode.price_cents || 999;
+  };
+
+  const isSpecialOfferActive = (): boolean => {
+    if (!episode.special_offer_active || !episode.special_offer_price_cents) return false;
+    
+    const now = new Date();
+    const startDate = episode.special_offer_start_date ? new Date(episode.special_offer_start_date) : null;
+    const endDate = episode.special_offer_end_date ? new Date(episode.special_offer_end_date) : null;
+    
+    return (!startDate || now >= startDate) && (!endDate || now <= endDate);
+  };
+
   const handlePurchase = async () => {
     if (!user) {
       alert('Please log in to purchase CPD content');
@@ -101,6 +137,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           contentId: episode.content_id,
           userId: user.id,
           type: 'content_purchase',
+          priceCents: getCurrentPrice(),
           successUrl: `${window.location.origin}/purchase-success?contentId=${episode.content_id}`,
           cancelUrl: `${window.location.origin}/purchase-cancelled?contentId=${episode.content_id}`,
         }),
@@ -187,7 +224,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 <ul className="space-y-2 text-sm text-neutral-600">
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
-                    Full podcast episode access
+                    Full podcast access
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
@@ -195,15 +232,15 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
-                    Downloadable PDF: Comprehensive report on the subject matter. All sources included
+                    Downloadable PDF: Comprehensive report on the subject matter. All information sources included
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
-                    Interactive quiz
+                    CPD certificate
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
-                    CPD certificate upon completion
+                    RCVS CPD Activity Log
                   </li>
                 </ul>
               </div>
@@ -212,8 +249,31 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               {/* Price and Purchase */}
               <div className="text-center">
                 <div className="mb-4">
-                  <div className="text-2xl font-bold text-neutral-900">£9.99</div>
-                  <div className="text-sm text-neutral-500">One-time purchase</div>
+                  {isSpecialOfferActive() ? (
+                    <div>
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <span className="text-lg text-neutral-500 line-through">
+                          {formatPrice(getRegularPrice())}
+                        </span>
+                        <span className="text-2xl font-bold text-green-600">
+                          {formatPrice(getCurrentPrice())}
+                        </span>
+                      </div>
+                      <div className="text-sm text-green-600 font-medium mb-1">
+                        {episode.special_offer_description || 'Special Offer'}
+                      </div>
+                      {episode.special_offer_end_date && (
+                        <div className="text-xs text-neutral-500">
+                          Offer ends {new Date(episode.special_offer_end_date).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-2xl font-bold text-neutral-900">
+                      {formatPrice(getCurrentPrice())}
+                    </div>
+                  )}
+                  <div className="text-sm text-neutral-500 mt-2">One-time purchase</div>
                 </div>
 
                 <button
