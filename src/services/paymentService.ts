@@ -10,7 +10,8 @@ export class PaymentService {
     contentId: string, 
     userId: string, 
     successUrl: string, 
-    cancelUrl: string
+    cancelUrl: string,
+    priceCents?: number
   ): Promise<Stripe.Checkout.Session> {
     try {
       // Get content details
@@ -28,7 +29,10 @@ export class PaymentService {
         throw new Error('Content is not available for purchase');
       }
 
-      if (!content.price_cents || content.price_cents <= 0) {
+      // Use passed price if provided, otherwise use content price
+      const finalPrice = priceCents || content.price_cents;
+      
+      if (!finalPrice || finalPrice <= 0) {
         throw new Error('Content price not set or invalid');
       }
 
@@ -48,7 +52,7 @@ export class PaymentService {
                 name: `CPD Access: ${content.title}`,
                 description: 'Full access to podcast, quiz, report, and certificate',
               },
-              unit_amount: content.price_cents,
+              unit_amount: finalPrice,
             },
             quantity: 1,
           },

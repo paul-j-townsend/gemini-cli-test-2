@@ -28,7 +28,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
         // First, try to get titles from preserved quiz completion data
         const preservedTitles: Record<string, string> = {};
         completions.forEach(completion => {
-          const contentId = completion.quiz_id || completion.content_id;
+          const contentId = completion.quiz_id;
           if (contentId && (completion.quiz_title || completion.content_title)) {
             preservedTitles[contentId] = completion.quiz_title || completion.content_title || '';
           }

@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       userId, 
       type = 'content_purchase',  // 'content_purchase' or 'subscription'
       priceId,  // For subscriptions
+      priceCents, // For content purchases - pass the calculated price (with offers)
       successUrl,
       cancelUrl 
     } = req.body;
@@ -49,7 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         contentId,
         userId,
         successUrl,
-        cancelUrl
+        cancelUrl,
+        priceCents
       );
 
     } else if (type === 'subscription') {
