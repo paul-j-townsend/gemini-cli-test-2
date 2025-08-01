@@ -199,11 +199,11 @@ const Header = () => {
 
           {/* Mobile Menu */}
           <div 
-            className={`md:hidden transition-all duration-300 ease-out overflow-hidden ${
+            className={`md:hidden transition-all duration-300 ease-out overflow-hidden bg-white border-t border-neutral-100 ${
               isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
-            <div className="py-4 space-y-2">
+            <div className="py-6 px-4 space-y-1 max-h-96 overflow-y-auto">
               {navigationItems.map((item, index) => {
                 const isActive = router.pathname === item.href;
                 return (
@@ -211,13 +211,12 @@ const Header = () => {
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block px-4 py-3 ${
+                    className={`block px-4 py-3 text-base ${
                       isActive 
                         ? 'text-primary-600 bg-primary-50' 
                         : 'text-neutral-700 hover:text-primary-600 hover:bg-primary-50'
-                    } rounded-lg font-medium transition-all duration-200 animate-slide-in-left no-focus-border`}
+                    } rounded-lg font-medium transition-all duration-200 no-focus-border`}
                     style={{ 
-                      animationDelay: `${index * 100}ms`,
                       outline: 'none', 
                       border: 'none',
                       boxShadow: 'none',
@@ -227,18 +226,22 @@ const Header = () => {
                     onFocus={(e) => e.currentTarget.style.outline = 'none'}
                   >
                     {item.label}
-          </Link>
+                  </Link>
                 );
               })}
 
               {/* My Stuff - Mobile */}
               {user && (
-                <div className="px-4 py-3 mt-4 border-t border-neutral-200 space-y-2">
-                  <div className="text-sm font-medium text-neutral-500 px-2 mb-3">My Stuff</div>
+                <div className="mt-6 pt-6 border-t border-neutral-200 space-y-1">
+                  <div className="text-sm font-semibold text-neutral-600 px-4 py-2 uppercase tracking-wide">My Stuff</div>
                   <Link
                     href="/my-profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors no-focus-border"
+                    className={`flex items-center space-x-3 px-4 py-3 text-base rounded-lg transition-colors no-focus-border ${
+                      router.pathname === '/my-profile'
+                        ? 'text-primary-600 bg-primary-50' 
+                        : 'text-neutral-700 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
                     style={{ 
                       outline: 'none', 
                       border: 'none',
@@ -246,13 +249,17 @@ const Header = () => {
                       textDecoration: 'none'
                     }}
                   >
-                    <UserCircle size={18} />
-                    <span>My Profile</span>
+                    <UserCircle size={20} />
+                    <span className="font-medium">My Profile</span>
                   </Link>
                   <Link
                     href="/my-progress"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors no-focus-border"
+                    className={`flex items-center space-x-3 px-4 py-3 text-base rounded-lg transition-colors no-focus-border ${
+                      router.pathname === '/my-progress'
+                        ? 'text-primary-600 bg-primary-50' 
+                        : 'text-neutral-700 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
                     style={{ 
                       outline: 'none', 
                       border: 'none',
@@ -260,20 +267,25 @@ const Header = () => {
                       textDecoration: 'none'
                     }}
                   >
-                    <TrendingUp size={18} />
-                    <span>My Progress</span>
+                    <TrendingUp size={20} />
+                    <span className="font-medium">My Progress</span>
                   </Link>
                 </div>
               )}
 
               {/* User Info - Mobile */}
               {user && (
-                <div className="px-4 py-3 mt-4 border-t border-neutral-200 space-y-3">
-                  <div className="flex items-center space-x-2 px-3 py-2 bg-primary-50 rounded-lg">
-                    <User size={16} className="text-primary-600" />
-                    <span className="text-sm font-medium text-primary-700">{user.name}</span>
+                <div className="mt-6 pt-6 border-t border-neutral-200 space-y-4">
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-primary-50 rounded-lg">
+                    <User size={20} className="text-primary-600" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-base font-medium text-primary-700 block truncate">{user.name}</span>
+                      <span className="text-sm text-primary-600">{user.email}</span>
+                    </div>
                   </div>
-                  <HeaderUserSwitcher />
+                  <div className="px-4">
+                    <HeaderUserSwitcher />
+                  </div>
                 </div>
               )}
 

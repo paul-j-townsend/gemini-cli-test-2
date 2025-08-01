@@ -14,33 +14,31 @@ const MyProfile: React.FC = () => {
         <meta name="description" content="Manage your VetSidekick profile and account settings" />
       </Head>
 
-      <div className="min-h-screen bg-neutral-50">
-        <div className="container-wide py-8">
-          <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-neutral-900 mb-2">My Profile</h1>
-              <p className="text-neutral-600">Manage your account information and preferences</p>
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">My Profile</h1>
+              <p className="text-neutral-600 text-sm sm:text-base">Manage your account information and preferences</p>
             </div>
 
             {/* Profile Card */}
             <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
               {/* Profile Header */}
-              <div className="bg-gradient-to-r from-primary-500 to-primary-600 p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-                    <User size={32} className="text-white" />
+              <div className="bg-gradient-to-r from-primary-500 to-primary-600 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                   </div>
-                  <div className="text-white">
-                    <h2 className="text-2xl font-semibold">{user?.name || 'Guest User'}</h2>
-                    <p className="text-primary-100">{user?.email || 'No email available'}</p>
+                  <div className="text-white text-center sm:text-left flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-semibold truncate">{user?.name || 'Guest User'}</h2>
+                    <p className="text-primary-100 text-sm sm:text-base truncate">{user?.email || 'No email available'}</p>
                   </div>
                 </div>
               </div>
 
               {/* Profile Content */}
-              <div className="p-6">
-                <div className="grid md:grid-cols-2 gap-6">
+              <div className="p-4 sm:p-6">
+                <div className="grid gap-6 md:grid-cols-2">
                   {/* Account Information */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-neutral-900 mb-4">Account Information</h3>
@@ -119,8 +117,6 @@ const MyProfile: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
     </Layout>
   );
 };

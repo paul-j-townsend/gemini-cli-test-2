@@ -31,13 +31,9 @@ const MyProgress: React.FC = () => {
         <title>My Progress - VetSidekick</title>
         <meta name="description" content="Track your CPD progress and learning achievements" />
       </Head>
-      <div className="bg-neutral-50 min-h-screen">
-        <div className="container-wide py-8">
-          <div className="max-w-6xl mx-auto space-y-6">
-            <UserSwitcher />
-            <UserProgressDashboard />
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+        <UserSwitcher />
+        <UserProgressDashboard />
       </div>
     </Layout>
   );
