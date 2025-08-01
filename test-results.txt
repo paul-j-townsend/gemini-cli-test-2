@@ -1,0 +1,256 @@
+
+> gemini-cli-test-2@0.1.0 test:ci
+> jest --ci --coverage --watchAll=false
+
+PASS __tests__/auth/authentication.test.ts
+PASS __tests__/api/payments/checkout.test.ts
+PASS __tests__/services/paymentService.test.ts
+PASS __tests__/components/PurchaseModal.test.tsx
+PASS __tests__/components/Header.test.tsx
+----------------------------------|---------|----------|---------|---------|-------------------
+File                              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------------------------------|---------|----------|---------|---------|-------------------
+All files                         |       0 |        0 |       0 |       0 |                   
+ components                       |       0 |        0 |       0 |       0 |                   
+  ArticleSearch.tsx               |       0 |        0 |       0 |       0 | 1-155             
+  Badge.tsx                       |       0 |      100 |       0 |       0 | 1-27              
+  Certificate.tsx                 |       0 |        0 |       0 |       0 | 1-437             
+  CompactEpisodeCard.tsx          |       0 |        0 |       0 |       0 | 1-420             
+  Dashboard.tsx                   |       0 |        0 |       0 |       0 | 1-41              
+  EmailSubscription.tsx           |       0 |        0 |       0 |       0 | 1-120             
+  EpisodeForm.tsx                 |       0 |        0 |       0 |       0 | 1-643             
+  EpisodeList.tsx                 |       0 |        0 |       0 |       0 | 1-158             
+  ErrorBoundary.tsx               |       0 |        0 |       0 |       0 | 1-153             
+  FileSelector.tsx                |       0 |        0 |       0 |       0 | 1-210             
+  FileUpload.tsx                  |       0 |        0 |       0 |       0 | 1-369             
+  Footer.tsx                      |       0 |      100 |       0 |       0 | 1-114             
+  FooterLinkList.tsx              |       0 |      100 |       0 |       0 | 1-29              
+  Header.tsx                      |       0 |        0 |       0 |       0 | 1-300             
+  HeaderUserSwitcher.tsx          |       0 |        0 |       0 |       0 | 1-79              
+  HeartIcon.tsx                   |       0 |        0 |     100 |       0 | 1-16              
+  IconTest.tsx                    |       0 |        0 |       0 |       0 | 1-55              
+  Layout.tsx                      |       0 |      100 |       0 |       0 | 1-23              
+  LinkedInIcon.tsx                |       0 |        0 |     100 |       0 | 1-23              
+  LogoSvg.tsx                     |       0 |      100 |     100 |       0 | 1-9               
+  MasonryEpisodeCard.tsx          |       0 |        0 |       0 |       0 | 1-405             
+  Notification.tsx                |       0 |        0 |       0 |       0 | 1-127             
+  PadlockIcon.tsx                 |       0 |        0 |       0 |       0 | 1-25              
+  PodcastPlayer.tsx               |       0 |        0 |       0 |       0 | 1-186             
+  PodcastPlayerItem.tsx           |       0 |        0 |       0 |       0 | 1-705             
+  ProtectedRoute.tsx              |       0 |        0 |       0 |       0 | 1-114             
+  PurchaseModal.tsx               |       0 |        0 |       0 |       0 | 1-335             
+  Quiz.tsx                        |       0 |        0 |       0 |       0 | 1-164             
+  SeriesCard.tsx                  |       0 |        0 |       0 |       0 | 1-166             
+  SeriesGroup.tsx                 |       0 |        0 |       0 |       0 | 1-138             
+  TwitterIcon.tsx                 |       0 |        0 |     100 |       0 | 1-23              
+  UserProgressDashboard.tsx       |       0 |        0 |       0 |       0 | 1-353             
+  UserSwitcher.tsx                |       0 |        0 |       0 |       0 | 1-79              
+  YouTubeIcon.tsx                 |       0 |        0 |     100 |       0 | 1-23              
+ components/admin                 |       0 |        0 |       0 |       0 |                   
+  ArticlesManagement.tsx          |       0 |        0 |       0 |       0 | 1-603             
+  ContentManagement.tsx           |       0 |        0 |       0 |       0 | 1-1406            
+  DataTable.tsx                   |       0 |        0 |       0 |       0 | 1-325             
+  MigrationRunner.tsx             |       0 |        0 |       0 |       0 | 1-63              
+  PodcastManagement.tsx           |       0 |        0 |       0 |       0 | 1-463             
+  QuizManagement.tsx              |       0 |        0 |       0 |       0 | 1-553             
+  SeriesManagement.tsx            |       0 |        0 |       0 |       0 | 1-452             
+ components/admin/shared          |       0 |        0 |       0 |       0 |                   
+  AdminDataTable.tsx              |       0 |        0 |       0 |       0 | 1-260             
+  AdminForm.tsx                   |       0 |        0 |       0 |       0 | 1-279             
+  Checkbox.tsx                    |       0 |        0 |       0 |       0 | 1-37              
+  FileUploadField.tsx             |       0 |        0 |       0 |       0 | 1-106             
+  Select.tsx                      |       0 |        0 |       0 |       0 | 1-69              
+  SuccessMessage.tsx              |       0 |        0 |       0 |       0 | 1-54              
+  TextArea.tsx                    |       0 |        0 |       0 |       0 | 1-59              
+  index.ts                        |       0 |      100 |     100 |       0 | 1-12              
+ components/auth                  |       0 |        0 |       0 |       0 |                   
+  FacebookLoginButton.tsx         |       0 |        0 |       0 |       0 | 1-65              
+  GoogleLoginButton.tsx           |       0 |        0 |       0 |       0 | 1-77              
+  index.ts                        |       0 |      100 |     100 |       0 | 1-2               
+ components/certificate           |       0 |      100 |       0 |       0 |                   
+  ProtectedCertificate.tsx        |       0 |      100 |       0 |       0 | 1-39              
+ components/icons                 |       0 |      100 |     100 |       0 |                   
+  BadgeIcons.tsx                  |       0 |      100 |     100 |       0 | 1-173             
+ components/payments              |       0 |        0 |       0 |       0 |                   
+  PaywallWrapper.tsx              |       0 |        0 |       0 |       0 | 1-155             
+  PurchaseCPDButton.tsx           |       0 |        0 |       0 |       0 | 1-150             
+ components/quiz                  |       0 |        0 |       0 |       0 |                   
+  AnswerOptions.tsx               |       0 |        0 |       0 |       0 | 1-116             
+  ProtectedQuiz.tsx               |       0 |      100 |       0 |       0 | 1-41              
+  QuestionDisplay.tsx             |       0 |        0 |       0 |       0 | 1-99              
+  QuizAttemptGuard.tsx            |       0 |        0 |       0 |       0 | 1-205             
+  QuizCompletion.tsx              |       0 |        0 |       0 |       0 | 1-202             
+  QuizHeader.tsx                  |       0 |        0 |       0 |       0 | 1-89              
+  QuizNavigation.tsx              |       0 |        0 |       0 |       0 | 1-88              
+  index.ts                        |       0 |      100 |     100 |       0 | 1-5               
+ components/ui                    |       0 |        0 |       0 |       0 |                   
+  Button.tsx                      |       0 |        0 |       0 |       0 | 1-69              
+  Card.tsx                        |       0 |        0 |       0 |       0 | 1-42              
+  DurationInput.tsx               |       0 |        0 |       0 |       0 | 1-101             
+  ErrorDisplay.tsx                |       0 |        0 |       0 |       0 | 1-71              
+  Input.tsx                       |       0 |        0 |       0 |       0 | 1-71              
+  LoadingState.tsx                |       0 |        0 |       0 |       0 | 1-30              
+  index.ts                        |       0 |      100 |     100 |       0 | 1-5               
+ config                           |       0 |      100 |     100 |       0 |                   
+  footer.ts                       |       0 |      100 |     100 |       0 | 1                 
+  navigation.ts                   |       0 |      100 |     100 |       0 | 1                 
+ contexts                         |       0 |        0 |       0 |       0 |                   
+  UserContext.tsx                 |       0 |        0 |       0 |       0 | 1-324             
+ data                             |       0 |      100 |     100 |       0 |                   
+  dummyUsers.ts                   |       0 |      100 |     100 |       0 | 8                 
+  projects.ts                     |       0 |      100 |     100 |       0 | 10                
+ hooks                            |       0 |        0 |       0 |       0 |                   
+  index.ts                        |       0 |      100 |     100 |       0 | 2-10              
+  useAdminManagement.ts           |       0 |        0 |       0 |       0 | 1-300             
+  useAuth.ts                      |       0 |        0 |       0 |       0 | 1-103             
+  useFileUpload.ts                |       0 |        0 |       0 |       0 | 1-219             
+  useFormManagement.ts            |       0 |        0 |       0 |       0 | 1-299             
+  useLoadingState.ts              |       0 |        0 |       0 |       0 | 1-299             
+  usePersistedState.ts            |       0 |        0 |       0 |       0 | 1-334             
+  usePodcastManagement.ts         |       0 |        0 |       0 |       0 | 1-400             
+  useQuizCompletion.ts            |       0 |        0 |       0 |       0 | 1-351             
+  useQuizContinuation.ts          |       0 |        0 |       0 |       0 | 1-145             
+  useQuizLogic.ts                 |       0 |        0 |       0 |       0 | 1-178             
+  useQuizState.ts                 |       0 |        0 |       0 |       0 | 1-249             
+  useUserContentProgress.ts       |       0 |        0 |       0 |       0 | 1-104             
+ lib                              |       0 |        0 |     100 |       0 |                   
+  stripe.ts                       |       0 |        0 |     100 |       0 | 1-23              
+  supabase-admin.ts               |       0 |        0 |     100 |       0 | 1-23              
+  supabase.ts                     |       0 |        0 |     100 |       0 | 1-23              
+ pages                            |       0 |        0 |       0 |       0 |                   
+  _app.tsx                        |       0 |      100 |       0 |       0 | 1-21              
+  _document.tsx                   |       0 |      100 |       0 |       0 | 1-3               
+  about.tsx                       |       0 |      100 |       0 |       0 | 1-277             
+  admin.tsx                       |       0 |        0 |       0 |       0 | 1-105             
+  articles.tsx                    |       0 |        0 |       0 |       0 | 1-232             
+  badges.tsx                      |       0 |        0 |       0 |       0 | 1-352             
+  calculators.tsx                 |       0 |        0 |       0 |       0 | 1-806             
+  contact.tsx                     |       0 |      100 |       0 |       0 | 1-19              
+  cookies.tsx                     |       0 |      100 |       0 |       0 | 1-114             
+  create-table.tsx                |       0 |        0 |       0 |       0 | 1-59              
+  fix-database.tsx                |       0 |        0 |       0 |       0 | 1-65              
+  forum.tsx                       |       0 |      100 |       0 |       0 | 1-4               
+  help-center.tsx                 |       0 |      100 |       0 |       0 | 1-19              
+  index.tsx                       |       0 |      100 |       0 |       0 | 1-311             
+  jobs.tsx                        |       0 |        0 |       0 |       0 | 1-167             
+  login.tsx                       |       0 |        0 |       0 |       0 | 1-153             
+  my-profile.tsx                  |       0 |        0 |       0 |       0 | 1-124             
+  my-progress.tsx                 |       0 |        0 |       0 |       0 | 1-42              
+  news.tsx                        |       0 |        0 |       0 |       0 | 1-134             
+  player-old.tsx                  |       0 |        0 |       0 |       0 | 1-530             
+  player.tsx                      |       0 |        0 |       0 |       0 | 1-614             
+  podcasts.tsx                    |       0 |        0 |       0 |       0 | 1-361             
+  privacy-policy.tsx              |       0 |      100 |       0 |       0 | 1-88              
+  purchase-cancelled.tsx          |       0 |        0 |       0 |       0 | 1-57              
+  purchase-success.tsx            |       0 |        0 |       0 |       0 | 1-108             
+  quiz.tsx                        |       0 |        0 |       0 |       0 | 1-80              
+  supabase-test.tsx               |       0 |        0 |       0 |       0 | 1-263             
+  terms-of-service.tsx            |       0 |      100 |       0 |       0 | 1-121             
+  user-demo.tsx                   |       0 |      100 |       0 |       0 | 1-17              
+  user-management.tsx             |       0 |        0 |       0 |       0 | 1-132             
+ pages/admin                      |       0 |        0 |       0 |       0 |                   
+  migrate.tsx                     |       0 |        0 |       0 |       0 | 1-31              
+ pages/api                        |       0 |        0 |       0 |       0 |                   
+  apply-migration.ts              |       0 |        0 |       0 |       0 | 2-102             
+  articles.ts                     |       0 |        0 |       0 |       0 | 2-63              
+  audio-files.ts                  |       0 |        0 |       0 |       0 | 2-59              
+  check-quiz-schema.ts            |       0 |        0 |       0 |       0 | 2-88              
+  create-progress-table.ts        |       0 |        0 |       0 |       0 | 2-140             
+  create-quiz-record.ts           |       0 |        0 |       0 |       0 | 2-100             
+  create-table-simple.ts          |       0 |        0 |       0 |       0 | 2-66              
+  fix-fk-constraint.ts            |       0 |        0 |       0 |       0 | 2-50              
+  image-files.ts                  |       0 |        0 |       0 |       0 | 2-76              
+  keywords.ts                     |       0 |        0 |       0 |       0 | 2-25              
+  migration-dashboard.ts          |       0 |        0 |       0 |       0 | 2-296             
+  quiz-attempts-summary.ts        |       0 |        0 |       0 |       0 | 2-137             
+  quiz-completion-service.ts      |       0 |        0 |       0 |       0 | 2-149             
+  quiz-completions.ts             |       0 |        0 |       0 |       0 | 2-98              
+  quiz-continuation.ts            |       0 |        0 |       0 |       0 | 2-82              
+  quiz-questions-by-category.ts   |       0 |        0 |       0 |       0 | 2-46              
+  quiz-questions.ts               |       0 |        0 |       0 |       0 | 2-139             
+  quizzes-redesigned.ts           |       0 |        0 |       0 |       0 | 2-180             
+  quizzes.ts                      |       0 |        0 |       0 |       0 | 2-147             
+  remove-fk-constraint.ts         |       0 |        0 |       0 |       0 | 2-107             
+  simple-upload.ts                |       0 |        0 |       0 |       0 | 2-128             
+  subscribe.ts                    |       0 |        0 |       0 |       0 | 2-45              
+  test-db-direct.ts               |       0 |        0 |       0 |       0 | 2-70              
+  test-storage.ts                 |       0 |        0 |       0 |       0 | 2-39              
+  test-table-creation.ts          |       0 |        0 |       0 |       0 | 2-81              
+  upload-audio-simple.ts          |       0 |        0 |       0 |       0 | 3-10              
+  upload-audio.ts                 |       0 |        0 |       0 |       0 | 2-84              
+  upload-image.ts                 |       0 |        0 |       0 |       0 | 2-84              
+  upload-test.ts                  |       0 |        0 |       0 |       0 | 2-72              
+  upload.ts                       |       0 |        0 |       0 |       0 | 2-90              
+  user-content-progress.ts        |       0 |        0 |       0 |       0 | 2-129             
+  user-progress.ts                |       0 |        0 |       0 |       0 | 2-31              
+ pages/api/admin                  |       0 |        0 |       0 |       0 |                   
+  content.ts                      |       0 |        0 |       0 |       0 | 2-488             
+  migrate-to-unified-content.ts   |       0 |        0 |       0 |       0 | 2-204             
+  quizzes.ts                      |       0 |        0 |       0 |       0 | 2-282             
+  series.ts                       |       0 |        0 |       0 |       0 | 2-106             
+  simple-migration.ts             |       0 |        0 |       0 |       0 | 2-159             
+ pages/api/admin/series           |       0 |        0 |       0 |       0 |                   
+  [id].ts                         |       0 |        0 |       0 |       0 | 2-73              
+  reorder.ts                      |       0 |        0 |       0 |       0 | 2-30              
+ pages/api/articles               |       0 |        0 |       0 |       0 |                   
+  [id].ts                         |       0 |        0 |       0 |       0 | 2-68              
+ pages/api/content                |       0 |        0 |       0 |       0 |                   
+  [id].ts                         |       0 |        0 |       0 |       0 | 2-91              
+ pages/api/debug                  |       0 |        0 |       0 |       0 |                   
+  checkout-debug.ts               |       0 |        0 |       0 |       0 | 2-53              
+  clear-auth.ts                   |       0 |        0 |       0 |       0 | 3-48              
+  create-user.ts                  |       0 |        0 |       0 |       0 | 2-44              
+  process-payment.ts              |       0 |        0 |       0 |       0 | 2-55              
+  purchases.ts                    |       0 |        0 |       0 |       0 | 2-50              
+  users.ts                        |       0 |        0 |       0 |       0 | 2-23              
+ pages/api/payments               |       0 |        0 |       0 |       0 |                   
+  checkout.ts                     |       0 |        0 |       0 |       0 | 2-107             
+  subscription.ts                 |       0 |        0 |       0 |       0 | 2-93              
+  user-purchases.ts               |       0 |        0 |       0 |       0 | 2-68              
+  verify-access.ts                |       0 |        0 |       0 |       0 | 2-71              
+ pages/api/podcast-admin          |       0 |        0 |       0 |       0 |                   
+  episodes.ts                     |       0 |        0 |       0 |       0 | 2-169             
+ pages/api/podcast-admin/episodes |       0 |        0 |       0 |       0 |                   
+  [id].ts                         |       0 |        0 |       0 |       0 | 2-175             
+ pages/api/quiz-questions         |       0 |        0 |       0 |       0 |                   
+  [id].ts                         |       0 |        0 |       0 |       0 | 2-39              
+ pages/api/quizzes                |       0 |        0 |       0 |       0 |                   
+  [id].ts                         |       0 |        0 |       0 |       0 | 2-93              
+  test-learning-outcome.ts        |       0 |        0 |       0 |       0 | 2-40              
+ pages/api/webhooks               |       0 |        0 |       0 |       0 |                   
+  stripe.ts                       |       0 |        0 |       0 |       0 | 2-154             
+ pages/articles                   |       0 |        0 |       0 |       0 |                   
+  [slug].tsx                      |       0 |        0 |       0 |       0 | 2-269             
+ pages/auth                       |       0 |        0 |       0 |       0 |                   
+  callback.tsx                    |       0 |        0 |       0 |       0 | 1-116             
+ services                         |       0 |        0 |       0 |       0 |                   
+  accessControlService.ts         |       0 |        0 |       0 |       0 | 1-303             
+  continuationService.ts          |       0 |        0 |       0 |       0 | 1-244             
+  database.ts                     |       0 |        0 |       0 |       0 | 1-72              
+  paymentService.ts               |       0 |        0 |       0 |       0 | 1-320             
+  podcastService.ts               |       0 |        0 |       0 |       0 | 1-491             
+  quizCompletionService.ts        |       0 |        0 |       0 |       0 | 1-512             
+  quizService.ts                  |       0 |        0 |       0 |       0 | 1-215             
+  quizServiceClient.ts            |       0 |        0 |       0 |       0 | 53-79             
+  reportGenerator.ts              |       0 |        0 |       0 |       0 | 29-218            
+  seriesService.ts                |       0 |        0 |       0 |       0 | 1-229             
+  userContentProgressService.ts   |       0 |        0 |       0 |       0 | 1-215             
+  userService.ts                  |       0 |        0 |       0 |       0 | 5-153             
+ utils                            |       0 |        0 |       0 |       0 |                   
+  apiHandler.ts                   |       0 |        0 |       0 |       0 | 3-190             
+  apiUtils.ts                     |       0 |        0 |       0 |       0 | 4-302             
+  dataTransforms.ts               |       0 |        0 |       0 |       0 | 1-322             
+  performanceUtils.ts             |       0 |        0 |       0 |       0 | 1-339             
+  permissions.ts                  |       0 |      100 |       0 |       0 | 26-227            
+  podcastQuizTransforms.ts        |       0 |        0 |       0 |       0 | 104-275           
+  podcastValidation.ts            |       0 |        0 |       0 |       0 | 20-156            
+  progressUtils.ts                |       0 |        0 |       0 |       0 | 44-345            
+  relationshipValidation.ts       |       0 |        0 |       0 |       0 | 8-166             
+  validationUtils.ts              |       0 |        0 |       0 |       0 | 19-495            
+----------------------------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 5 passed, 5 total
+Tests:       44 passed, 44 total
+Snapshots:   0 total
+Time:        16.887 s
+Ran all test suites.
