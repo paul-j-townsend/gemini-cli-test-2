@@ -8,6 +8,7 @@
 ## 🛠️ General Tasks
 
 - [x] **Fix:** Pass offer price (not full price) to Stripe
+- [ ] **Feature:** Remove 'level' functionality
 - [ ] **Fix:** Purchase CPD Content panel is cut off
 - [ ] **Feature:** Remove migration tab
 - [ ] **Feature:** Move purchase button to a more prominent position
@@ -23,6 +24,7 @@
 - [ ] **Feature:** Add 'My Stuff' page and new header item
 - [ ] **Test:** Mobile responsiveness
 - [ ] **Feature:** Make the series management items clickable
+- [ ] **Fix:** My Profile - Member Since date is incorrect (01/01/2024)
 
 ---
 
@@ -32,6 +34,9 @@
 - [ ] Download CPD unit items (report, certificate if quiz complete, transcript)
 - [ ] Show time spent
 - [ ] Show CPD hours accumulated
+- [ ] Full profile editing
+- [ ] Avatar uploads
+- [ ] Advanced settings
 
 ---
 

@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import LogoSvg from './LogoSvg';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, ChevronDown, UserCircle, TrendingUp } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { HeaderUserSwitcher } from './HeaderUserSwitcher';
 
@@ -10,8 +10,24 @@ import { navigationItems } from '../config/navigation';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMyStuffOpen, setIsMyStuffOpen] = useState(false);
   const router = useRouter();
   const { user } = useUser();
+  const myStuffRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (myStuffRef.current && !myStuffRef.current.contains(event.target as Node)) {
+        setIsMyStuffOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -83,6 +99,67 @@ const Header = () => {
           </Link>
                 );
               })}
+
+              {/* My Stuff Dropdown */}
+              {user && (
+                <div className="relative" ref={myStuffRef}>
+                  <button
+                    onClick={() => setIsMyStuffOpen(!isMyStuffOpen)}
+                    className={`relative px-4 py-2 ${
+                      router.pathname === '/my-profile' || router.pathname === '/my-progress'
+                        ? 'text-primary-600 bg-primary-50' 
+                        : 'text-neutral-700 hover:text-primary-600 focus:text-primary-600 active:text-primary-600 hover:bg-primary-50 focus:bg-primary-50 active:bg-primary-50'
+                    } font-medium transition-all duration-200 rounded-lg group no-focus-border flex items-center space-x-1`}
+                    style={{ 
+                      outline: 'none', 
+                      border: 'none',
+                      boxShadow: 'none'
+                    }}
+                    onMouseDown={(e) => e.currentTarget.style.outline = 'none'}
+                    onFocus={(e) => e.currentTarget.style.outline = 'none'}
+                  >
+                    <span>My Stuff</span>
+                    <ChevronDown size={16} className={`transition-transform duration-200 ${isMyStuffOpen ? 'rotate-180' : ''}`} />
+                    <span className={`absolute bottom-0 left-1/2 h-0.5 bg-gradient-primary transition-all duration-300 transform -translate-x-1/2 ${
+                      (router.pathname === '/my-profile' || router.pathname === '/my-progress') ? 'w-8' : 'w-0 group-hover:w-8'
+                    }`}></span>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isMyStuffOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-50">
+                      <Link
+                        href="/my-profile"
+                        onClick={() => setIsMyStuffOpen(false)}
+                        className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:text-primary-600 hover:bg-primary-50 transition-colors no-focus-border"
+                        style={{ 
+                          outline: 'none', 
+                          border: 'none',
+                          boxShadow: 'none',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <UserCircle size={18} />
+                        <span>My Profile</span>
+                      </Link>
+                      <Link
+                        href="/my-progress"
+                        onClick={() => setIsMyStuffOpen(false)}
+                        className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:text-primary-600 hover:bg-primary-50 transition-colors no-focus-border"
+                        style={{ 
+                          outline: 'none', 
+                          border: 'none',
+                          boxShadow: 'none',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <TrendingUp size={18} />
+                        <span>My Progress</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
               
               {/* User Info */}
               {user && (
@@ -153,6 +230,41 @@ const Header = () => {
           </Link>
                 );
               })}
+
+              {/* My Stuff - Mobile */}
+              {user && (
+                <div className="px-4 py-3 mt-4 border-t border-neutral-200 space-y-2">
+                  <div className="text-sm font-medium text-neutral-500 px-2 mb-3">My Stuff</div>
+                  <Link
+                    href="/my-profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors no-focus-border"
+                    style={{ 
+                      outline: 'none', 
+                      border: 'none',
+                      boxShadow: 'none',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <UserCircle size={18} />
+                    <span>My Profile</span>
+                  </Link>
+                  <Link
+                    href="/my-progress"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors no-focus-border"
+                    style={{ 
+                      outline: 'none', 
+                      border: 'none',
+                      boxShadow: 'none',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <TrendingUp size={18} />
+                    <span>My Progress</span>
+                  </Link>
+                </div>
+              )}
 
               {/* User Info - Mobile */}
               {user && (
