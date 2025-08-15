@@ -32,6 +32,14 @@ export class PaymentService {
       // Use passed price if provided, otherwise use content price
       const finalPrice = priceCents || content.price_cents;
       
+      console.log('Payment Service Debug:', {
+        passedPrice: priceCents,
+        contentPrice: content.price_cents,
+        finalPrice,
+        contentId,
+        userId
+      });
+      
       if (!finalPrice || finalPrice <= 0) {
         throw new Error('Content price not set or invalid');
       }
@@ -47,7 +55,7 @@ export class PaymentService {
         line_items: [
           {
             price_data: {
-              currency: 'usd',
+              currency: 'gbp',
               product_data: {
                 name: `CPD Access: ${content.title}`,
                 description: 'Full access to podcast, quiz, report, and certificate',

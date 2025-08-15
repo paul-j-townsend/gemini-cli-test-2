@@ -113,6 +113,23 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     return (!startDate || now >= startDate) && (!endDate || now <= endDate);
   };
 
+  const hasSpecialOfferPrice = (): boolean => {
+    return !!episode.special_offer_price_cents && 
+           episode.special_offer_price_cents < getRegularPrice();
+  };
+
+  const calculateSavings = (): number => {
+    if (!hasSpecialOfferPrice()) return 0;
+    return getRegularPrice() - (episode.special_offer_price_cents || 0);
+  };
+
+  const getSavingsPercentage = (): number => {
+    if (!hasSpecialOfferPrice()) return 0;
+    const regularPrice = getRegularPrice();
+    const savings = calculateSavings();
+    return Math.round((savings / regularPrice) * 100);
+  };
+
   const handlePurchase = async () => {
     if (!user) {
       alert('Please log in to purchase CPD content');
@@ -128,11 +145,25 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     setIsLoading(true);
 
     try {
+      const currentPrice = getCurrentPrice();
+      const regularPrice = getRegularPrice();
+      const isOfferActive = isSpecialOfferActive();
+      
+      console.log('Pricing Debug:', {
+        currentPrice,
+        regularPrice,
+        isOfferActive,
+        specialOfferPrice: episode.special_offer_price_cents,
+        specialOfferActive: episode.special_offer_active,
+        startDate: episode.special_offer_start_date,
+        endDate: episode.special_offer_end_date
+      });
+
       const requestBody = {
         contentId: episode.content_id,
         userId: user.id,
         type: 'content_purchase',
-        priceCents: getCurrentPrice(),
+        priceCents: currentPrice,
         successUrl: `${window.location.origin}/purchase-success?contentId=${episode.content_id}`,
         cancelUrl: `${window.location.origin}/purchase-cancelled?contentId=${episode.content_id}`,
       };
@@ -188,7 +219,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-neutral-200">
           <h2 className="text-xl font-semibold text-neutral-900">Purchase CPD Content</h2>
@@ -201,7 +232,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto">
+        <div className="p-6">
           {isCheckingAccess ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 size={24} className="animate-spin text-primary-600" />
@@ -269,37 +300,71 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               {/* Price and Purchase */}
               <div className="text-center">
                 <div className="mb-4">
-                  {isSpecialOfferActive() ? (
-                    <div>
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <span className="text-lg text-neutral-500 line-through">
-                          {formatPrice(getRegularPrice())}
-                        </span>
-                        <span className="text-2xl font-bold text-green-600">
-                          {formatPrice(getCurrentPrice())}
-                        </span>
-                      </div>
-                      <div className="text-sm text-green-600 font-medium mb-1">
-                        {episode.special_offer_description || 'Special Offer'}
-                      </div>
-                      {episode.special_offer_end_date && (
-                        <div className="text-xs text-neutral-500">
-                          Offer ends {new Date(episode.special_offer_end_date).toLocaleDateString()}
-                        </div>
+                  {hasSpecialOfferPrice() ? (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4">
+                      {isSpecialOfferActive() ? (
+                        <>
+                          {/* Active Special Offer */}
+                          <div className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mb-2 animate-pulse">
+                            🔥 LIMITED TIME OFFER
+                          </div>
+                          <div className="flex items-center justify-center gap-3 mb-2">
+                            <span className="text-xl text-neutral-500 line-through decoration-2">
+                              {formatPrice(getRegularPrice())}
+                            </span>
+                            <span className="text-3xl font-bold text-green-600">
+                              Now {formatPrice(getCurrentPrice())}
+                            </span>
+                            <span className="bg-red-100 text-red-700 text-sm font-bold px-2 py-1 rounded">
+                              {getSavingsPercentage()}% OFF
+                            </span>
+                          </div>
+                          <div className="text-sm text-green-700 font-medium mb-1">
+                            {episode.special_offer_description || 'Special Discount Active'}
+                          </div>
+                          <div className="text-lg font-bold text-green-700 mb-1">
+                            You save {formatPrice(calculateSavings())}!
+                          </div>
+                          <div className="text-sm text-green-600 mb-2">One-time purchase</div>
+                          {episode.special_offer_end_date && (
+                            <div className="text-xs text-red-600 font-medium mb-3">
+                              ⏰ Offer ends {new Date(episode.special_offer_end_date).toLocaleDateString()}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {/* Show offer exists but not currently active */}
+                          <div className="flex items-center justify-center gap-3 mb-2">
+                            <span className="text-lg text-neutral-400 line-through">
+                              Was {formatPrice(getRegularPrice())}</span>
+                            <span className="text-2xl font-bold text-neutral-900">
+                              Now {formatPrice(episode.special_offer_price_cents || 0)}
+                            </span>
+                            <span className="bg-gray-100 text-gray-600 text-sm font-bold px-2 py-1 rounded">
+                              {getSavingsPercentage()}% OFF
+                            </span>
+                          </div>
+                          <div className="text-sm text-neutral-600 mb-2">One-time purchase</div>
+                        </>
                       )}
                     </div>
                   ) : (
-                    <div className="text-2xl font-bold text-neutral-900">
-                      {formatPrice(getCurrentPrice())}
-                    </div>
+                    <>
+                      {/* No special offer pricing set */}
+                      <div className="text-3xl font-bold text-neutral-900 mb-2">
+                        {formatPrice(getCurrentPrice())}
+                      </div>
+                      <div className="text-sm text-neutral-500 mb-3">One-time purchase</div>
+                    </>
                   )}
-                  <div className="text-sm text-neutral-500 mt-2">One-time purchase</div>
                 </div>
 
+                {/* Purchase Button - Always visible outside pricing box */}
                 <button
                   onClick={handlePurchase}
                   disabled={isLoading || !user}
-                  className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+                  className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-lg font-medium text-lg transition-colors mt-4 ${
                     isLoading || !user
                       ? 'bg-gray-400 text-white cursor-not-allowed'
                       : 'bg-primary-600 hover:bg-primary-700 text-white'
@@ -315,7 +380,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                       <ShoppingCart size={20} />
                       Purchase CPD Access
                     </>
-                  )}
+                    )}
                 </button>
 
                 {!user && (
