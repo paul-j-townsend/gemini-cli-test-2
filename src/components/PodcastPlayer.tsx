@@ -142,7 +142,7 @@ const PodcastPlayer = () => {
             </div>
             
             {/* Action Buttons Skeleton */}
-            <div className="pt-6 border-t border-neutral-200/80">
+            <div className="pt-6 border-t border-emerald-200/80">
               <div className="h-12 bg-gray-200 rounded-xl w-full"></div>
             </div>
           </div>

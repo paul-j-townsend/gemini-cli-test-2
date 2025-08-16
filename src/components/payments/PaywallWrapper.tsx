@@ -53,8 +53,8 @@ export const PaywallWrapper: React.FC<PaywallWrapperProps> = ({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Checking access...</p>
+          <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-emerald-600">Checking access...</p>
         </div>
       </div>
     );
@@ -97,24 +97,21 @@ export const PaywallWrapper: React.FC<PaywallWrapperProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-lg p-6 text-center">
-      <div className="mb-4">
-        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-          <Lock className="w-8 h-8 text-blue-600" />
-        </div>
-        <div className="text-3xl mb-2">{getContentTypeIcon()}</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          Premium CPD Content
-        </h3>
-        <p className="text-gray-600 mb-4">
-          {previewMessage || getContentTypeMessage()}
-        </p>
+    <div className="bg-gradient-to-br from-emerald-50 to-teal-100 border border-emerald-200 rounded-lg p-6 text-center">
+      <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <Lock className="w-8 h-8 text-emerald-600" />
       </div>
+      
+      <h3 className="text-xl font-semibold text-emerald-900 mb-2">
+        {contentTitle}
+      </h3>
+      <p className="text-emerald-700 mb-4">
+        {getContentTypeMessage()}
+      </p>
 
-      {showPreview && (
-        <div className="bg-white/50 rounded-lg p-4 mb-4 text-left">
-          <h4 className="font-medium text-gray-900 mb-2">What you'll get:</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
+      <div className="bg-white rounded-lg p-4 mb-6 text-left">
+        <h4 className="font-medium text-emerald-900 mb-2">What you'll get:</h4>
+        <ul className="text-sm text-emerald-700 space-y-1">
             <li className="flex items-center gap-2">
               <Check className="w-4 h-4 text-green-500" />
               <span>Full podcast access</span>
@@ -133,7 +130,6 @@ export const PaywallWrapper: React.FC<PaywallWrapperProps> = ({
             </li>
           </ul>
         </div>
-      )}
 
       <div className="space-y-3">
         <PurchaseCPDButton
@@ -143,7 +139,7 @@ export const PaywallWrapper: React.FC<PaywallWrapperProps> = ({
         />
         
         {!user && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-emerald-600">
             Please log in to purchase CPD content
           </p>
         )}

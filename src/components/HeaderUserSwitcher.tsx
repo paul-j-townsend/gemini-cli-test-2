@@ -77,8 +77,8 @@ export const HeaderUserSwitcher: React.FC = () => {
                 <button
                   key={availableUser.id}
                   onClick={() => handleUserChange(availableUser)}
-                  className={`w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors duration-150 ${
-                    user.id === availableUser.id ? 'bg-blue-50 border-l-2 border-blue-500' : ''
+                  className={`w-full text-left px-3 py-2 hover:bg-emerald-50 transition-colors duration-150 ${
+                    user.id === availableUser.id ? 'bg-emerald-50 border-l-2 border-emerald-500' : ''
                   }`}
                 >
                   <div className="flex items-center justify-between">

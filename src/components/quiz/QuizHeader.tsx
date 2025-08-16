@@ -17,7 +17,7 @@ export const QuizHeader: React.FC<QuizHeaderProps> = React.memo(({
   return (
     <div className="mb-8">
       {/* CPD Assessment Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-xl shadow-lg mb-6">
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6 rounded-xl shadow-lg mb-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -28,7 +28,7 @@ export const QuizHeader: React.FC<QuizHeaderProps> = React.memo(({
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold mb-2">{quiz.title || 'Professional Knowledge Quiz'}</h1>
             {quiz.description && (
-              <p className="text-blue-100 leading-relaxed">{quiz.description}</p>
+              <p className="text-emerald-100 leading-relaxed">{quiz.description}</p>
             )}
           </div>
           <div className="flex-shrink-0 ml-6">
@@ -41,23 +41,23 @@ export const QuizHeader: React.FC<QuizHeaderProps> = React.memo(({
       </div>
       
       {/* Enhanced Progress Bar */}
-      <div className="bg-white rounded-xl border border-neutral-200 p-4 shadow-sm">
+      <div className="bg-white rounded-xl border border-emerald-200 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <span className="font-semibold text-neutral-900">Assessment Progress</span>
+            <span className="font-semibold text-emerald-900">Assessment Progress</span>
           </div>
-          <div className="bg-blue-100 px-3 py-1 rounded-full">
-            <span className="text-sm font-bold text-blue-800">{Math.round(progressPercentage)}% Complete</span>
+          <div className="bg-emerald-100 px-3 py-1 rounded-full">
+            <span className="text-sm font-bold text-emerald-800">{Math.round(progressPercentage)}% Complete</span>
           </div>
         </div>
         
         <div className="relative">
-          <div className="w-full bg-neutral-200 rounded-full h-3 shadow-inner">
+          <div className="w-full bg-emerald-200 rounded-full h-3 shadow-inner">
             <div 
-              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-700 ease-out shadow-sm relative overflow-hidden" 
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 h-3 rounded-full transition-all duration-700 ease-out shadow-sm relative overflow-hidden" 
               style={{ width: `${progressPercentage}%` }}
             >
               <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
@@ -65,7 +65,7 @@ export const QuizHeader: React.FC<QuizHeaderProps> = React.memo(({
           </div>
         </div>
         
-        <div className="flex justify-between items-center text-xs text-neutral-600 mt-2">
+        <div className="flex justify-between items-center text-xs text-emerald-600 mt-2">
           <span className="flex items-center gap-1">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />

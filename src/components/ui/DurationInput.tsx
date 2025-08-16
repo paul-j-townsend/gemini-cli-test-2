@@ -104,14 +104,14 @@ export const DurationInput: React.FC<DurationInputProps> = ({
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-emerald-700">
           {label}
         </label>
       )}
       
       <div className="flex items-center space-x-2">
         {/* Hours */}
-        <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+        <div className="flex items-center border border-emerald-300 rounded-md focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500">
           <input
             type="number"
             value={hours}
@@ -121,12 +121,12 @@ export const DurationInput: React.FC<DurationInputProps> = ({
             min="0"
             max="999"
           />
-          <div className="flex flex-col border-l border-gray-300">
+          <div className="flex flex-col border-l border-emerald-300">
             <button
               type="button"
               onClick={incrementHours}
               disabled={disabled}
-              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-0.5 text-xs text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ▲
             </button>
@@ -134,17 +134,17 @@ export const DurationInput: React.FC<DurationInputProps> = ({
               type="button"
               onClick={decrementHours}
               disabled={disabled}
-              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-0.5 text-xs text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ▼
             </button>
           </div>
         </div>
 
-        <span className="text-gray-500 font-medium">:</span>
+        <span className="text-emerald-500 font-medium">:</span>
 
         {/* Minutes */}
-        <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+        <div className="flex items-center border border-emerald-300 rounded-md focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500">
           <input
             type="number"
             value={minutes.toString().padStart(2, '0')}
@@ -154,12 +154,12 @@ export const DurationInput: React.FC<DurationInputProps> = ({
             min="0"
             max="59"
           />
-          <div className="flex flex-col border-l border-gray-300">
+          <div className="flex flex-col border-l border-emerald-300">
             <button
               type="button"
               onClick={incrementMinutes}
               disabled={disabled}
-              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-0.5 text-xs text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ▲
             </button>
@@ -167,14 +167,14 @@ export const DurationInput: React.FC<DurationInputProps> = ({
               type="button"
               onClick={decrementMinutes}
               disabled={disabled}
-              className="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-0.5 text-xs text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ▼
             </button>
           </div>
         </div>
 
-        <span className="text-sm text-gray-400">hh:mm</span>
+        <span className="text-sm text-emerald-400">hh:mm</span>
       </div>
 
       {error && (

@@ -17,7 +17,7 @@ const PadlockIcon: React.FC<PadlockIconProps> = ({
   return (
     <Icon 
       size={size}
-      className={`${isLocked ? 'text-neutral-400' : 'text-primary-600'} ${className}`}
+      className={`${isLocked ? 'text-emerald-400' : 'text-emerald-600'} ${className}`}
     />
   );
 };

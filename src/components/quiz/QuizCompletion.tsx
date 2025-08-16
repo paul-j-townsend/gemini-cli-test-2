@@ -48,7 +48,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
     }
   };
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in-up border border-neutral-100">
+    <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in-up border border-emerald-100">
       {/* Celebration Header */}
       <div className="mb-8">
         <div className={`w-32 h-32 mx-auto mb-6 rounded-full flex items-center justify-center relative overflow-hidden ${
@@ -72,7 +72,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
         </div>
         
         <div className="space-y-2">
-          <h2 className="text-4xl font-bold text-neutral-900">CPD Assessment Complete!</h2>
+          <h2 className="text-4xl font-bold text-emerald-900">CPD Assessment Complete!</h2>
           <p className={`text-2xl font-semibold ${
             score.passed ? 'text-green-600' : 'text-orange-600'
           }`}>
@@ -101,7 +101,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
             }`}>
               {score.passed ? '✓' : '○'}
             </div>
-            <div className="text-sm text-neutral-600 font-medium">Status</div>
+            <div className="text-sm text-emerald-600 font-medium">Status</div>
           </div>
           
           {/* CPD Status */}
@@ -111,7 +111,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
             }`}>
               {score.passed ? 'VALIDATED' : 'REVIEW'}
             </div>
-            <div className="text-sm text-neutral-600 font-medium">CPD Status</div>
+            <div className="text-sm text-emerald-600 font-medium">CPD Status</div>
           </div>
         </div>
         
@@ -139,7 +139,7 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
           </p>
         </div>
         
-        <div className="mt-4 text-xs text-neutral-500 font-medium text-center">
+        <div className="mt-4 text-xs text-emerald-500 font-medium text-center">
           Veterinary Professional Standard: {score.passed ? 'Met ✓' : 'Requires completion for CPD validation'}
         </div>
       </div>
@@ -179,8 +179,8 @@ export const QuizCompletion: React.FC<QuizCompletionProps> = ({
       {showCertificate && completion && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-hidden">
           <div className="bg-white rounded-xl w-fit h-fit max-w-[95vw] max-h-[95vh] flex flex-col">
-            <div className="p-4 border-b border-neutral-200 flex-shrink-0">
-              <h2 className="text-xl font-bold text-neutral-900 text-center">Certificate of Completion</h2>
+            <div className="p-4 border-b border-emerald-200 flex-shrink-0">
+              <h2 className="text-xl font-bold text-emerald-900 text-center">Certificate of Completion</h2>
             </div>
             <div className="p-4 flex items-center justify-center">
               <div className="transform scale-75 sm:scale-90 md:scale-100 origin-center">

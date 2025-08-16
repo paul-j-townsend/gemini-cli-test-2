@@ -270,7 +270,7 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
       
       <div onClick={handleCardClick} className="relative group cursor-pointer">
         <div className="flex flex-col">
-          <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-200">
+          <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-emerald-100 to-emerald-200">
             <Image 
               src={getThumbnailUrl(episode)} 
               alt={episode.title}
@@ -282,7 +282,7 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
             
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
               <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                <ExternalLink size={24} className="text-primary-600" />
+                <ExternalLink size={24} className="text-emerald-600" />
               </div>
             </div>
             
@@ -312,22 +312,22 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: seriesColor }}
                 />
-                <span className="text-xs font-medium text-neutral-600">
+                <span className="text-xs font-medium text-emerald-600">
                   {seriesName}
                 </span>
               </div>
             )}
             
-            <h3 className="font-semibold text-lg text-neutral-900 mb-2 line-clamp-2">
+            <h3 className="font-semibold text-lg text-emerald-900 mb-2 line-clamp-2">
               {episode.title}
             </h3>
             
             
-            <p className="text-sm text-neutral-600 mb-3 line-clamp-3">
+            <p className="text-sm text-emerald-700 mb-3 line-clamp-3">
               {episode.description}
             </p>
             
-            <div className="text-xs text-neutral-500 mb-3">
+            <div className="text-xs text-emerald-500 mb-3">
               {episode.duration && (
                 <div className="font-bold">CPD: {Math.floor(episode.duration / 3600) > 0 ? `${Math.floor(episode.duration / 3600)} hour${Math.floor(episode.duration / 3600) > 1 ? 's' : ''}` : `${Math.floor(episode.duration / 60)} min`}</div>
               )}
@@ -340,14 +340,14 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
       </div>
       
       {hasAudio && (
-        <div className="px-4 pb-4 border-t border-neutral-100">
+        <div className="px-4 pb-4 border-t border-emerald-100">
           <div className="flex items-center gap-3 pt-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handlePlayPause();
               }}
-              className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-600 hover:bg-primary-700 text-white flex items-center justify-center transition-colors"
+              className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -360,22 +360,22 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
             </button>
             
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between text-xs text-neutral-500 mb-1">
+              <div className="flex items-center justify-between text-xs text-emerald-500 mb-1">
                 <span>{formatTime(displayTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
               
               <div 
-                className="relative h-1 bg-neutral-200 rounded-full cursor-pointer hover:h-1.5 transition-all duration-200 group"
+                className="relative h-1 bg-emerald-200 rounded-full cursor-pointer hover:h-1.5 transition-all duration-200 group"
                 onClick={handleSeek}
                 onMouseDown={handleScrubberMouseDown}
               >
                 <div 
-                  className={`absolute top-0 left-0 h-full bg-primary-600 rounded-full ${isScrubbing ? '' : 'transition-all duration-100'}`}
+                  className={`absolute top-0 left-0 h-full bg-emerald-600 rounded-full ${isScrubbing ? '' : 'transition-all duration-100'}`}
                   style={{ width: `${displayPercentage}%` }}
                 />
                 <div 
-                  className={`absolute top-1/2 transform -translate-y-1/2 bg-primary-600 rounded-full border-2 border-white shadow-sm ${isScrubbing ? 'w-4 h-4 shadow-md' : 'w-3 h-3 group-hover:w-4 group-hover:h-4 group-hover:shadow-md'} ${isScrubbing ? '' : 'transition-all duration-200'}`}
+                  className={`absolute top-1/2 transform -translate-y-1/2 bg-emerald-600 rounded-full border-2 border-white shadow-sm ${isScrubbing ? 'w-4 h-4 shadow-md' : 'w-3 h-3 group-hover:w-4 group-hover:h-4 group-hover:shadow-md'} ${isScrubbing ? '' : 'transition-all duration-200'}`}
                   style={{ left: `${displayPercentage}%`, marginLeft: '-6px' }}
                 />
               </div>

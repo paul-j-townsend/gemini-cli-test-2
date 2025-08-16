@@ -7,7 +7,7 @@ interface LinkedInIconProps {
 
 const LinkedInIcon: React.FC<LinkedInIconProps> = ({ 
   size = 20, 
-  className = "text-neutral-400 group-hover:text-white transition-colors" 
+  className = "text-emerald-400 group-hover:text-white transition-colors" 
 }) => (
   <svg 
     width={size} 

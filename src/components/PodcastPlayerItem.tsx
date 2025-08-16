@@ -368,7 +368,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           {/* Preview/Full Version Indicator */}
           {podcast.full_audio_src && (
             <div className={`absolute -top-1 -left-1 text-white text-xs font-bold px-2 py-1 rounded-full shadow-medium ${
-              isFullVersion ? 'bg-primary-500' : 'bg-amber-500'
+              isFullVersion ? 'bg-emerald-500' : 'bg-amber-500'
             }`}>
               {isFullVersion ? 'FULL' : 'PREVIEW'}
             </div>
@@ -378,10 +378,10 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
         <div className="flex-grow min-w-0 w-full sm:w-auto">
           <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
             <div className="flex-grow min-w-0 w-full sm:w-auto">
-              <h3 className="text-lg lg:text-xl font-semibold text-neutral-900 mb-1 line-clamp-2 text-center sm:text-left">
+              <h3 className="text-lg lg:text-xl font-semibold text-emerald-900 mb-1 line-clamp-2 text-center sm:text-left">
                 {podcast.title}
               </h3>
-              <p className="text-sm text-neutral-600 line-clamp-3 sm:line-clamp-2 leading-relaxed mb-2 text-center sm:text-left">
+              <p className="text-sm text-emerald-700 line-clamp-3 sm:line-clamp-2 leading-relaxed mb-2 text-center sm:text-left">
                 {podcast.description}
                 {!isFullVersion && podcast.full_audio_src && (
                   <span className="inline-block ml-2 text-xs text-amber-600 font-medium">
@@ -397,7 +397,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                       onClick={() => setIsFullVersion(!isFullVersion)}
                       className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
                         isFullVersion 
-                          ? 'bg-primary-100 text-primary-700 border border-primary-200 hover:bg-primary-200' 
+                          ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200' 
                           : 'bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200'
                       }`}
                     >
@@ -419,7 +419,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                 {/* Open in Full Player Link */}
                 <Link 
                   href={`/player?id=${podcast.id}`}
-                  className="inline-flex items-center space-x-1 text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors hover:underline"
+                  className="inline-flex items-center space-x-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium transition-colors hover:underline"
                 >
                   <ExternalLink size={12} />
                   <span>Open in Full Player</span>
@@ -454,55 +454,21 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       {/* Progress Bar - Only show if audio exists */}
       {hasAudio && (
         <div className="mb-4">
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
+          <div className="flex items-center justify-between text-xs text-emerald-500 mb-2">
             <span className="font-medium">{formatTime(currentTime)}</span>
             <span className="font-medium">{formatTime(duration)}</span>
           </div>
           
-          <div className="relative">
-          <input
-            type="range"
-            min="0"
-              max={duration || 0}
-            value={currentTime}
-            onChange={handleScrubberChange}
-            onMouseDown={handleScrubberMouseDown}
-            onMouseUp={handleScrubberMouseUp}
-              onTouchStart={handleScrubberMouseDown}
-              onTouchEnd={handleScrubberMouseUp}
-              className="audio-player-progress w-full cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${progressPercentage}%, rgb(228, 228, 231) ${progressPercentage}%, rgb(228, 228, 231) 100%)`
-              }}
+          {/* Progress Bar */}
+          <div className="relative h-2 bg-emerald-200 rounded-full overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 right-0 h-2 bg-emerald-600 rounded-full transition-all duration-200"
+              style={{ width: `${progressPercentage}%` }}
             />
-            {isLoading && (
-              <div className="absolute top-0 left-0 right-0 h-2 bg-neutral-200 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary-400 to-primary-600 animate-pulse"></div>
-              </div>
-            )}
           </div>
-          
-          {/* Error Message */}
-          {error && (
-            <div className={`mt-2 p-2 rounded-lg ${
-              retryCount < 2 
-                ? 'bg-yellow-50 border border-yellow-200' 
-                : 'bg-red-50 border border-red-200'
-            }`}>
-              <p className={`text-sm flex items-center gap-2 ${
-                retryCount < 2 ? 'text-yellow-700' : 'text-red-600'
-              }`}>
-                <AlertCircle size={16} />
-                {error}
-                {retryCount < 2 && (
-                  <span className="ml-auto text-xs opacity-75">Retrying...</span>
-                )}
-              </p>
-            </div>
-          )}
         </div>
       )}
-      
+
       {/* No Audio Message */}
       {!hasAudio && (
         <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -521,7 +487,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <div className="flex items-center justify-center sm:justify-start space-x-3 sm:space-x-2">
             <button
               onClick={handleSkipBack}
-              className="audio-control w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50 touch-manipulation"
+              className="audio-control w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 disabled:opacity-50 touch-manipulation"
               disabled={isLoading || (!audioReady && !!error)}
               aria-label="Skip back 15 seconds"
             >
@@ -530,7 +496,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             
             <button
               onClick={handlePlayPause}
-              className="audio-control w-14 h-14 sm:w-12 sm:h-12 flex items-center justify-center text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 rounded-xl shadow-soft hover:shadow-medium focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 touch-manipulation"
+              className="audio-control w-14 h-14 sm:w-12 sm:h-12 flex items-center justify-center text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 rounded-xl shadow-soft hover:shadow-medium focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 touch-manipulation"
               disabled={isLoading || (!audioReady && !!error)}
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
@@ -545,7 +511,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             
             <button
               onClick={handleSkipForward}
-              className="audio-control w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50 touch-manipulation"
+              className="audio-control w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 disabled:opacity-50 touch-manipulation"
               disabled={isLoading || (!audioReady && !!error)}
               aria-label="Skip forward 15 seconds"
             >
@@ -559,7 +525,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             <div className="flex items-center space-x-2 group/volume">
               <button
                 onClick={handleVolumeToggle}
-                className="w-8 h-8 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
+                className="w-8 h-8 flex items-center justify-center text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200"
                 aria-label={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -572,7 +538,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
                   step="0.1"
                   value={isMuted ? 0 : volume}
                   onChange={handleVolumeChange}
-                  className="w-20 h-1 bg-neutral-200 rounded-full appearance-none cursor-pointer"
+                  className="w-20 h-1 bg-emerald-200 rounded-full appearance-none cursor-pointer"
                   style={{
                     background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) ${(isMuted ? 0 : volume) * 100}%, rgb(228, 228, 231) 100%)`
                   }}
@@ -583,7 +549,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
             {/* Speed Control */}
             <button
               onClick={handleSpeedChange}
-              className="flex items-center space-x-1 px-2 py-1 text-xs font-medium text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
+              className="flex items-center space-x-1 px-2 py-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200"
               aria-label={`Playback speed: ${playbackRate}x`}
             >
               <Settings size={16} />
@@ -595,14 +561,14 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
           <div className="md:hidden flex items-center space-x-3">
             <button
               onClick={handleVolumeToggle}
-              className="w-10 h-10 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 touch-manipulation"
+              className="w-10 h-10 flex items-center justify-center text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 touch-manipulation"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
             </button>
             <button
               onClick={handleSpeedChange}
-              className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 touch-manipulation min-w-[3rem]"
+              className="px-3 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 touch-manipulation min-w-[3rem]"
               aria-label={`Playback speed: ${playbackRate}x`}
             >
               {playbackRate}x
@@ -612,7 +578,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
       )}
 
       {/* Action Buttons */}
-      <div className="pt-6 border-t border-neutral-200/80 flex flex-col gap-3 sm:gap-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+      <div className="pt-6 border-t border-emerald-200/80 flex flex-col gap-3 sm:gap-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
         {hasAudio ? (
           /* Show audio-related actions if audio exists */
           <>
@@ -694,7 +660,7 @@ const PodcastPlayerItem: React.FC<PodcastPlayerItemProps> = ({ podcast }) => {
 
       {/* Quiz Component */}
       {showQuiz && (
-        <div className="mt-6 pt-6 border-t border-neutral-200/80">
+        <div className="mt-6 pt-6 border-t border-emerald-200/80">
           <Quiz quizId={podcast.content_id} episodeTitle={podcast.title} />
         </div>
       )}

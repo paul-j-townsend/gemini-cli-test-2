@@ -231,34 +231,34 @@ const Badges = () => {
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
       case 'common':
-        return 'from-gray-400 to-gray-500';
+        return 'from-emerald-400 to-emerald-500';
       case 'uncommon':
-        return 'from-green-400 to-green-500';
+        return 'from-teal-400 to-teal-500';
       case 'rare':
-        return 'from-blue-400 to-blue-500';
+        return 'from-emerald-500 to-teal-600';
       case 'epic':
-        return 'from-purple-400 to-purple-500';
+        return 'from-teal-500 to-emerald-600';
       case 'legendary':
-        return 'from-yellow-400 to-orange-500';
+        return 'from-emerald-600 to-teal-700';
       default:
-        return 'from-gray-400 to-gray-500';
+        return 'from-emerald-400 to-emerald-500';
     }
   };
 
   const getBorderColor = (rarity: string) => {
     switch (rarity) {
       case 'common':
-        return 'border-gray-300';
+        return 'border-emerald-300';
       case 'uncommon':
-        return 'border-green-300';
+        return 'border-teal-300';
       case 'rare':
-        return 'border-blue-300';
+        return 'border-emerald-400';
       case 'epic':
-        return 'border-purple-300';
+        return 'border-teal-400';
       case 'legendary':
-        return 'border-yellow-300';
+        return 'border-emerald-500';
       default:
-        return 'border-gray-300';
+        return 'border-emerald-300';
     }
   };
 
@@ -270,10 +270,10 @@ const Badges = () => {
       </Head>
 
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-primary-50 via-white to-neutral-50 overflow-hidden">
+      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-emerald-50 via-white to-emerald-50 overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/3 w-80 h-80 bg-primary-200/20 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-0 left-1/3 w-80 h-80 bg-emerald-200/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-teal-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
         </div>
 
         <div className="relative container-wide">
@@ -324,18 +324,18 @@ const Badges = () => {
       </div>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+      <section className="py-20 lg:py-32 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
         <div className="container-wide text-center">
           <div className="animate-fade-in-up">
             <h2 className="text-3xl lg:text-4xl font-bold mb-6">
               Start Earning Badges Today
             </h2>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto mb-10">
+            <p className="text-xl text-emerald-100 max-w-3xl mx-auto mb-10">
               Join our community of veterinary professionals and start building your professional badge collection. 
               Track your progress and showcase your expertise.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/forum" className="btn-secondary btn-lg bg-white text-primary-600 hover:bg-neutral-50">
+              <Link href="/forum" className="btn-secondary btn-lg bg-white text-emerald-600 hover:bg-emerald-50">
                 Join the Community
               </Link>
               <Link href="/podcasts" className="btn-ghost btn-lg text-white border-white hover:bg-white/10">

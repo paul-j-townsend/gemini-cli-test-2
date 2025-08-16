@@ -221,13 +221,13 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-neutral-200">
-          <h2 className="text-xl font-semibold text-neutral-900">Purchase CPD Content</h2>
+        <div className="flex items-center justify-between p-6 border-b border-emerald-200">
+          <h2 className="text-xl font-semibold text-emerald-900">Purchase CPD Content</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+            className="p-2 hover:bg-emerald-100 rounded-full transition-colors"
           >
-            <X size={20} className="text-neutral-500" />
+            <X size={20} className="text-emerald-500" />
           </button>
         </div>
 
@@ -235,14 +235,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
         <div className="p-6">
           {isCheckingAccess ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 size={24} className="animate-spin text-primary-600" />
-              <span className="ml-2 text-neutral-600">Checking access...</span>
+              <Loader2 size={24} className="animate-spin text-emerald-600" />
+              <span className="ml-2 text-emerald-600">Checking access...</span>
             </div>
           ) : (
             <>
               {/* Episode Info */}
               <div className="flex gap-4 mb-6">
-                <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-200">
+                <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-100 to-emerald-200">
                   <Image
                     src={getThumbnailUrl(episode)}
                     alt={episode.title}
@@ -252,14 +252,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg text-neutral-900 mb-2 line-clamp-2">
+                  <h3 className="font-semibold text-lg text-emerald-900 mb-2 line-clamp-2">
                     {episode.title}
                   </h3>
-                  <p className="text-sm text-neutral-600 mb-2 line-clamp-2">
+                  <p className="text-sm text-emerald-700 mb-2 line-clamp-2">
                     {episode.description}
                   </p>
                   {episode.duration && (
-                    <div className="text-xs text-neutral-500">
+                    <div className="text-xs text-emerald-500">
                       <span className="font-medium">CPD: </span>
                       {Math.floor(episode.duration / 3600) > 0 
                         ? `${Math.floor(episode.duration / 3600)} hour${Math.floor(episode.duration / 3600) > 1 ? 's' : ''}` 
@@ -271,8 +271,8 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
               {/* Benefits */}
               <div className="mb-6">
-                <h4 className="font-medium text-neutral-900 mb-3">What's included:</h4>
-                <ul className="space-y-2 text-sm text-neutral-600">
+                <h4 className="font-medium text-emerald-900 mb-3">What's included:</h4>
+                <ul className="space-y-2 text-sm text-emerald-700">
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
                     Full podcast access
@@ -291,7 +291,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={16} className="text-green-500 flex-shrink-0" />
-                    RCVS CPD Activity Log
+                    RCVS CPD Activity Log with quick 1CPD access
                   </li>
                 </ul>
               </div>
@@ -309,7 +309,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                             🔥 LIMITED TIME OFFER
                           </div>
                           <div className="flex items-center justify-center gap-3 mb-2">
-                            <span className="text-xl text-neutral-500 line-through decoration-2">
+                            <span className="text-xl text-emerald-500 line-through decoration-2">
                               {formatPrice(getRegularPrice())}
                             </span>
                             <span className="text-3xl font-bold text-green-600">
@@ -336,26 +336,26 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                         <>
                           {/* Show offer exists but not currently active */}
                           <div className="flex items-center justify-center gap-3 mb-2">
-                            <span className="text-lg text-neutral-400 line-through">
+                            <span className="text-lg text-emerald-400 line-through">
                               Was {formatPrice(getRegularPrice())}</span>
-                            <span className="text-2xl font-bold text-neutral-900">
+                            <span className="text-2xl font-bold text-emerald-900">
                               Now {formatPrice(episode.special_offer_price_cents || 0)}
                             </span>
-                            <span className="bg-gray-100 text-gray-600 text-sm font-bold px-2 py-1 rounded">
+                            <span className="bg-emerald-100 text-emerald-600 text-sm font-bold px-2 py-1 rounded">
                               {getSavingsPercentage()}% OFF
                             </span>
                           </div>
-                          <div className="text-sm text-neutral-600 mb-2">One-time purchase</div>
+                          <div className="text-sm text-emerald-600 mb-2">One-time purchase</div>
                         </>
                       )}
                     </div>
                   ) : (
                     <>
                       {/* No special offer pricing set */}
-                      <div className="text-3xl font-bold text-neutral-900 mb-2">
+                      <div className="text-3xl font-bold text-emerald-900 mb-2">
                         {formatPrice(getCurrentPrice())}
                       </div>
-                      <div className="text-sm text-neutral-500 mb-3">One-time purchase</div>
+                      <div className="text-sm text-emerald-500 mb-3">One-time purchase</div>
                     </>
                   )}
                 </div>
@@ -366,8 +366,8 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   disabled={isLoading || !user}
                   className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-lg font-medium text-lg transition-colors mt-4 ${
                     isLoading || !user
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'bg-primary-600 hover:bg-primary-700 text-white'
+                      ? 'bg-emerald-400 text-white cursor-not-allowed'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                   }`}
                 >
                   {isLoading ? (
@@ -384,7 +384,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 </button>
 
                 {!user && (
-                  <p className="mt-2 text-xs text-neutral-500">
+                  <p className="mt-2 text-xs text-emerald-500">
                     Please log in to purchase content
                   </p>
                 )}

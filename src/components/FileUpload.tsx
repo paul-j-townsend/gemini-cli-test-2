@@ -197,7 +197,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <button
           type="button"
           onClick={() => setShowFileSelector(true)}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
+          className="text-sm text-emerald-600 hover:text-emerald-700 font-medium underline"
         >
           Browse existing files
         </button>
@@ -206,9 +206,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
       <div
         className={`
           relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200
-          ${dragActive ? 'border-blue-400 bg-blue-50 scale-[1.02]' : 'border-gray-300'}
-          ${uploading ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer hover:border-gray-400 hover:bg-gray-50'}
-          ${successMessage ? 'border-green-400 bg-green-50' : ''}
+          ${dragActive ? 'border-emerald-400 bg-emerald-50 scale-[1.02]' : 'border-emerald-300'}
+          ${uploading ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer hover:border-emerald-400 hover:bg-emerald-50'}
+          ${successMessage ? 'border-emerald-400 bg-emerald-50' : ''}
         `}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -230,13 +230,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <div className="w-16 h-16 relative">
               <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
               <div 
-                className="w-16 h-16 border-4 border-blue-600 rounded-full border-t-transparent absolute top-0 animate-spin"
+                className="w-16 h-16 border-4 border-emerald-600 rounded-full border-t-transparent absolute top-0 animate-spin"
                 style={{
-                  background: `conic-gradient(#2563eb ${uploadProgress * 3.6}deg, transparent 0deg)`
+                  background: `conic-gradient(#059669 ${uploadProgress * 3.6}deg, transparent 0deg)`
                 }}
               ></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-semibold text-blue-600">
+                <span className="text-xs font-semibold text-emerald-600">
                   {Math.round(uploadProgress)}%
                 </span>
               </div>
@@ -250,9 +250,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </p>
             </div>
             {/* Progress bar */}
-            <div className="w-full max-w-xs bg-gray-200 rounded-full h-2">
+            <div className="w-full max-w-xs bg-emerald-200 rounded-full h-2">
               <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
@@ -281,7 +281,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
             <div className="space-y-1">
               <p className="text-sm font-medium text-gray-700">
-                Drop your {type} here or <span className="text-blue-600 underline">browse</span>
+                Drop your {type} here or <span className="text-emerald-600 underline">browse</span>
               </p>
               <p className="text-xs text-gray-500">
                 {type === 'image' 

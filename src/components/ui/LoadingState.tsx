@@ -19,9 +19,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 
   return (
     <div className={`flex items-center justify-center py-8 ${className}`}>
-      <div className={`animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500 ${sizeClasses[size]}`}></div>
+      <div className={`animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-500 ${sizeClasses[size]}`}></div>
       {message && (
-        <span className="ml-3 text-neutral-600">{message}</span>
+        <span className="ml-3 text-emerald-600">{message}</span>
       )}
     </div>
   );

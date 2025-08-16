@@ -14,7 +14,7 @@ const Footer = () => {
   return (
     <footer className="relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white">
       {/* Decorative gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-primary-900/20 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/20 to-transparent"></div>
       
       <div className="relative container-wide">
         {/* Main footer content */}
@@ -28,31 +28,31 @@ const Footer = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gradient-primary">Vet Sidekick</h3>
-                  <p className="text-xs text-neutral-400">Professional CPD</p>
+                  <p className="text-xs text-emerald-400">Professional CPD</p>
                 </div>
               </div>
-              <p className="text-neutral-300 leading-relaxed mb-6">
+              <p className="text-emerald-300 leading-relaxed mb-6">
                 Empowering veterinary professionals with expert insights, educational podcasts and community-driven resources.
               </p>
               <div className="flex space-x-4">
                 {/* Social media icons */}
                 <a 
                   href={footerLinks.connect[0].href} 
-                  className="w-10 h-10 bg-neutral-800 hover:bg-primary-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                  className="w-10 h-10 bg-emerald-800 hover:bg-emerald-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                   aria-label="Follow us on X"
                 >
                   <TwitterIcon />
                 </a>
                 <a 
                   href={footerLinks.connect[1].href} 
-                  className="w-10 h-10 bg-neutral-800 hover:bg-primary-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                  className="w-10 h-10 bg-emerald-800 hover:bg-emerald-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                   aria-label="Connect on LinkedIn"
                 >
                   <LinkedInIcon />
                 </a>
                 <a 
                   href={footerLinks.connect[2].href} 
-                  className="w-10 h-10 bg-neutral-800 hover:bg-primary-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                  className="w-10 h-10 bg-emerald-800 hover:bg-emerald-600 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                   aria-label="Subscribe on YouTube"
                 >
                   <YouTubeIcon />
@@ -79,27 +79,27 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-neutral-800 py-6">
+        <div className="border-t border-emerald-800 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-emerald-400">
               © {currentYear} Vet Sidekick. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
               <Link 
                 href="/privacy-policy" 
-                className="text-sm text-neutral-400 hover:text-primary-400 transition-colors duration-200"
+                className="text-sm text-emerald-400 hover:text-emerald-400 transition-colors duration-200"
               >
                 Privacy Policy
               </Link>
               <Link 
                 href="/terms-of-service" 
-                className="text-sm text-neutral-400 hover:text-primary-400 transition-colors duration-200"
+                className="text-sm text-emerald-400 hover:text-emerald-400 transition-colors duration-200"
               >
                 Terms of Service
               </Link>
               <Link 
                 href="/cookies" 
-                className="text-sm text-neutral-400 hover:text-primary-400 transition-colors duration-200"
+                className="text-sm text-emerald-400 hover:text-emerald-400 transition-colors duration-200"
               >
                 Cookies
               </Link>

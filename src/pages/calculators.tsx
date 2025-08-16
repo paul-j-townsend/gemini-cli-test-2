@@ -310,38 +310,38 @@ export default function Calculators() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {/* Drug Dosage Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">💉</span>
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
+              <span className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">💉</span>
               Drug Dosage Calculator
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={dogWeight}
                   onChange={(e) => setDogWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Dose (mg/kg)
                 </label>
                 <input
                   type="number"
                   value={drugDose}
                   onChange={(e) => setDrugDose(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Enter dose in mg/kg"
                 />
               </div>
               {calculateDrugDose() && (
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-lg font-semibold text-blue-900">
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <p className="text-lg font-semibold text-emerald-900">
                     Total Dose: {calculateDrugDose()} mg
                   </p>
                 </div>
@@ -351,31 +351,31 @@ export default function Calculators() {
 
           {/* Chocolate Toxicity Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">⚠️</span>
               Chocolate Toxicity
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={chocolateWeight}
                   onChange={(e) => setChocolateWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Chocolate Type
                 </label>
                 <select
                   value={chocolateType}
                   onChange={(e) => setChocolateType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
                   <option value="white">White Chocolate</option>
                   <option value="milk">Milk Chocolate</option>
@@ -384,14 +384,14 @@ export default function Calculators() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Amount Ingested (g)
                 </label>
                 <input
                   type="number"
                   value={chocolateAmount}
                   onChange={(e) => setChocolateAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Enter amount in grams"
                 />
               </div>
@@ -423,20 +423,20 @@ export default function Calculators() {
 
           {/* Body Surface Area Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">📏</span>
               Body Surface Area
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={bsaWeight}
                   onChange={(e) => setBsaWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
@@ -455,32 +455,32 @@ export default function Calculators() {
 
           {/* Fluid Therapy Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🩹</span>
               Fluid Therapy Calculator
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={patientWeight}
                   onChange={(e) => setPatientWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Dehydration (%)
                 </label>
                 <input
                   type="number"
                   value={dehydrationPercent}
                   onChange={(e) => setDehydrationPercent(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Enter dehydration percentage"
                 />
               </div>
@@ -502,31 +502,31 @@ export default function Calculators() {
 
           {/* Anaesthesia Gas Flow Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🫁</span>
               Anaesthesia Calculator
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={anesthesiaWeight}
                   onChange={(e) => setAnesthesiaWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Species
                 </label>
                 <select
                   value={anesthesiaSpecies}
                   onChange={(e) => setAnesthesiaSpecies(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="canine">Canine</option>
                   <option value="feline">Feline</option>
@@ -553,44 +553,44 @@ export default function Calculators() {
 
           {/* Calorie Requirements Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🥘</span>
               Calorie Requirements
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={calorieWeight}
                   onChange={(e) => setCalorieWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Species
                 </label>
                 <select
                   value={calorieSpecies}
                   onChange={(e) => setCalorieSpecies(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="canine">Canine</option>
                   <option value="feline">Feline</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Life Stage
                 </label>
                 <select
                   value={calorieLifeStage}
                   onChange={(e) => setCalorieLifeStage(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value={calorieSpecies === 'canine' ? 'puppy' : 'kitten'}>
                     {calorieSpecies === 'canine' ? 'Puppy' : 'Kitten'}
@@ -620,44 +620,44 @@ export default function Calculators() {
 
           {/* Blood Transfusion Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🔴</span>
               Blood Transfusion
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={transfusionWeight}
                   onChange={(e) => setTransfusionWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Current PCV (%)
                 </label>
                 <input
                   type="number"
                   value={currentPCV}
                   onChange={(e) => setCurrentPCV(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Current PCV"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Target PCV (%)
                 </label>
                 <input
                   type="number"
                   value={targetPCV}
                   onChange={(e) => setTargetPCV(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Target PCV"
                 />
               </div>
@@ -679,56 +679,56 @@ export default function Calculators() {
 
           {/* CRI Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🧪</span>
               CRI Calculator
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Patient Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={criWeight}
                   onChange={(e) => setCriWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Drug Concentration (mg/ml)
                 </label>
                 <input
                   type="number"
                   value={criDrugAmount}
                   onChange={(e) => setCriDrugAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Drug concentration"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Fluid Rate (ml/hr)
                 </label>
                 <input
                   type="number"
                   value={criFluidRate}
                   onChange={(e) => setCriFluidRate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Fluid rate ml/hr"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Desired Rate (mg/kg/hr)
                 </label>
                 <input
                   type="number"
                   value={criDesiredRate}
                   onChange={(e) => setCriDesiredRate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Desired dose rate"
                 />
               </div>
@@ -747,19 +747,19 @@ export default function Calculators() {
 
           {/* Unit Conversion Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">⚖️</span>
               Unit Converter
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Unit Category
                 </label>
                 <select
                   value={convertCategory}
                   onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   <option value="weight">Weight</option>
                   <option value="volume">Volume</option>
@@ -767,26 +767,26 @@ export default function Calculators() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-emerald-700 mb-2">
                   Value to Convert
                 </label>
                 <input
                   type="number"
                   value={convertValue}
                   onChange={(e) => setConvertValue(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="Enter value"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-emerald-700 mb-2">
                     From
                   </label>
                   <select
                     value={convertFrom}
                     onChange={(e) => setConvertFrom(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     {unitCategories[convertCategory].units.map(unit => (
                       <option key={unit} value={unit}>{unit}</option>
@@ -794,13 +794,13 @@ export default function Calculators() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-emerald-700 mb-2">
                     To
                   </label>
                   <select
                     value={convertTo}
                     onChange={(e) => setConvertTo(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     {unitCategories[convertCategory].units.map(unit => (
                       <option key={unit} value={unit}>{unit}</option>
@@ -820,7 +820,7 @@ export default function Calculators() {
 
           {/* Body Condition Score Reference */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🐕</span>
               Body Condition Score
             </h2>
@@ -850,7 +850,7 @@ export default function Calculators() {
 
           {/* Emergency Drug Doses */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">🆘</span>
               Emergency Drug Doses
             </h2>

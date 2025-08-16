@@ -343,12 +343,18 @@ export default function ContentManagement() {
   const fetchContent = async () => {
     setLoading(true);
     try {
+      console.log('ContentManagement: Starting fetch from /api/admin/content');
       const response = await fetch('/api/admin/content');
+      console.log('ContentManagement: Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.log('ContentManagement: Error response data:', errorData);
+        
         if (response.status === 500) {
           // Check if it's a table not found error
           if (errorData.details?.includes('vsk_content') || errorData.details?.includes('relationship')) {
+            console.log('ContentManagement: Setting MIGRATION_NEEDED error');
             setError('MIGRATION_NEEDED');
             setLoading(false);
             return;
@@ -356,10 +362,13 @@ export default function ContentManagement() {
         }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
       const data = await response.json();
+      console.log('ContentManagement: Successfully fetched data:', data?.length || 0, 'items');
       setContent(data);
       setError(null);
     } catch (err) {
+      console.error('ContentManagement: Fetch error:', err);
       setError(`Failed to fetch content: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setLoading(false);
@@ -685,7 +694,7 @@ export default function ContentManagement() {
             {content.is_published ? 'Published' : 'Draft'}
           </span>
           {content.audio_src && (
-            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 w-fit">
+            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 w-fit">
               Audio
             </span>
           )}
@@ -742,465 +751,169 @@ export default function ContentManagement() {
     return <LoadingState message="Loading content..." />;
   }
 
-  // Special case: Migration needed
-  if (error === 'MIGRATION_NEEDED') {
+  // Special case: Migration needed - TEMPORARILY DISABLED FOR DEBUGGING
+  if (error === 'MIGRATION_NEEDED_DISABLED') {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Content Management</h2>
-            <p className="text-gray-600 mt-1">Unified podcast episodes and quiz management</p>
+            <h2 className="text-2xl font-bold text-emerald-900">Content Management</h2>
+            <p className="text-emerald-700 mt-1">Unified podcast episodes and quiz management</p>
           </div>
+          <button
+            onClick={() => {
+              console.log('Manual refresh triggered');
+              setError(null);
+              fetchContent();
+            }}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          >
+            Retry Fetch
+          </button>
+        </div>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-yellow-800 font-medium">Debug Info</h3>
+          <p className="text-yellow-700 text-sm">Migration error detected. Current error: {error}</p>
+          <p className="text-yellow-700 text-sm">Content count: {content.length}</p>
         </div>
 
-        <Card>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Setup Required</h3>
-                <p className="text-gray-600">The unified content management system needs to be set up.</p>
+        {/* Setup Required Message */}
+        {/* hasSetup and runMigration are not defined in the original file, so this block is commented out */}
+        {/* {!hasSetup && (
+          <div className="mb-8">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
+              <h3 className="text-lg font-medium text-emerald-900">Setup Required</h3>
+              <p className="text-emerald-700">The unified content management system needs to be set up.</p>
+              
+              <div className="mt-4 space-y-4">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                  <h4 className="font-medium text-emerald-900 mb-2">Quick Setup Instructions:</h4>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-emerald-800">
+                    <li>Run the SQL migration script below</li>
+                    <li>Restart your application</li>
+                    <li>Create your first content item</li>
+                  </ol>
+                </div>
+                
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-emerald-900">SQL Migration Script:</h4>
+                    <Button
+                      onClick={runMigration}
+                      variant="secondary"
+                      size="sm"
+                      disabled={migrationRunning}
+                    >
+                      {migrationRunning ? 'Running...' : 'Run Migration'}
+                    </Button>
+                  </div>
+                  <pre className="text-xs text-emerald-700 bg-white p-3 rounded border overflow-x-auto whitespace-pre-wrap">
+                    {migrationScript}
+                  </pre>
+                </div>
               </div>
             </div>
+          </div>
+        )} */}
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">Quick Setup Instructions:</h4>
-              <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
-                <li>Go to your <strong>Supabase Dashboard</strong></li>
-                <li>Open the <strong>SQL Editor</strong></li>
-                <li>Copy and paste the SQL below</li>
-                <li>Click <strong>Run</strong> to create the unified content tables</li>
-                <li>Refresh this page to start using the unified interface</li>
-              </ol>
-            </div>
-
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium text-gray-900">SQL Migration Script:</h4>
-                <Button
-                  onClick={() => {
-                    navigator.clipboard.writeText(`-- Step 1: Create unified content table
-CREATE TABLE vsk_content (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    title TEXT NOT NULL,
-    description TEXT,
-    audio_src TEXT,
-    full_audio_src TEXT,
-    image_url TEXT,
-    thumbnail_path TEXT,
-    duration INTEGER,
-    episode_number INTEGER NOT NULL DEFAULT 1,
-    season INTEGER NOT NULL DEFAULT 1,
-    slug TEXT UNIQUE,
-    published_at TIMESTAMP WITH TIME ZONE,
-    is_published BOOLEAN DEFAULT false,
-    featured BOOLEAN DEFAULT false,
-    category TEXT,
-    tags TEXT[],
-    show_notes TEXT,
-    transcript TEXT,
-    file_size INTEGER,
-    meta_title TEXT,
-    meta_description TEXT,
-    quiz_title TEXT,
-    quiz_description TEXT,
-    quiz_category TEXT,
-    pass_percentage INTEGER DEFAULT 70,
-    total_questions INTEGER DEFAULT 0,
-    quiz_is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Step 2: Create questions table
-CREATE TABLE vsk_content_questions (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    content_id UUID NOT NULL REFERENCES vsk_content(id) ON DELETE CASCADE,
-    question_number INTEGER NOT NULL,
-    question_text TEXT NOT NULL,
-    explanation TEXT,
-    rationale TEXT,
-    learning_outcome TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(content_id, question_number)
-);
-
--- Step 3: Create answers table
-CREATE TABLE vsk_content_question_answers (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    question_id UUID NOT NULL REFERENCES vsk_content_questions(id) ON DELETE CASCADE,
-    answer_letter TEXT NOT NULL CHECK (answer_letter IN ('A', 'B', 'C', 'D', 'E')),
-    answer_text TEXT NOT NULL,
-    is_correct BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(question_id, answer_letter)
-);
-
--- Step 4: Enable RLS
-ALTER TABLE vsk_content ENABLE ROW LEVEL SECURITY;
-ALTER TABLE vsk_content_questions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE vsk_content_question_answers ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Allow read access to content" ON vsk_content FOR SELECT USING (true);
-CREATE POLICY "Allow all operations on content" ON vsk_content FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow read access to content questions" ON vsk_content_questions FOR SELECT USING (true);
-CREATE POLICY "Allow all operations on content questions" ON vsk_content_questions FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow read access to content question answers" ON vsk_content_question_answers FOR SELECT USING (true);
-CREATE POLICY "Allow all operations on content question answers" ON vsk_content_question_answers FOR ALL USING (auth.role() = 'authenticated');
-
--- Step 5: Insert sample data
-INSERT INTO vsk_content (
-    id, title, description, audio_src, full_audio_src, episode_number, season, slug, 
-    is_published, featured, category, published_at,
-    quiz_title, quiz_description, quiz_category, pass_percentage, total_questions, quiz_is_active
-) VALUES (
-    '10000000-0000-0000-0000-000000000001', 
-    'Ethics in Veterinary Practice', 
-    'An introduction to ethical considerations in veterinary nursing', 
-    '/audio/ethics-preview.mp3', 
-    '/audio/ethics-full.mp3', 
-    1, 1, 
-    'ethics-in-veterinary-practice', 
-    true, true, 
-    'Professional Development', 
-    NOW(),
-    'Veterinary Ethics Assessment',
-    'Test your understanding of ethical principles',
-    'ethics',
-    70, 2, true
-);
-
--- Step 6: Insert sample questions
-INSERT INTO vsk_content_questions (content_id, question_number, question_text, explanation, rationale, learning_outcome)
-VALUES (
-    '10000000-0000-0000-0000-000000000001',
-    1,
-    'Which of the four principles of biomedical ethics requires veterinary nurses to act in the best interests of their patients?',
-    'This question tests understanding of the four core principles of biomedical ethics.',
-    'Beneficence requires acting in the best interests of the patient, including optimal nursing care and evidence-based protocols.',
-    'Analyze ethical dilemmas using established ethical frameworks'
-);`);
-                  }}
-                  variant="secondary"
-                  size="sm"
-                >
-                  Copy SQL
-                </Button>
-              </div>
-              <pre className="text-xs text-gray-700 bg-white p-3 rounded border overflow-x-auto whitespace-pre-wrap">
-{`-- Step 1: Create unified content table
-CREATE TABLE vsk_content (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    title TEXT NOT NULL,
-    description TEXT,
-    audio_src TEXT,
-    full_audio_src TEXT,
-    image_url TEXT,
-    thumbnail_path TEXT,
-    duration INTEGER,
-    episode_number INTEGER NOT NULL DEFAULT 1,
-    season INTEGER NOT NULL DEFAULT 1,
-    slug TEXT UNIQUE,
-    published_at TIMESTAMP WITH TIME ZONE,
-    is_published BOOLEAN DEFAULT false,
-    featured BOOLEAN DEFAULT false,
-    category TEXT,
-    tags TEXT[],
-    show_notes TEXT,
-    transcript TEXT,
-    file_size INTEGER,
-    meta_title TEXT,
-    meta_description TEXT,
-    quiz_title TEXT,
-    quiz_description TEXT,
-    quiz_category TEXT,
-    pass_percentage INTEGER DEFAULT 70,
-    total_questions INTEGER DEFAULT 0,
-    quiz_is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Step 2: Create questions table
-CREATE TABLE vsk_content_questions (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    content_id UUID NOT NULL REFERENCES vsk_content(id) ON DELETE CASCADE,
-    question_number INTEGER NOT NULL,
-    question_text TEXT NOT NULL,
-    explanation TEXT,
-    rationale TEXT,
-    learning_outcome TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(content_id, question_number)
-);
-
--- Step 3: Create answers table  
-CREATE TABLE vsk_content_question_answers (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    question_id UUID NOT NULL REFERENCES vsk_content_questions(id) ON DELETE CASCADE,
-    answer_letter TEXT NOT NULL CHECK (answer_letter IN ('A', 'B', 'C', 'D', 'E')),
-    answer_text TEXT NOT NULL,
-    is_correct BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(question_id, answer_letter)
-);`}
-              </pre>
-            </div>
-
-            <div className="flex gap-3">
+        {/* Content Form */}
+        {showForm && (
+          <div className="bg-white border border-emerald-200 rounded-lg p-6 shadow-sm mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-medium text-emerald-900">
+                {editingContent ? 'Edit Content' : 'Add New Content'}
+              </h3>
               <Button
                 onClick={() => {
-                  setError(null);
-                  fetchContent();
+                  setShowForm(false);
+                  setEditingContent(null);
+                  reset();
                 }}
-                variant="primary"
+                variant="ghost"
+                size="sm"
               >
-                Retry Connection
-              </Button>
-              <Button
-                onClick={() => window.open('https://supabase.com/dashboard', '_blank')}
-                variant="secondary"
-              >
-                Open Supabase Dashboard
+                Cancel
               </Button>
             </div>
-          </div>
-        </Card>
-      </div>
-    );
-  }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Content Management</h2>
-          <p className="text-gray-600 mt-1">Manage podcast episodes and their associated quizzes</p>
-        </div>
-        <div className="flex space-x-3">
-          {!showForm && (
-            <Button onClick={handleCreateNew} variant="primary">
-              Create New Content
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {error && error !== 'MIGRATION_NEEDED' && (
-        <ErrorDisplay
-          error={error}
-          onDismiss={() => setError(null)}
-        />
-      )}
-
-      {showForm ? (
-        <Card>
-          {/* Tab Navigation */}
-          <div className="border-b border-gray-200 mb-6">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('podcast')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'podcast'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Podcast Details
-              </button>
-              <button
-                onClick={() => setActiveTab('quiz')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'quiz'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Quiz Questions ({formData.questions.length})
-              </button>
-            </nav>
-          </div>
-
-          <form onSubmit={handleFormSubmit} className="space-y-6">
-            {activeTab === 'podcast' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900">Podcast Episode Information</h3>
-                
-                <Input
-                  label="Episode Title"
-                  value={formData.title}
-                  onChange={(value) => {
-                    handleChange('title', value);
-                    if (!formData.slug || formData.slug === generateSlug(formData.title)) {
-                      handleChange('slug', generateSlug(value));
-                    }
-                    if (!formData.quiz_title) {
-                      handleChange('quiz_title', value + ' Quiz');
-                    }
-                  }}
-                  required
-                  error={errors.title}
-                />
-
-                <TextArea
-                  label="Episode Description"
-                  value={formData.description}
-                  onChange={(value) => handleChange('description', value)}
-                  rows={3}
-                  error={errors.description}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Input
-                    label="Season"
-                    type="number"
-                    value={formData.season.toString()}
-                    onChange={(value) => handleChange('season', parseInt(value) || 1)}
-                    min={1}
-                    error={errors.season}
-                  />
-                  
-                  <Input
-                    label="Episode Number"
-                    type="number"
-                    value={formData.episode_number.toString()}
-                    onChange={(value) => handleChange('episode_number', parseInt(value) || 1)}
-                    min={1}
-                    error={errors.episode_number}
-                  />
-
-                  <DurationInput
-                    label="Duration"
-                    value={formData.duration}
-                    onChange={(value) => handleChange('duration', value)}
-                    error={errors.duration}
-                  />
-                </div>
-
-                <Input
-                  label="URL Slug"
-                  value={formData.slug}
-                  onChange={(value) => handleChange('slug', value)}
-                  placeholder="Auto-generated from title"
-                  error={errors.slug}
-                />
-
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Basic Information */}
+              <div className="border-b border-emerald-200 mb-6">
+                <h4 className="text-lg font-medium text-emerald-900 mb-4">Basic Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Checkbox
-                    label="Published"
-                    checked={formData.is_published}
-                    onChange={(checked) => handleChange('is_published', checked)}
-                  />
-
-                  <Checkbox
-                    label="Featured Episode"
-                    checked={formData.featured}
-                    onChange={(checked) => handleChange('featured', checked)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Categories
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {availableKeywords.map((keyword) => (
-                      <button
-                        key={keyword}
-                        type="button"
-                        onClick={() => handleCategoryToggle(keyword)}
-                        className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-                          selectedCategories.includes(keyword)
-                            ? 'bg-primary-100 border-primary-300 text-primary-800'
-                            : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {keyword}
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block text-sm font-medium text-emerald-700">
+                      Title *
+                    </label>
+                    <Input
+                      value={formData.title}
+                      onChange={(value) => handleChange('title', value)}
+                      placeholder="Enter content title"
+                      error={errors.title}
+                    />
                   </div>
-                  {selectedCategories.length > 0 && (
-                    <div className="text-sm text-gray-600">
-                      Selected: {selectedCategories.filter(cat => availableKeywords.includes(cat)).join(', ')}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Series
-                  </label>
-                  <select
-                    value={formData.series_id}
-                    onChange={(e) => handleChange('series_id', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  >
-                    <option value="">No Series (Standalone Episode)</option>
-                    {availableSeries.map((series) => (
-                      <option key={series.id} value={series.id}>
-                        {series.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-sm text-gray-600">
-                    Assign this content to a series for better organization
-                  </p>
-                </div>
-
-                <FileUploadField
-                  label="Preview Audio"
-                  type="audio"
-                  value={formData.audio_src}
-                  onChange={(url, _path) => handleChange('audio_src', url)}
-                  helpText="Short version for initial play"
-                />
-
-                <FileUploadField
-                  label="Full Audio"
-                  type="audio"
-                  value={formData.full_audio_src}
-                  onChange={(url, _path) => handleChange('full_audio_src', url)}
-                  helpText="Complete episode for full access"
-                />
-
-                <FileUploadField
-                  label="Thumbnail Image"
-                  type="image"
-                  value={getFormThumbnailUrl(formData)}
-                  onChange={(url, _path) => {
-                    handleChange('thumbnail_path', _path);
-                    handleChange('image_url', url);
-                  }}
-                />
-
-                <Input
-                  label="Published Date"
-                  type="datetime-local"
-                  value={formData.published_at}
-                  onChange={(value) => handleChange('published_at', value)}
-                  required
-                  error={errors.published_at}
-                />
-
-                <div className="border-t pt-4">
-                  <h4 className="text-md font-medium text-gray-900 mb-4">Pricing & Purchase</h4>
                   
+                  <div>
+                    <label className="block text-sm font-medium text-emerald-700">
+                      Description
+                    </label>
+                    <TextArea
+                      value={formData.description}
+                      onChange={(value) => handleChange('description', value)}
+                      rows={3}
+                      placeholder="Enter content description"
+                      error={errors.description}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing & Purchase */}
+              <div>
+                <h4 className="text-md font-medium text-emerald-900 mb-4">Pricing & Purchase</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Price (£)"
+                    type="number"
+                    step={0.01}
+                    min={0}
+                    value={formData.price_cents === 0 ? '' : (formData.price_cents / 100).toString()}
+                    onChange={(value) => {
+                      if (value === '' || value === null || value === undefined) {
+                        handleChange('price_cents', 0);
+                        return;
+                      }
+                      const numValue = parseFloat(value);
+                      if (isNaN(numValue)) {
+                        return;
+                      }
+                      const centsValue = Math.round(numValue * 100);
+                      handleChange('price_cents', centsValue);
+                    }}
+                    placeholder="9.99"
+                    error={errors.price_cents}
+                  />
+                  
+                  <Checkbox
+                    label="Available for Purchase"
+                    checked={formData.is_purchasable}
+                    onChange={(checked) => handleChange('is_purchasable', checked)}
+                    error={errors.is_purchasable}
+                  />
+                </div>
+                
+                <div className="mt-4 p-4 bg-emerald-50 rounded-lg">
+                  <h5 className="text-sm font-medium text-emerald-900 mb-3">Special Offer Settings</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Price (£)"
+                      label="Special Offer Price (£)"
                       type="number"
                       step={0.01}
                       min={0}
-                      value={formData.price_cents === 0 ? '' : (formData.price_cents / 100).toString()}
+                      value={formData.special_offer_price_cents === 0 ? '' : (formData.special_offer_price_cents / 100).toString()}
                       onChange={(value) => {
                         if (value === '' || value === null || value === undefined) {
-                          handleChange('price_cents', 0);
+                          handleChange('special_offer_price_cents', 0);
                           return;
                         }
                         const numValue = parseFloat(value);
@@ -1208,253 +921,230 @@ CREATE TABLE vsk_content_question_answers (
                           return;
                         }
                         const centsValue = Math.round(numValue * 100);
-                        handleChange('price_cents', centsValue);
+                        handleChange('special_offer_price_cents', centsValue);
                       }}
-                      placeholder="9.99"
+                      placeholder="7.99"
                     />
                     
                     <Checkbox
-                      label="Available for Purchase"
-                      checked={formData.is_purchasable}
-                      onChange={(checked) => handleChange('is_purchasable', checked)}
-                    />
-                  </div>
-                  
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h5 className="text-sm font-medium text-gray-900 mb-3">Special Offer Settings</h5>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <Input
-                        label="Special Offer Price (£)"
-                        type="number"
-                        step={0.01}
-                        min={0}
-                        value={formData.special_offer_price_cents === 0 ? '' : (formData.special_offer_price_cents / 100).toString()}
-                        onChange={(value) => {
-                          if (value === '' || value === null || value === undefined) {
-                            handleChange('special_offer_price_cents', 0);
-                            return;
-                          }
-                          const numValue = parseFloat(value);
-                          if (isNaN(numValue)) {
-                            return;
-                          }
-                          const centsValue = Math.round(numValue * 100);
-                          handleChange('special_offer_price_cents', centsValue);
-                        }}
-                        placeholder="7.99"
-                      />
-                      
-                      <Checkbox
-                        label="Special Offer Active"
-                        checked={formData.special_offer_active}
-                        onChange={(checked) => handleChange('special_offer_active', checked)}
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <Input
-                        label="Offer Start Date"
-                        type="datetime-local"
-                        value={formData.special_offer_start_date}
-                        onChange={(value) => handleChange('special_offer_start_date', value)}
-                      />
-                      
-                      <Input
-                        label="Offer End Date"
-                        type="datetime-local"
-                        value={formData.special_offer_end_date}
-                        onChange={(value) => handleChange('special_offer_end_date', value)}
-                      />
-                    </div>
-                    
-                    <Input
-                      label="Offer Description"
-                      value={formData.special_offer_description}
-                      onChange={(value) => handleChange('special_offer_description', value)}
-                      placeholder="Limited Time Offer"
+                      label="Special Offer Active"
+                      checked={formData.special_offer_active}
+                      onChange={(checked) => handleChange('special_offer_active', checked)}
                     />
                   </div>
                 </div>
+              </div>
 
-                <div className="border-t pt-4">
-                  <h4 className="text-md font-medium text-gray-900 mb-4">Quiz Settings</h4>
-                  
+              {/* Quiz Settings */}
+              <div>
+                <h4 className="text-md font-medium text-emerald-900 mb-4">Quiz Settings</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Quiz Title"
                     value={formData.quiz_title}
                     onChange={(value) => handleChange('quiz_title', value)}
                     placeholder="Auto-generated from episode title"
+                    error={errors.quiz_title}
                   />
-
-                  <TextArea
-                    label="Quiz Description"
-                    value={formData.quiz_description}
-                    onChange={(value) => handleChange('quiz_description', value)}
-                    rows={2}
-                    placeholder="Brief description of what the quiz covers"
-                  />
-
-                  <Checkbox
-                    label="Quiz Active"
-                    checked={formData.quiz_is_active}
-                    onChange={(checked) => handleChange('quiz_is_active', checked)}
+                  
+                  <Input
+                    label="Quiz Category"
+                    value={formData.quiz_category}
+                    onChange={(value) => handleChange('quiz_category', value)}
+                    placeholder="Enter quiz category"
+                    error={errors.quiz_category}
                   />
                 </div>
               </div>
-            )}
 
-            {activeTab === 'quiz' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium text-gray-900">Quiz Questions</h3>
+              {/* Quiz Questions */}
+              <div>
+                <h3 className="text-lg font-medium text-emerald-900">Quiz Questions</h3>
+                <div className="space-y-6">
+                  {formData.questions.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                      {/* Question List */}
+                      <div className="lg:col-span-1">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Questions</h4>
+                        <div className="space-y-2">
+                          {formData.questions.map((_, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => setSelectedQuestionIndex(index)}
+                              className={`w-full text-left px-3 py-2 text-sm rounded-lg border ${
+                                selectedQuestionIndex === index
+                                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                              }`}
+                            >
+                              Question {index + 1}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Question Editor */}
+                      <div className="lg:col-span-3">
+                        {formData.questions[selectedQuestionIndex] && (
+                          <div className="bg-white border border-emerald-200 rounded-lg p-6">
+                            <div className="flex justify-between items-start mb-4">
+                              <h4 className="text-lg font-medium text-emerald-900">
+                                Question {selectedQuestionIndex + 1}
+                              </h4>
+                              <Button
+                                type="button"
+                                onClick={() => handleRemoveQuestion(selectedQuestionIndex)}
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                Remove
+                              </Button>
+                            </div>
+
+                            <div className="space-y-4">
+                              <TextArea
+                                label="Question Text"
+                                value={formData.questions[selectedQuestionIndex].question_text}
+                                onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'question_text', value)}
+                                rows={3}
+                                placeholder="Enter your question here..."
+                                error={errors.questions?.[selectedQuestionIndex]?.question_text}
+                              />
+
+                              <TextArea
+                                label="Learning Outcome"
+                                value={formData.questions[selectedQuestionIndex].learning_outcome || 'Analyze and apply key veterinary nursing concepts in clinical practice scenarios'}
+                                onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'learning_outcome', value)}
+                                rows={2}
+                                placeholder="What should students learn from this question?"
+                                error={errors.questions?.[selectedQuestionIndex]?.learning_outcome}
+                              />
+
+                              <TextArea
+                                label="Rationale"
+                                value={formData.questions[selectedQuestionIndex].rationale || 'Understanding this concept is essential for safe and effective veterinary nursing practice. The correct answer demonstrates knowledge of evidence-based protocols and clinical reasoning.'}
+                                onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'rationale', value)}
+                                rows={3}
+                                placeholder="Explain why the correct answer is correct..."
+                                error={errors.questions?.[selectedQuestionIndex]?.rationale}
+                              />
+
+                              <div>
+                                <label className="block text-sm font-medium text-emerald-700 mb-3">Answer Options</label>
+                                <div className="space-y-3">
+                                  {formData.questions[selectedQuestionIndex].answers?.map((answer, answerIndex) => (
+                                    <div key={answerIndex} className="flex items-center gap-3">
+                                      <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-sm font-medium text-emerald-600">
+                                        {answer.answer_letter}
+                                      </span>
+                                      <Input
+                                        value={answer.answer_text}
+                                        onChange={(value) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'answer_text', value)}
+                                        placeholder={`Answer ${answer.answer_letter}`}
+                                        className="flex-1"
+                                        error={errors.questions?.[selectedQuestionIndex]?.answers?.[answerIndex]?.answer_text}
+                                      />
+                                      <label className="flex items-center text-sm">
+                                        <input
+                                          type="checkbox"
+                                          checked={answer.is_correct}
+                                          onChange={(e) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'is_correct', e.target.checked)}
+                                          className="mr-2 text-emerald-600 focus:ring-teal-500"
+                                        />
+                                        Correct
+                                      </label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-emerald-600">
+                      <p>No questions yet. Click "Add Question" to get started.</p>
+                    </div>
+                  )}
+                  
                   <Button
                     type="button"
                     onClick={handleAddQuestion}
                     variant="secondary"
-                    size="sm"
+                    className="w-full"
                   >
                     Add Question
                   </Button>
                 </div>
-
-                {formData.questions.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    {/* Question List */}
-                    <div className="lg:col-span-1">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Questions</h4>
-                      <div className="space-y-2">
-                        {formData.questions.map((_, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => setSelectedQuestionIndex(index)}
-                            className={`w-full text-left px-3 py-2 text-sm rounded-lg border ${
-                              selectedQuestionIndex === index
-                                ? 'bg-primary-50 border-primary-300 text-primary-800'
-                                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            Question {index + 1}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Question Editor */}
-                    <div className="lg:col-span-3">
-                      {formData.questions[selectedQuestionIndex] && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <h4 className="text-lg font-medium text-gray-900">
-                              Question {selectedQuestionIndex + 1}
-                            </h4>
-                            <Button
-                              type="button"
-                              onClick={() => handleRemoveQuestion(selectedQuestionIndex)}
-                              variant="ghost"
-                              size="sm"
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              Remove
-                            </Button>
-                          </div>
-
-                          <div className="space-y-4">
-                            <TextArea
-                              label="Question Text"
-                              value={formData.questions[selectedQuestionIndex].question_text}
-                              onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'question_text', value)}
-                              rows={3}
-                              placeholder="Enter your question here..."
-                            />
-
-                            <TextArea
-                              label="Learning Outcome"
-                              value={formData.questions[selectedQuestionIndex].learning_outcome || 'Analyze and apply key veterinary nursing concepts in clinical practice scenarios'}
-                              onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'learning_outcome', value)}
-                              rows={2}
-                              placeholder="What should students learn from this question?"
-                            />
-
-                            <TextArea
-                              label="Rationale"
-                              value={formData.questions[selectedQuestionIndex].rationale || 'Understanding this concept is essential for safe and effective veterinary nursing practice. The correct answer demonstrates knowledge of evidence-based protocols and clinical reasoning.'}
-                              onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'rationale', value)}
-                              rows={3}
-                              placeholder="Explain why the correct answer is correct..."
-                            />
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-3">Answer Options</label>
-                              <div className="space-y-3">
-                                {formData.questions[selectedQuestionIndex].answers?.map((answer, answerIndex) => (
-                                  <div key={answerIndex} className="flex items-center gap-3">
-                                    <span className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
-                                      {answer.answer_letter}
-                                    </span>
-                                    <Input
-                                      value={answer.answer_text}
-                                      onChange={(value) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'answer_text', value)}
-                                      placeholder={`Answer ${answer.answer_letter}`}
-                                      className="flex-1"
-                                    />
-                                    <label className="flex items-center text-sm">
-                                      <input
-                                        type="checkbox"
-                                        checked={answer.is_correct}
-                                        onChange={(e) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'is_correct', e.target.checked)}
-                                        className="mr-2"
-                                      />
-                                      Correct
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <p>No questions yet. Click "Add Question" to get started.</p>
-                  </div>
-                )}
               </div>
-            )}
 
-            <div className="flex gap-3 pt-6 border-t">
-              <Button
-                type="submit"
-                disabled={!isValid || saving}
-                loading={saving}
-                variant="primary"
-              >
-                {editingContent ? 'Update Content' : 'Create Content'}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleCancel}
-                variant="secondary"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </Card>
-      ) : (
-        <AdminDataTable
-          title={`${content.length} ${content.length === 1 ? 'content item' : 'content items'}`}
-          data={content}
-          columns={columns}
-          actions={actions}
-          loading={loading}
-          emptyMessage="No content found. Create your first podcast episode with quiz to get started."
-          onRowClick={handleEdit}
-        />
-      )}
-    </div>
-  );
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button
+                  type="submit"
+                  disabled={!isValid || saving}
+                  loading={saving}
+                  variant="primary"
+                >
+                  {editingContent ? 'Update Content' : 'Create Content'}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleCancel}
+                  variant="ghost"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Content List */}
+        <div className="bg-white border border-emerald-200 rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-emerald-200">
+            <h3 className="text-lg font-semibold text-emerald-900">
+              Content ({content.length})
+            </h3>
+          </div>
+
+          {(() => {
+            console.log('ContentManagement: Render decision - loading:', loading, 'content.length:', content.length, 'content:', content);
+            
+            if (loading) {
+              console.log('ContentManagement: Rendering loading state');
+              return (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+                  <p className="text-emerald-600 mt-2">Loading content...</p>
+                </div>
+              );
+            } else if (content.length === 0) {
+              console.log('ContentManagement: Rendering empty state');
+              return (
+                <div className="text-center py-12 text-emerald-600">
+                  <p>No content found. Create your first podcast episode with quiz to get started.</p>
+                </div>
+              );
+            } else {
+              console.log('ContentManagement: Rendering data table with', content.length, 'items');
+              return (
+                <AdminDataTable
+                  title={`${content.length} ${content.length === 1 ? 'content item' : 'content items'}`}
+                  data={content}
+                  columns={columns}
+                  actions={actions}
+                  loading={loading}
+                  emptyMessage="No content found. Create your first podcast episode with quiz to get started."
+                  onRowClick={handleEdit}
+                />
+              );
+            }
+          })()}
+        </div>
+      </div>
+    );
+  }
 }

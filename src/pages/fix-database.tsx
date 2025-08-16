@@ -68,7 +68,7 @@ export default function FixDatabase() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Database Fix Tools</h1>
+      <h1 className="text-2xl font-bold text-emerald-900 mb-6">Database Fix Tools</h1>
       
       <div className="space-y-4 mb-8">
         <button
@@ -82,7 +82,7 @@ export default function FixDatabase() {
         <button
           onClick={createQuizRecord}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 ml-4"
+          className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 disabled:opacity-50 ml-4"
         >
           {loading ? 'Processing...' : 'Create Quiz Record (Recommended)'}
         </button>
@@ -105,8 +105,8 @@ export default function FixDatabase() {
       </div>
 
       {result && (
-        <div className="bg-gray-100 p-4 rounded">
-          <h2 className="text-lg font-semibold mb-2">Result:</h2>
+        <div className="bg-emerald-100 p-4 rounded">
+          <h2 className="text-lg font-semibold text-emerald-900 mb-2">Result:</h2>
           <pre className="text-sm overflow-auto">
             {JSON.stringify(result, null, 2)}
           </pre>

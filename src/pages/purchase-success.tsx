@@ -50,7 +50,7 @@ const PurchaseSuccessPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+            <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Processing Your Purchase
             </h1>
@@ -86,7 +86,7 @@ const PurchaseSuccessPage: React.FC = () => {
           <div className="space-y-3">
             <button
               onClick={handleGoToContent}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
             >
               Access Your Content
               <ArrowRight className="w-4 h-4" />

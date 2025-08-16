@@ -68,7 +68,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, episodeDur
 
   if (!quiz) {
     return (
-      <div className="text-center py-8 text-neutral-500">
+      <div className="text-center py-8 text-emerald-600">
         <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.287 0-4.33.957-5.824 2.496" />
         </svg>

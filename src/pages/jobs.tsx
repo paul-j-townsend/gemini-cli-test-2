@@ -63,9 +63,9 @@ export default function Jobs() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'Full-time': return 'bg-green-100 text-green-800';
-      case 'Part-time': return 'bg-blue-100 text-blue-800';
+      case 'Part-time': return 'bg-emerald-100 text-emerald-800';
       case 'Contract': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-emerald-100 text-emerald-800';
     }
   };
 
@@ -77,8 +77,8 @@ export default function Jobs() {
       </Head>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Veterinary Jobs</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-emerald-900 mb-4">Veterinary Jobs</h1>
+          <p className="text-lg text-emerald-700 max-w-2xl mx-auto">
             Find your next career opportunity in veterinary medicine. Explore positions from general practice to specialized roles across the UK.
           </p>
         </div>
@@ -89,20 +89,20 @@ export default function Jobs() {
             <input
               type="text"
               placeholder="Job title or keyword"
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
             <input
               type="text"
               placeholder="Location"
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
               <option>All job types</option>
               <option>Full-time</option>
               <option>Part-time</option>
               <option>Contract</option>
             </select>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
               Search Jobs
             </button>
           </div>
@@ -115,13 +115,13 @@ export default function Jobs() {
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-xl font-semibold text-gray-900">{job.title}</h2>
+                    <h2 className="text-xl font-semibold text-emerald-900">{job.title}</h2>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(job.type)}`}>
                       {job.type}
                     </span>
                   </div>
                   
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-emerald-600 mb-3">
                     <span className="flex items-center">
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
@@ -141,18 +141,18 @@ export default function Jobs() {
                       </svg>
                       {job.salary}
                     </span>
-                    <span className="text-gray-400">• {job.posted}</span>
+                    <span className="text-emerald-500">• {job.posted}</span>
                   </div>
 
-                  <p className="text-gray-700 mb-4">{job.description}</p>
+                  <p className="text-emerald-700 mb-4">{job.description}</p>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Requirements:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-medium text-emerald-900 mb-2">Requirements:</h4>
+                      <ul className="text-sm text-emerald-600 space-y-1">
                         {job.requirements.map((req, idx) => (
                           <li key={idx} className="flex items-center">
-                            <svg className="w-3 h-3 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-3 h-3 mr-2 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                             </svg>
                             {req}
@@ -161,8 +161,8 @@ export default function Jobs() {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-medium text-emerald-900 mb-2">Benefits:</h4>
+                      <ul className="text-sm text-emerald-600 space-y-1">
                         {job.benefits.map((benefit, idx) => (
                           <li key={idx} className="flex items-center">
                             <svg className="w-3 h-3 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
@@ -177,7 +177,7 @@ export default function Jobs() {
                 </div>
 
                 <div className="mt-4 lg:mt-0 lg:ml-6 flex-shrink-0">
-                  <button className="w-full lg:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors mb-2">
+                  <button className="w-full lg:w-auto bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors mb-2">
                     Apply Now
                   </button>
                   <button className="w-full lg:w-auto border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">

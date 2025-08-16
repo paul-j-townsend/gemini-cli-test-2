@@ -38,7 +38,7 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-neutral-700">
+        <label htmlFor={inputId} className="block text-sm font-medium text-emerald-700">
           {label}
           {required && <span className="text-error-500 ml-1">*</span>}
         </label>
@@ -53,7 +53,7 @@ export const Input: React.FC<InputProps> = ({
         className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
           error 
             ? 'border-error-500 focus:border-error-500 focus:ring-error-500' 
-            : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500'
+            : 'border-emerald-300 focus:border-teal-500 focus:ring-teal-500'
         }`}
         required={required}
         disabled={disabled}

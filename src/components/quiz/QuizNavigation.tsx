@@ -58,7 +58,7 @@ export const QuizNavigation: React.FC<QuizNavigationProps> = React.memo(({
 
   return (
     <div className="flex justify-between items-center">
-      <div className="text-sm text-neutral-500">
+      <div className="text-sm text-emerald-500">
       </div>
       
       <div className="flex gap-3">

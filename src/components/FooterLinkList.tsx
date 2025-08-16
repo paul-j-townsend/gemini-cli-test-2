@@ -15,7 +15,7 @@ const FooterLinkList: React.FC<FooterLinkListProps> = ({ title, links }) => {
           <li key={link.href}>
             <Link 
               href={link.href}
-              className="text-neutral-300 hover:text-primary-400 transition-colors duration-200 hover:translate-x-1 transform inline-block"
+              className="text-emerald-300 hover:text-emerald-400 transition-colors duration-200 hover:translate-x-1 transform inline-block"
             >
               {link.label}
             </Link>

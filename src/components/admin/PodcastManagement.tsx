@@ -271,7 +271,7 @@ export default function PodcastManagement() {
             {episode.published ? 'Published' : 'Draft'}
           </span>
           {episode.audio_url && (
-            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 w-fit">
+            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 w-fit">
               Audio
             </span>
           )}

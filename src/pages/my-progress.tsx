@@ -15,10 +15,10 @@ const MyProgress: React.FC = () => {
           <title>My Progress - VetSidekick</title>
           <meta name="description" content="Track your CPD progress and learning achievements" />
         </Head>
-        <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-          <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-neutral-200">
-            <h1 className="text-2xl font-bold text-neutral-900 mb-4">My Learning Progress</h1>
-            <p className="text-neutral-600">Please log in to view your progress.</p>
+        <div className="min-h-screen bg-emerald-50 flex items-center justify-center">
+          <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-emerald-200">
+            <h1 className="text-2xl font-bold text-emerald-900 mb-4">My Learning Progress</h1>
+            <p className="text-emerald-700">Please log in to view your progress.</p>
           </div>
         </div>
       </Layout>

@@ -82,19 +82,19 @@ const About = () => {
       </Head>
 
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-primary-50 via-white to-neutral-50 overflow-hidden">
+      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-emerald-50 via-white to-emerald-50 overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/3 w-80 h-80 bg-primary-200/20 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-0 left-1/3 w-80 h-80 bg-emerald-200/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-teal-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
         </div>
 
         <div className="relative container-wide">
           <div className="text-center animate-fade-in-up">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 mb-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              Advancing <span className="text-gradient-primary">Veterinary</span> Education
-        </h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-emerald-900 mb-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              Advancing <span className="text-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Veterinary</span> Education
+            </h1>
 
-            <p className="text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+            <p className="text-xl lg:text-2xl text-emerald-700 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               We're dedicated to providing veterinary professionals with expert insights, 
               evidence-based education and innovative resources that elevate the standard of animal care worldwide.
             </p>
@@ -107,15 +107,15 @@ const About = () => {
         <div className="container-wide">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="animate-fade-in-up">
-              <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-6">
+              <h2 className="text-3xl lg:text-4xl font-bold text-emerald-900 mb-6">
                 Our Mission
               </h2>
-              <p className="text-lg text-neutral-600 leading-relaxed mb-6">
+              <p className="text-lg text-emerald-700 leading-relaxed mb-6">
                 At Vet Sidekick, we believe that exceptional veterinary care begins with exceptional education. 
                 Our mission is to bridge the gap between cutting-edge research and practical clinical application, 
                 making advanced veterinary knowledge accessible to professionals at every stage of their career.
               </p>
-              <p className="text-lg text-neutral-600 leading-relaxed mb-8">
+              <p className="text-lg text-emerald-700 leading-relaxed mb-8">
                 Through our comprehensive podcast series, educational resources and professional community, 
                 we're building a global network of veterinary professionals committed to lifelong learning 
                 and excellence in animal care.
@@ -143,8 +143,8 @@ const About = () => {
                   <div className="grid grid-cols-2 gap-6">
                     {stats.map((stat, index) => (
                       <div key={index} className="text-center animate-scale-in" style={{ animationDelay: `${index * 150}ms` }}>
-                        <div className="text-3xl font-bold text-gradient-primary mb-2">{stat.number}</div>
-                        <div className="text-sm text-neutral-500">{stat.label}</div>
+                        <div className="text-3xl font-bold text-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">{stat.number}</div>
+                        <div className="text-sm text-emerald-600">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -156,13 +156,13 @@ const About = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-br from-neutral-50 to-primary-50">
+      <section className="py-20 lg:py-32 bg-gradient-to-br from-emerald-50 to-emerald-50">
         <div className="container-wide">
           <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-6">
+            <h2 className="text-3xl lg:text-4xl font-bold text-emerald-900 mb-6">
               Our Core Values
             </h2>
-            <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
+            <p className="text-xl text-emerald-700 max-w-3xl mx-auto">
               These principles guide everything we do and inform how we serve the veterinary community.
             </p>
           </div>
@@ -174,13 +174,13 @@ const About = () => {
                 className="card text-center p-6 animate-fade-in-up"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-soft">
+                <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-soft">
                   {value.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-3">
+                <h3 className="text-xl font-semibold text-emerald-900 mb-3">
                   {value.title}
                 </h3>
-                <p className="text-neutral-600 leading-relaxed">
+                <p className="text-emerald-700 leading-relaxed">
                   {value.description}
                 </p>
               </div>
@@ -193,10 +193,10 @@ const About = () => {
       <section className="py-20 lg:py-32 bg-white">
         <div className="container-wide">
           <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-6">
+            <h2 className="text-3xl lg:text-4xl font-bold text-emerald-900 mb-6">
               Meet Our Expert Team
             </h2>
-            <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
+            <p className="text-xl text-emerald-700 max-w-3xl mx-auto">
               Our team combines decades of clinical experience with a passion for veterinary education and innovation.
             </p>
           </div>
@@ -216,26 +216,26 @@ const About = () => {
                     width={96}
                     height={96}
                   />
-                  <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500 rounded-full flex items-center justify-center">
                     <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 </div>
                 
-                <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-emerald-900 mb-2">
                   {member.name}
                 </h3>
-                <p className="text-primary-600 font-medium mb-4 text-sm sm:text-base">{member.role}</p>
-                <p className="text-neutral-600 leading-relaxed mb-6 text-sm sm:text-base flex-grow">{member.bio}</p>
+                <p className="text-emerald-600 font-medium mb-4 text-sm sm:text-base">{member.role}</p>
+                <p className="text-emerald-700 leading-relaxed mb-6 text-sm sm:text-base flex-grow">{member.bio}</p>
                 
                 <div className="space-y-3 mt-auto">
-                  <h4 className="text-xs sm:text-sm font-semibold text-neutral-900">Areas of Expertise:</h4>
+                  <h4 className="text-xs sm:text-sm font-semibold text-emerald-900">Areas of Expertise:</h4>
                   <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
                     {member.expertise.map((skill, skillIndex) => (
                       <span
                         key={skillIndex}
-                        className="px-2 sm:px-3 py-1 bg-primary-100 text-primary-700 text-xs rounded-full whitespace-nowrap"
+                        className="px-2 sm:px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full whitespace-nowrap"
                       >
                         {skill}
                       </span>
@@ -249,18 +249,18 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+      <section className="py-20 lg:py-32 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
         <div className="container-wide text-center">
           <div className="animate-fade-in-up">
             <h2 className="text-3xl lg:text-4xl font-bold mb-6">
               Join Our Mission
             </h2>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto mb-10">
+            <p className="text-xl text-emerald-100 max-w-3xl mx-auto mb-10">
               We're looking for passionate veterinary professionals to contribute to our platform. 
               If you're an expert in your field, we invite you to collaborate with us.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="#" className="btn-secondary btn-lg bg-white text-primary-600 hover:bg-neutral-50">
+              <Link href="#" className="btn-secondary btn-lg bg-white text-emerald-600 hover:bg-emerald-50">
                 Become a Contributor
               </Link>
               <Link href="#" className="btn-ghost btn-lg text-white border-white hover:bg-white/10">
@@ -268,7 +268,7 @@ const About = () => {
               </Link>
             </div>
           </div>
-    </div>
+        </div>
       </section>
     </Layout>
   );

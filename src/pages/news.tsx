@@ -74,8 +74,8 @@ export default function News() {
       </Head>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Veterinary News</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-emerald-900 mb-4">Veterinary News</h1>
+          <p className="text-lg text-emerald-700 max-w-2xl mx-auto">
             Stay updated with the latest developments in veterinary medicine, research breakthroughs, 
             and industry news that matters to animal healthcare professionals.
           </p>
@@ -98,17 +98,17 @@ export default function News() {
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(newsArticles[0].category)}`}>
                   {newsArticles[0].category}
                 </span>
-                <span className="text-gray-500 text-sm ml-4">Featured Article</span>
+                <span className="text-emerald-600 text-sm ml-4">Featured Article</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">{newsArticles[0].title}</h2>
-              <p className="text-gray-600 mb-6">{newsArticles[0].summary}</p>
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4">{newsArticles[0].title}</h2>
+              <p className="text-emerald-700 mb-6">{newsArticles[0].summary}</p>
               <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-emerald-600">
                   <span>{newsArticles[0].date}</span>
                   <span className="mx-2">•</span>
                   <span>{newsArticles[0].readTime}</span>
                 </div>
-                <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
                   Read Full Article
                 </button>
               </div>
@@ -136,15 +136,15 @@ export default function News() {
                       </span>
                     ))}
                   </div>
-                  <span className="text-gray-500 text-sm">{article.readTime}</span>
+                  <span className="text-emerald-600 text-sm">{article.readTime}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                <h3 className="text-lg font-semibold text-emerald-900 mb-2 line-clamp-2">
                   {article.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.summary}</p>
+                <p className="text-emerald-700 text-sm mb-4 line-clamp-3">{article.summary}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500 text-sm">{article.date}</span>
-                  <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                  <span className="text-emerald-600 text-sm">{article.date}</span>
+                  <button className="text-emerald-600 hover:text-teal-700 font-medium text-sm">
                     Read More →
                   </button>
                 </div>
@@ -154,9 +154,9 @@ export default function News() {
         </div>
 
         {/* Newsletter Signup */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-8 mt-12 text-center">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg p-8 mt-12 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Stay Informed</h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
+          <p className="text-emerald-100 mb-6 max-w-2xl mx-auto">
             Subscribe to our newsletter to receive the latest veterinary news, research updates, 
             and professional development opportunities directly in your inbox.
           </p>
@@ -164,9 +164,9 @@ export default function News() {
             <input
               type="email"
               placeholder="Enter your email address"
-              className="flex-1 px-4 py-2 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="flex-1 px-4 py-2 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             />
-            <button className="bg-white text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+            <button className="bg-white text-emerald-600 px-6 py-2 rounded-lg hover:bg-emerald-50 transition-colors font-medium">
               Subscribe
             </button>
           </div>

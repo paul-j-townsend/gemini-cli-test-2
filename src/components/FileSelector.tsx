@@ -79,13 +79,13 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
+        <div className="px-6 py-4 border-b border-emerald-200 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-emerald-900">
             Select {type === 'image' ? 'Image' : 'Audio'} File
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-emerald-400 hover:text-emerald-600 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -97,8 +97,8 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading {type} files...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+              <p className="text-emerald-700">Loading {type} files...</p>
             </div>
           ) : error ? (
             <div className="text-center py-8">
@@ -107,22 +107,22 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-gray-600 mb-4">{error}</p>
+              <p className="text-emerald-700 mb-4">{error}</p>
               <button
                 onClick={fetchFiles}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg"
               >
                 Try Again
               </button>
             </div>
           ) : files.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-gray-400 mb-4">
+              <div className="text-emerald-400 mb-4">
                 <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-gray-600">No {type} files found</p>
+              <p className="text-emerald-600">No {type} files found</p>
             </div>
           ) : (
             <div className={`grid gap-4 ${type === 'image' ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
@@ -131,14 +131,14 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
                   key={file.name}
                   className={`border rounded-lg p-3 cursor-pointer transition-all ${
                     selectedFile === file.url
-                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200'
+                      : 'border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50'
                   }`}
                   onClick={() => setSelectedFile(file.url)}
                 >
                   {type === 'image' ? (
                     <div className="space-y-2">
-                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="aspect-square bg-emerald-100 rounded-lg overflow-hidden">
                         <img
                           src={file.url}
                           alt={file.displayName}
@@ -146,10 +146,10 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
                         />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 truncate" title={file.displayName}>
+                        <p className="text-sm font-medium text-emerald-900 truncate" title={file.displayName}>
                           {file.displayName}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-emerald-500">
                           {formatFileSize(file.size)} • {formatDate(file.created_at)}
                         </p>
                       </div>
@@ -164,10 +164,10 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate" title={file.displayName}>
+                        <p className="text-sm font-medium text-emerald-900 truncate" title={file.displayName}>
                           {file.displayName}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-emerald-500">
                           {formatFileSize(file.size)} • {formatDate(file.created_at)}
                         </p>
                       </div>
@@ -180,8 +180,8 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+        <div className="px-6 py-4 border-t border-emerald-200 flex items-center justify-between">
+          <p className="text-sm text-emerald-600">
             {selectedFile && files.find(f => f.url === selectedFile)?.displayName && (
               <>Selected: {files.find(f => f.url === selectedFile)?.displayName}</>
             )}
@@ -189,14 +189,14 @@ const FileSelector = ({ type, onFileSelect, onClose, currentValue }: FileSelecto
           <div className="flex space-x-3">
             <button
               onClick={onClose}
-              className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-emerald-300 hover:bg-emerald-400 text-emerald-700 px-4 py-2 rounded-lg font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSelect}
               disabled={!selectedFile}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 disabled:text-emerald-500 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
               Select File
             </button>

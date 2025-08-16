@@ -75,8 +75,8 @@ const Notification: React.FC<NotificationProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           ),
-          colors: 'bg-blue-50 border-blue-200 text-blue-800',
-          iconColor: 'text-blue-400'
+          colors: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+          iconColor: 'text-emerald-400'
         };
     }
   };
@@ -109,7 +109,7 @@ const Notification: React.FC<NotificationProps> = ({
                   ${type === 'success' ? 'hover:bg-green-100 focus:ring-green-600' : ''}
                   ${type === 'error' ? 'hover:bg-red-100 focus:ring-red-600' : ''}
                   ${type === 'warning' ? 'hover:bg-yellow-100 focus:ring-yellow-600' : ''}
-                  ${type === 'info' ? 'hover:bg-blue-100 focus:ring-blue-600' : ''}
+                  ${type === 'info' ? 'hover:bg-emerald-100 focus:ring-emerald-600' : ''}
                 `}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

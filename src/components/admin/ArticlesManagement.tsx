@@ -246,16 +246,16 @@ const ArticlesManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-    <div>
-          <h2 className="text-2xl font-bold text-gray-900">Articles Management</h2>
-          <p className="text-gray-600 mt-1">Create and manage your articles</p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-emerald-900">Articles Management</h2>
+          <p className="text-emerald-700 mt-1">Create and manage your articles</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          onClick={() => setShowForm(true)}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
         >
-          {showForm ? 'Cancel' : 'Add Article'}
+          Add New Article
         </button>
       </div>
 
@@ -293,129 +293,100 @@ const ArticlesManagement = () => {
         </div>
       )}
 
-      {/* Form */}
+      {/* Article Form */}
       {showForm && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white border border-emerald-200 rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-emerald-900 mb-4">
             {editingArticle ? 'Edit Article' : 'Create New Article'}
           </h3>
-          
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Author
-                </label>
-                <input
-                  type="text"
-                  value={formData.author}
-                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <select
-                  id="category"
-                  multiple
-                  value={formData.category}
-                  onChange={handleCategoryChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-                >
-                  <option disabled>Select categories</option>
-                  {keywords.map((kw) => (
-                    <option key={kw} value={kw}>
-                      {kw}
-                    </option>
-                  ))}
-                </select>
-
-                {formData.category.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {formData.category.map((kw) => (
-                      <span
-                        key={kw}
-                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
-                      >
-                        {kw}
-                        <button
-                          type="button"
-                          className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              category: formData.category.filter((c) => c !== kw),
-                            })
-                          }
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Slug
-                </label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Auto-generated from title"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-emerald-700 mb-1">
+                Title *
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Enter article title"
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-emerald-700 mb-1">
                 Excerpt
               </label>
               <textarea
                 value={formData.excerpt}
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 h-32"
+                placeholder="Enter article excerpt"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Content
+              <label htmlFor="category" className="block text-sm font-medium text-emerald-700 mb-1">
+                Categories
               </label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={8}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <div className="flex flex-wrap gap-2 mb-2">
+                {formData.category.map((cat, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800"
+                  >
+                    {cat}
+                    <button
+                      type="button"
+                      onClick={() => removeCategory(index)}
+                      className="ml-1 text-emerald-600 hover:text-teal-700 focus:outline-none"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="Add category"
+                />
+                <button
+                  type="button"
+                  onClick={addCategory}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-emerald-700 mb-1">
+                Author
+              </label>
+              <input
+                type="text"
+                value={formData.author}
+                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Enter author name"
               />
             </div>
 
             <div>
-              <FileUpload
-                type="image"
-                onUploadSuccess={handleImageUpload}
-                onUploadError={handleImageUploadError}
-                currentValue={formData.image_url}
+              <label className="block text-sm font-medium text-emerald-700 mb-1">
+                Slug
+              </label>
+              <input
+                type="text"
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Enter URL slug"
               />
             </div>
 
@@ -425,33 +396,37 @@ const ArticlesManagement = () => {
                   type="checkbox"
                   checked={formData.published}
                   onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                  className="mr-2 rounded"
+                  className="rounded border-emerald-300 text-emerald-600 focus:ring-teal-500"
                 />
-                Published
+                <span className="ml-2 text-sm text-emerald-700">Published</span>
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
                   checked={formData.featured}
                   onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="mr-2 rounded"
+                  className="rounded border-emerald-300 text-emerald-600 focus:ring-teal-500"
                 />
-                Featured
+                <span className="ml-2 text-sm text-emerald-700">Featured</span>
               </label>
             </div>
 
-            <div className="flex space-x-3 pt-4">
+            <div className="flex justify-end space-x-3 pt-4">
               <button
                 type="submit"
                 disabled={saving}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               >
-                {saving ? 'Saving...' : editingArticle ? 'Update Article' : 'Create Article'}
+                {saving ? 'Saving...' : (editingArticle ? 'Update Article' : 'Create Article')}
               </button>
               <button
                 type="button"
-                onClick={handleCancel}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingArticle(null);
+                  resetForm();
+                }}
+                className="bg-emerald-300 hover:bg-emerald-400 text-emerald-700 px-6 py-2 rounded-lg font-medium transition-colors"
               >
                 Cancel
               </button>
@@ -460,134 +435,109 @@ const ArticlesManagement = () => {
         </div>
       )}
 
-      {/* Articles Table */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {loading ? 'Loading...' : `${articles.length} article${articles.length === 1 ? '' : 's'}`}
+      {/* Articles List */}
+      <div className="bg-white border border-emerald-200 rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-emerald-200">
+          <h3 className="text-lg font-semibold text-emerald-900">
+            Articles ({articles.length})
           </h3>
         </div>
 
         {loading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-500 mt-2">Loading articles...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+            <p className="text-emerald-600 mt-2">Loading articles...</p>
           </div>
         ) : articles.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500">No articles found. Create your first article to get started.</p>
+            <p className="text-emerald-600">No articles found. Create your first article to get started.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-emerald-200">
+              <thead className="bg-emerald-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">
                     Image
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">
                     Title
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">
+                    Excerpt
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">
                     Author
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-emerald-600 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-emerald-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-emerald-200">
                 {articles.map((article) => (
-                  <tr key={article.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                  <tr key={article.id} className="hover:bg-emerald-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       {article.image_url ? (
                         <img
                           src={article.image_url}
                           alt={article.title}
-                          className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                          className="w-16 h-16 object-cover rounded-lg border border-emerald-200"
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
-                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <div className="w-16 h-16 bg-emerald-100 rounded-lg border border-emerald-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={article.title}>
-                          {article.title}
-                        </div>
-                        {article.excerpt && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs" title={article.excerpt}>
-                            {article.excerpt}
-                          </div>
-                        )}
+                      <div className="text-sm font-medium text-emerald-900 truncate max-w-xs" title={article.title}>
+                        {article.title}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {article.author || 'Unknown'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {article.category ? (
-                        <div className="flex flex-wrap gap-1">
-                          {article.category.split(',').map((kw) => (
-                            <span
-                              key={kw}
-                              className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
-                            >
-                              {kw.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">Uncategorized</span>
-                      )}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex flex-col space-y-1">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full w-fit ${
-                          article.published 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {article.published ? 'Published' : 'Draft'}
-                        </span>
-                        {article.featured && (
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 w-fit">
-                            Featured
-                          </span>
-                        )}
+                      <div className="text-sm text-emerald-600 truncate max-w-xs" title={article.excerpt}>
+                        {article.excerpt}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {formatDate(article.created_at)}
+                    <td className="px-6 py-4 text-sm text-emerald-900">
+                      {article.author || 'Unknown'}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-emerald-900">
+                      {article.category && article.category.length > 0 ? (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">
+                          {article.category[0]}
+                        </span>
+                      ) : (
+                        <span className="text-emerald-600">Uncategorized</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-emerald-500">
+                      {article.published ? (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                          Draft
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleEdit(article)}
-                          className="text-blue-600 hover:text-blue-900 font-medium"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(article)}
-                          className="text-red-600 hover:text-red-900 font-medium"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleEdit(article)}
+                        className="text-emerald-600 hover:text-teal-700 font-medium"
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))}

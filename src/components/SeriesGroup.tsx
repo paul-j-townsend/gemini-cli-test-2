@@ -56,31 +56,31 @@ const SeriesGroup: React.FC<SeriesGroupProps> = ({
       <div className="mb-6">
         <button
           onClick={toggleExpanded}
-          className="w-full text-left group focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
+          className="w-full text-left group focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-lg"
         >
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 mb-2 group-hover:text-primary-600 transition-colors">
+              <h2 className="text-2xl lg:text-3xl font-bold text-emerald-900 mb-2 group-hover:text-emerald-600 transition-colors">
                 {title}
                 {showEpisodeCount && (
-                  <span className="text-lg font-normal text-neutral-500 ml-2">
+                  <span className="text-lg font-normal text-emerald-500 ml-2">
                     ({episodes.length} episode{episodes.length !== 1 ? 's' : ''})
                   </span>
                 )}
               </h2>
               {description && (
-                <p className="text-neutral-600 text-lg leading-relaxed">
+                <p className="text-emerald-700 text-lg leading-relaxed">
                   {description}
                 </p>
               )}
             </div>
             
             <div className="flex-shrink-0 ml-4">
-              <div className="w-8 h-8 rounded-full bg-primary-100 group-hover:bg-primary-200 transition-colors flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 group-hover:bg-emerald-200 transition-colors flex items-center justify-center">
                 {isExpanded ? (
-                  <ChevronUp size={20} className="text-primary-600" />
+                  <ChevronUp size={20} className="text-emerald-600" />
                 ) : (
-                  <ChevronDown size={20} className="text-primary-600" />
+                  <ChevronDown size={20} className="text-emerald-600" />
                 )}
               </div>
             </div>
@@ -112,7 +112,7 @@ const SeriesGroup: React.FC<SeriesGroupProps> = ({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h4 className="text-sm font-medium text-neutral-700 line-clamp-2">
+                <h4 className="text-sm font-medium text-emerald-700 line-clamp-2">
                   {episode.title}
                 </h4>
               </div>
@@ -120,8 +120,8 @@ const SeriesGroup: React.FC<SeriesGroupProps> = ({
             {episodes.length > 3 && (
               <div key="more-indicator" className="flex-shrink-0 w-32 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-32 h-32 rounded-lg bg-neutral-100 flex items-center justify-center mb-2">
-                    <span className="text-neutral-500 font-medium">
+                  <div className="w-32 h-32 rounded-lg bg-emerald-100 flex items-center justify-center mb-2">
+                    <span className="text-emerald-500 font-medium">
                       +{episodes.length - 3} more
                     </span>
                   </div>

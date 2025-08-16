@@ -63,7 +63,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
       // Default error UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="min-h-screen flex items-center justify-center bg-emerald-50">
           <div className="max-w-md w-full bg-white shadow-soft rounded-lg p-6">
             <div className="flex items-center mb-4">
               <svg 
@@ -79,21 +79,21 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
                 />
               </svg>
-              <h2 className="text-lg font-semibold text-neutral-900">
+              <h2 className="text-lg font-semibold text-emerald-900">
                 Something went wrong
               </h2>
             </div>
             
-            <p className="text-neutral-600 mb-4">
+            <p className="text-emerald-700 mb-4">
               We're sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.
             </p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mb-4 p-3 bg-neutral-100 rounded-md">
-                <summary className="cursor-pointer text-sm font-medium text-neutral-700 mb-2">
+              <details className="mb-4 p-3 bg-emerald-100 rounded-md">
+                <summary className="cursor-pointer text-sm font-medium text-emerald-700 mb-2">
                   Error Details (Development)
                 </summary>
-                <pre className="text-xs text-neutral-600 overflow-auto">
+                <pre className="text-xs text-emerald-600 overflow-auto">
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack}
                 </pre>
@@ -103,13 +103,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <div className="flex gap-3">
               <button
                 onClick={this.handleRefresh}
-                className="flex-1 bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors"
+                className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 transition-colors"
               >
                 Refresh Page
               </button>
               <button
                 onClick={this.handleReset}
-                className="flex-1 bg-neutral-200 text-neutral-700 py-2 px-4 rounded-md hover:bg-neutral-300 transition-colors"
+                className="flex-1 bg-emerald-200 text-emerald-700 py-2 px-4 rounded-md hover:bg-emerald-300 transition-colors"
               >
                 Try Again
               </button>

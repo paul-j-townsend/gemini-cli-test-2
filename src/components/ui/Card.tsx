@@ -19,7 +19,7 @@ export const Card: React.FC<CardProps> = React.memo(({
 }) => {
   const cardClasses = useMemo(() => [
     'bg-white rounded-xl overflow-hidden',
-    bordered ? 'shadow-soft border border-neutral-200' : '',
+    bordered ? 'shadow-soft border border-emerald-200' : '',
     compact ? 'p-4' : 'p-6',
     className
   ].filter(Boolean).join(' '), [bordered, compact, className]);
@@ -28,7 +28,7 @@ export const Card: React.FC<CardProps> = React.memo(({
     <div className={cardClasses}>
       {title && (
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-neutral-800">{title}</h2>
+          <h2 className="text-xl font-semibold text-emerald-800">{title}</h2>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
       )}

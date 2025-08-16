@@ -371,7 +371,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 ${
               errors.title 
                 ? 'border-red-500 focus:ring-red-500' 
-                : 'border-gray-300 focus:ring-primary-500'
+                : 'border-emerald-300 focus:ring-teal-500'
             }`}
             placeholder="Enter episode title"
             disabled={isLoading}
@@ -380,7 +380,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="description" className="block text-sm font-medium text-emerald-700 mb-1">
             Description
           </label>
           <textarea
@@ -389,26 +389,26 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-emerald-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             placeholder="Enter episode description"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-emerald-700 mb-3">
             Audio Source
           </label>
           
           {/* Tab Navigation */}
-          <div className="flex border-b border-gray-200 mb-4">
+          <div className="flex border-b border-emerald-200 mb-4">
             <button
               type="button"
               onClick={switchToFileInput}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 audioInputType === 'file'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-emerald-500 text-emerald-600'
+                  : 'border-transparent text-emerald-500 hover:text-emerald-700'
               }`}
               disabled={isLoading || uploading}
             >
@@ -419,8 +419,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
               onClick={switchToUrlInput}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 audioInputType === 'url'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-emerald-500 text-emerald-600'
+                  : 'border-transparent text-emerald-500 hover:text-emerald-700'
               }`}
               disabled={isLoading || uploading}
             >
@@ -432,7 +432,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           {audioInputType === 'file' && (
             <div className="space-y-4">
               <div>
-                <label htmlFor="audio_file" className="block text-sm text-gray-600 mb-2">
+                <label htmlFor="audio_file" className="block text-sm text-emerald-600 mb-2">
                   Choose Audio File (MP3, WAV, OGG, AAC - Max 100MB)
                 </label>
                 <input
@@ -440,12 +440,12 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
                   id="audio_file"
                   accept="audio/*"
                   onChange={handleFileChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                   disabled={isLoading || uploading}
                 />
                 {audioFile && (
-                  <div className="mt-2 flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3">
-                    <p className="text-sm text-green-700">
+                  <div className="mt-2 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-md p-3">
+                    <p className="text-sm text-emerald-700">
                       Selected: {audioFile.name} ({Math.round(audioFile.size / 1024 / 1024 * 100) / 100} MB)
                     </p>
                     <button
@@ -462,9 +462,9 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
 
               {/* Upload Progress */}
               {uploading && (
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-emerald-200 rounded-full h-2">
                   <div 
-                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
@@ -511,8 +511,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
               )}
 
               {formData.audio_url && (
-                <div className="mt-2 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md p-3">
-                  <p className="text-sm text-blue-700">
+                <div className="mt-2 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-md p-3">
+                  <p className="text-sm text-emerald-700">
                     Selected: {audioFiles.find(f => f.url === formData.audio_url)?.displayName || 'Audio file'}
                   </p>
                   <button
@@ -532,20 +532,20 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-emerald-700 mb-1">
             Episode Thumbnail
           </label>
           <p className="text-sm text-gray-500 mb-3">Choose an image file or select from existing thumbnails</p>
           
           {/* Image Input Type Tabs */}
-          <div className="flex border-b border-gray-200 mb-4">
+          <div className="flex border-b border-emerald-200 mb-4">
             <button
               type="button"
               onClick={() => setImageInputType('file')}
               className={`px-4 py-2 text-sm font-medium border-b-2 ${
                 imageInputType === 'file'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-emerald-500 text-emerald-600'
+                  : 'border-transparent text-emerald-500 hover:text-emerald-700'
               }`}
               disabled={isLoading || uploadingImage}
             >
@@ -556,8 +556,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
               onClick={() => setImageInputType('existing')}
               className={`px-4 py-2 text-sm font-medium border-b-2 ml-4 ${
                 imageInputType === 'existing'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-emerald-500 text-emerald-600'
+                  : 'border-transparent text-emerald-500 hover:text-emerald-700'
               }`}
               disabled={isLoading || uploadingImage}
             >
@@ -571,14 +571,14 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
               id="image_file"
               accept="image/*"
               onChange={handleImageFileChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-emerald-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               disabled={isLoading || uploadingImage}
             />
           )}
 
           {imageInputType === 'existing' && (
             <div>
-              <label htmlFor="existing_image" className="block text-sm text-gray-600 mb-2">
+              <label htmlFor="existing_image" className="block text-sm text-emerald-600 mb-2">
                 Select from uploaded thumbnail images
               </label>
               
@@ -598,8 +598,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
                       key={file.path}
                       className={`relative border-2 rounded-lg p-2 cursor-pointer transition-all ${
                         formData.thumbnail_path === file.path
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-emerald-200 hover:border-emerald-300'
                       }`}
                       onClick={() => {
                         setFormData(prev => ({ ...prev, thumbnail_path: file.path }));
@@ -622,7 +622,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
                         {Math.round(file.size / 1024)} KB
                       </p>
                       {formData.thumbnail_path === file.path && (
-                        <div className="absolute top-1 right-1 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center">
+                        <div className="absolute top-1 right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
@@ -634,8 +634,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
               )}
 
               {formData.thumbnail_path && imageInputType === 'existing' && (
-                <div className="mt-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md p-3">
-                  <p className="text-sm text-blue-700">
+                <div className="mt-4 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-md p-3">
+                  <p className="text-sm text-emerald-700">
                     Selected: {imageFiles.find(f => f.path === formData.thumbnail_path)?.displayName || 'Image file'}
                   </p>
                   <button
@@ -653,8 +653,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           
           {imageInputType === 'file' && imageFile && (
             <div className="mt-4 space-y-4">
-              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3">
-                <p className="text-sm text-green-700">
+              <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-md p-3">
+                <p className="text-sm text-emerald-700">
                   Selected: {imageFile.name} ({Math.round(imageFile.size / 1024 * 100) / 100} KB)
                 </p>
                 <button
@@ -669,8 +669,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
 
               {/* Image Preview */}
               <div>
-                <p className="text-sm text-gray-600 mb-2">Preview:</p>
-                <div className="w-32 h-32 border border-gray-300 rounded-lg overflow-hidden">
+                <p className="text-sm text-emerald-600 mb-2">Preview:</p>
+                <div className="w-32 h-32 border border-emerald-300 rounded-lg overflow-hidden">
                   <img
                     src={URL.createObjectURL(imageFile)}
                     alt="Preview"
@@ -684,8 +684,8 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           {/* Show existing thumbnail if editing and using file input */}
           {imageInputType === 'file' && episode?.thumbnail_path && !imageFile && (
             <div className="mt-4">
-              <p className="text-sm text-gray-600 mb-2">Current thumbnail:</p>
-              <div className="w-32 h-32 border border-gray-300 rounded-lg overflow-hidden">
+              <p className="text-sm text-emerald-600 mb-2">Current thumbnail:</p>
+              <div className="w-32 h-32 border border-emerald-300 rounded-lg overflow-hidden">
                 <img
                   src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${episode.thumbnail_path}`}
                   alt="Current thumbnail"
@@ -698,13 +698,13 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           {/* Upload Progress */}
           {uploadingImage && (
             <div className="mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-emerald-200 rounded-full h-2">
                 <div 
-                  className="bg-primary-600 h-2 rounded-full transition-all duration-300 animate-pulse"
+                  className="bg-emerald-600 h-2 rounded-full transition-all duration-300 animate-pulse"
                   style={{ width: '100%' }}
                 ></div>
               </div>
-              <p className="text-sm text-gray-600 mt-1">Uploading thumbnail...</p>
+              <p className="text-sm text-emerald-600 mt-1">Uploading thumbnail...</p>
             </div>
           )}
           
@@ -712,7 +712,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
         </div>
 
         <div>
-          <label htmlFor="published_at" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="published_at" className="block text-sm font-medium text-emerald-700 mb-1">
             Published Date
           </label>
           <input
@@ -721,13 +721,13 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
             name="published_at"
             value={formData.published_at || ''}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-emerald-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-emerald-700 mb-1">
             Badge
           </label>
           <Badge
@@ -742,7 +742,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           <button
             type="submit"
             disabled={isLoading || uploading || uploadingImage}
-            className="flex-1 bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploadingImage ? 'Uploading Image...' : uploading ? 'Uploading Audio...' : isLoading ? 'Saving...' : episode ? 'Update Episode' : 'Create Episode'}
           </button>
@@ -750,7 +750,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
             type="button"
             onClick={onCancel}
             disabled={isLoading || uploading || uploadingImage}
-            className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-emerald-300 text-emerald-700 py-2 px-4 rounded-md hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>

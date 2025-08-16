@@ -28,17 +28,17 @@ const AdminPage = () => {
       `}</style>
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 mb-4 sm:mb-6 lg:mb-8">Admin Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-900 mb-4 sm:mb-6 lg:mb-8">Admin Dashboard</h1>
           <UserSwitcher />
         </div>
-        <div className="border-b border-gray-200">
+        <div className="border-b border-emerald-200">
           <nav className="-mb-px flex space-x-2 sm:space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide" aria-label="Tabs">
               <button
                 onClick={() => setActiveTab('content')}
                 className={`${
                   activeTab === 'content'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300'
                 } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0`}
               >
                 <span className="hidden sm:inline">Content Management</span>
@@ -48,8 +48,8 @@ const AdminPage = () => {
                 onClick={() => setActiveTab('articles')}
                 className={`${
                   activeTab === 'articles'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300'
                 } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0`}
               >
                 <span className="hidden sm:inline">Articles Management</span>
@@ -59,8 +59,8 @@ const AdminPage = () => {
                 onClick={() => setActiveTab('users')}
                 className={`${
                   activeTab === 'users'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300'
                 } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0`}
               >
                 <span className="hidden sm:inline">User Management</span>
@@ -70,8 +70,8 @@ const AdminPage = () => {
                 onClick={() => setActiveTab('progress')}
                 className={`${
                   activeTab === 'progress'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300'
                 } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0`}
               >
                 <span className="hidden sm:inline">User Progress</span>
@@ -81,8 +81,8 @@ const AdminPage = () => {
                 onClick={() => setActiveTab('series')}
                 className={`${
                   activeTab === 'series'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300'
                 } whitespace-nowrap py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0`}
               >
                 <span className="hidden sm:inline">Series Management</span>

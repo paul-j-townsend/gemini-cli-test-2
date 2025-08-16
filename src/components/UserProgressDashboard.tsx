@@ -110,8 +110,8 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
   if (isLoading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
-        <p className="text-neutral-600 mt-2">Loading your progress...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
+        <p className="text-emerald-700 mt-2">Loading your progress...</p>
       </div>
     );
   }
@@ -119,7 +119,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
   if (!user) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-600">Please log in to view your progress.</p>
+        <p className="text-emerald-700">Please log in to view your progress.</p>
       </div>
     );
   }
@@ -128,15 +128,15 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">Learning Progress</h1>
-            <p className="text-primary-100">Welcome back, {user.name}!</p>
+            <p className="text-emerald-100">Welcome back, {user.name}!</p>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold">Level {userLevel.level}</div>
-            <div className="text-sm text-primary-100">
+            <div className="text-sm text-emerald-100">
               {userLevel.nextLevelScore} pts to next level
             </div>
           </div>
@@ -148,7 +148,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
             <span>Progress to Level {userLevel.level + 1}</span>
             <span>{userLevel.progress}%</span>
           </div>
-          <div className="w-full bg-primary-700 rounded-full h-2">
+          <div className="w-full bg-emerald-700 rounded-full h-2">
             <div 
               className="bg-white rounded-full h-2 transition-all duration-300"
               style={{ width: `${userLevel.progress}%` }}
@@ -159,37 +159,37 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
-          <div className="text-3xl font-bold text-primary-600 mb-2">
+        <div className="bg-white rounded-xl p-6 border border-emerald-200 text-center">
+          <div className="text-3xl font-bold text-emerald-600 mb-2">
             {progressSummary?.totalQuizzes || 0}
           </div>
-          <p className="text-neutral-600">Quizzes Completed</p>
+          <p className="text-emerald-700">Quizzes Completed</p>
         </div>
         
-        <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
+        <div className="bg-white rounded-xl p-6 border border-emerald-200 text-center">
           <div className="text-3xl font-bold text-green-600 mb-2">
             {(progressSummary?.totalCPDHours || 0).toFixed(1)}
           </div>
-          <p className="text-neutral-600">CPD Hours Earned</p>
+          <p className="text-emerald-700">CPD Hours Earned</p>
         </div>
         
-        <div className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
+        <div className="bg-white rounded-xl p-6 border border-emerald-200 text-center">
           <div className="text-3xl font-bold text-purple-600 mb-2">
             {progressSummary?.streakDays || 0}
           </div>
-          <p className="text-neutral-600">Day Streak</p>
+          <p className="text-emerald-700">Day Streak</p>
         </div>
       </div>
 
       {/* Detailed Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl p-6 border border-neutral-200">
-          <h2 className="text-xl font-bold text-neutral-900 mb-4">Recent Activity</h2>
+        <div className="bg-white rounded-xl p-6 border border-emerald-200">
+          <h2 className="text-xl font-bold text-emerald-900 mb-4">Recent Activity</h2>
           {recentActivity.length > 0 ? (
             <div className="space-y-3">
               {recentActivity.map((completion) => (
-                <div key={completion.id} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg group hover:bg-neutral-100 transition-colors duration-200">
+                <div key={completion.id} className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg group hover:bg-emerald-100 transition-colors duration-200">
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                       completion.passed ? 'bg-green-100' : 'bg-red-100'
@@ -205,7 +205,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
                       )}
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-neutral-900">
+                      <p className="text-sm font-medium text-emerald-900">
                         {quizTitles[completion.quiz_id] || `Quiz #${completion.quiz_id.slice(0, 8)}...`}
                       </p>
                       <p className="text-xs text-neutral-500">
@@ -222,7 +222,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
                     {completion.passed && (
                       <button
                         onClick={() => setShowCertificate(completion)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 text-neutral-400 hover:text-blue-500 hover:bg-blue-50 rounded-md"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 text-emerald-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-md"
                         title="Download certificate"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,7 +233,7 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
                     <button
                       onClick={() => handleDeleteCompletion(completion.id)}
                       disabled={deletingId === completion.id}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-md disabled:opacity-50"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 text-emerald-400 hover:text-red-500 hover:bg-red-50 rounded-md disabled:opacity-50"
                       title="Delete completion"
                     >
                       {deletingId === completion.id ? (

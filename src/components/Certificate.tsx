@@ -407,7 +407,7 @@ const Certificate: React.FC<CertificateProps> = ({
         <button
           onClick={downloadCertificate}
           style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
             color: 'white',
             border: 'none',
             padding: '12px 24px',
@@ -415,16 +415,16 @@ const Certificate: React.FC<CertificateProps> = ({
             fontWeight: 'bold',
             borderRadius: '8px',
             cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+            boxShadow: '0 4px 15px rgba(5, 150, 105, 0.3)',
             transition: 'all 0.3s ease'
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.4)';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(5, 150, 105, 0.3)';
           }}
         >
           📄 Download Certificate

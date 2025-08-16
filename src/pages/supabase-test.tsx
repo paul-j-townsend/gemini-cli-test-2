@@ -152,9 +152,9 @@ const SupabaseTest = () => {
           </div>
 
           {/* Setup Instructions */}
-          <div className="card p-6 mb-8 bg-blue-50 border-blue-200">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-900">Setup Instructions</h2>
-            <div className="space-y-4 text-blue-800">
+          <div className="card p-6 mb-8 bg-emerald-50 border-emerald-200">
+            <h2 className="text-2xl font-semibold mb-4 text-emerald-900">Setup Instructions</h2>
+            <div className="space-y-4 text-emerald-800">
               <p>To use this test page, you need to:</p>
               <ol className="list-decimal list-inside space-y-2">
                 <li>Create a Supabase project at supabase.com</li>
@@ -173,10 +173,10 @@ const SupabaseTest = () => {
 
           {/* Add Item Form */}
           <div className="card p-6 mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Add Test Item</h2>
+            <h2 className="text-2xl font-semibold text-emerald-900 mb-4">Add Test Item</h2>
             <form onSubmit={addItem} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-emerald-700 mb-2">
                   Name *
                 </label>
                 <input
@@ -190,7 +190,7 @@ const SupabaseTest = () => {
                 />
               </div>
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label htmlFor="description" className="block text-sm font-medium text-emerald-700 mb-2">
                   Description
                 </label>
                 <textarea
@@ -214,28 +214,28 @@ const SupabaseTest = () => {
 
           {/* Items List */}
           <div className="card p-6">
-            <h2 className="text-2xl font-semibold mb-4">Test Items</h2>
+            <h2 className="text-2xl font-semibold text-emerald-900 mb-4">Test Items</h2>
             
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                 <span className="ml-3">Loading items...</span>
               </div>
             ) : items.length === 0 ? (
-              <p className="text-neutral-500 text-center py-8">
+              <p className="text-emerald-600 text-center py-8">
                 No items found. Add your first item above!
               </p>
             ) : (
               <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="border border-neutral-200 rounded-lg p-4">
+                  <div key={item.id} className="border border-emerald-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-neutral-900">{item.name}</h3>
+                        <h3 className="font-semibold text-emerald-900">{item.name}</h3>
                         {item.description && (
-                          <p className="text-neutral-600 mt-1">{item.description}</p>
+                          <p className="text-emerald-700 mt-1">{item.description}</p>
                         )}
-                        <p className="text-sm text-neutral-400 mt-2">
+                        <p className="text-sm text-emerald-500 mt-2">
                           Created: {new Date(item.created_at).toLocaleString()}
                         </p>
                       </div>

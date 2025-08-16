@@ -43,10 +43,10 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     <button
       onClick={handleGoogleLogin}
       disabled={isLoading}
-      className={`flex items-center justify-center gap-3 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
+      className={`flex items-center justify-center gap-3 w-full px-4 py-3 border border-emerald-300 rounded-lg shadow-sm bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
     >
       {isLoading ? (
-        <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="w-5 h-5 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin"></div>
       ) : (
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path

@@ -103,7 +103,7 @@ export const PurchaseCPDButton: React.FC<PurchaseCPDButtonProps> = ({
     return (
       <button
         disabled
-        className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-gray-300 text-gray-500 transition-colors ${className}`}
+        className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-emerald-300 text-emerald-500 transition-colors ${className}`}
       >
         <Loader2 size={12} className="animate-spin" />
         <span>Checking...</span>
@@ -128,8 +128,8 @@ export const PurchaseCPDButton: React.FC<PurchaseCPDButtonProps> = ({
       disabled={isLoading || !user}
       className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow-lg transition-colors ${
         isLoading || !user
-          ? 'bg-gray-400 text-white cursor-not-allowed'
-          : 'bg-blue-500 hover:bg-blue-600 text-white'
+          ? 'bg-emerald-400 text-white cursor-not-allowed'
+          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
       } ${className}`}
     >
       {isLoading ? (

@@ -79,7 +79,7 @@ const SeriesCard: React.FC<SeriesCardProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {featuredEpisodes.map((episode, index) => (
             <div key={episode.id} className="group cursor-pointer">
-              <div className="aspect-video rounded-xl overflow-hidden mb-4 bg-neutral-100">
+              <div className="aspect-video rounded-xl overflow-hidden mb-4 bg-emerald-100">
                 <img 
                   src={getThumbnailUrl(episode)} 
                   alt={episode.title}
@@ -87,13 +87,13 @@ const SeriesCard: React.FC<SeriesCardProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <h4 className="font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors line-clamp-2">
+                <h4 className="font-semibold text-emerald-900 group-hover:text-emerald-600 transition-colors line-clamp-2">
                   {episode.title}
                 </h4>
-                <p className="text-sm text-neutral-600 line-clamp-2">
+                <p className="text-sm text-emerald-700 line-clamp-2">
                   {episode.description}
                 </p>
-                <div className="flex items-center justify-between text-xs text-neutral-500">
+                <div className="flex items-center justify-between text-xs text-emerald-500">
                   {episode.episode_number && (
                     <span>Episode {episode.episode_number}</span>
                   )}
@@ -110,7 +110,7 @@ const SeriesCard: React.FC<SeriesCardProps> = ({
           <div className="text-center">
             <button 
               onClick={() => setIsExpanded(!isExpanded)}
-              className="inline-flex items-center px-6 py-3 border border-primary-300 text-primary-600 font-medium rounded-xl hover:bg-primary-50 transition-colors duration-200"
+              className="inline-flex items-center px-6 py-3 border border-emerald-300 text-emerald-600 font-medium rounded-xl hover:bg-emerald-50 transition-colors duration-200"
             >
               {isExpanded ? 'Show Less' : `View All ${episodes.length} Episodes`}
               <svg 
@@ -126,11 +126,11 @@ const SeriesCard: React.FC<SeriesCardProps> = ({
         )}
 
         {isExpanded && episodes.length > 3 && (
-          <div className="mt-8 pt-8 border-t border-neutral-200">
+          <div className="mt-8 pt-8 border-t border-emerald-200">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedEpisodes.slice(3).map((episode) => (
                 <div key={episode.id} className="group cursor-pointer">
-                  <div className="aspect-video rounded-lg overflow-hidden mb-3 bg-neutral-100">
+                  <div className="aspect-video rounded-lg overflow-hidden mb-3 bg-emerald-100">
                     <img 
                       src={getThumbnailUrl(episode)} 
                       alt={episode.title}
@@ -138,13 +138,13 @@ const SeriesCard: React.FC<SeriesCardProps> = ({
                     />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="font-medium text-neutral-900 group-hover:text-primary-600 transition-colors line-clamp-2 text-sm">
+                    <h4 className="font-medium text-emerald-900 group-hover:text-emerald-600 transition-colors line-clamp-2 text-sm">
                       {episode.title}
                     </h4>
-                    <p className="text-xs text-neutral-600 line-clamp-2">
+                    <p className="text-xs text-emerald-700 line-clamp-2">
                       {episode.description}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-neutral-500">
+                    <div className="flex items-center justify-between text-xs text-emerald-500">
                       {episode.episode_number && (
                         <span>Episode {episode.episode_number}</span>
                       )}

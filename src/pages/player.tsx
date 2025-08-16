@@ -531,7 +531,7 @@ const PodcastPlayer = () => {
                         {/* 1. Download Report - Always Available */}
                         <button
                           onClick={downloadReport}
-                          className="w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:shadow-xl transform hover:scale-[1.02]"
+                          className="w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 hover:shadow-xl transform hover:scale-[1.02]"
                         >
                           <FileText size={18} />
                           {reportDownloaded ? 'Download Report ✓' : 'Download Report'}
@@ -543,8 +543,8 @@ const PodcastPlayer = () => {
                           disabled={!hasListened || !reportDownloaded}
                           className={`w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
                             hasListened && reportDownloaded
-                              ? 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white hover:shadow-xl transform hover:scale-[1.02]' 
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+                              : 'bg-emerald-300 text-emerald-500 cursor-not-allowed'
                           }`}
                         >
                           <HelpCircle size={18} />
@@ -561,7 +561,7 @@ const PodcastPlayer = () => {
                           className={`w-full px-6 py-3 font-semibold rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
                             hasListened && reportDownloaded && progressQuizCompleted
                               ? 'bg-green-100 hover:bg-green-200 text-green-700 hover:shadow-xl transform hover:scale-[1.02]'
-                              : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+                              : 'bg-emerald-100 text-emerald-400 cursor-not-allowed opacity-60'
                           }`}
                         >
                           <Download size={18} />
@@ -584,9 +584,9 @@ const PodcastPlayer = () => {
         {showQuiz && episode?.content_id && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-primary-50 to-primary-100">
+              <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-emerald-50 to-teal-100">
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-gray-900">CPD Assessment Quiz</h2>
+                  <h2 className="text-xl font-bold text-emerald-900">CPD Assessment Quiz</h2>
                 </div>
                 <button
                   onClick={() => setShowQuiz(false)}
