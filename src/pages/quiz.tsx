@@ -43,10 +43,10 @@ const QuizPage: React.FC = () => {
       <div className="container-wide py-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-neutral-900 mb-4">
+            <h1 className="text-4xl font-bold text-emerald-900 mb-4">
               Knowledge Quiz
             </h1>
-            <p className="text-lg text-neutral-600">
+            <p className="text-lg text-emerald-600">
               Test your knowledge with our interactive quiz questions
             </p>
           </div>
@@ -55,7 +55,7 @@ const QuizPage: React.FC = () => {
             <Quiz quizId={selectedQuizId} />
           ) : (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <h2 className="text-2xl font-semibold text-neutral-900 mb-6">
+              <h2 className="text-2xl font-semibold text-emerald-900 mb-6">
                 Select a Quiz
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

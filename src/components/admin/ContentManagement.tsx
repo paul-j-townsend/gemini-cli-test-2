@@ -618,7 +618,7 @@ export default function ContentManagement() {
       sortable: true,
       render: (content) => (
         <div className="text-sm">
-          <div className="text-gray-900 font-medium">
+          <div className="text-emerald-900 font-medium">
             S{content.season}E{content.episode_number}
           </div>
           <div className="flex flex-wrap gap-1 mt-1">
@@ -642,11 +642,11 @@ export default function ContentManagement() {
       sortable: true,
       render: (content) => (
         <div className="max-w-xs">
-          <div className="font-medium text-gray-900 truncate" title={content.title}>
+          <div className="font-medium text-emerald-900 truncate" title={content.title}>
             {content.title}
           </div>
           {content.description && (
-            <div className="text-sm text-gray-500 mt-1 line-clamp-2" title={content.description}>
+            <div className="text-sm text-emerald-500 mt-1 line-clamp-2" title={content.description}>
               {content.description}
             </div>
           )}
@@ -658,7 +658,7 @@ export default function ContentManagement() {
       label: 'Duration',
       sortable: true,
       render: (content) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-emerald-500">
           {content.duration ? formatDuration(content.duration) : 'Unknown'}
         </span>
       ),
@@ -673,7 +673,7 @@ export default function ContentManagement() {
             {content.total_questions} questions
           </span>
           {content.quiz_title && (
-            <div className="text-gray-500 mt-1 text-xs truncate">
+            <div className="text-emerald-500 mt-1 text-xs truncate">
               {content.quiz_title}
             </div>
           )}
@@ -707,7 +707,7 @@ export default function ContentManagement() {
       sortable: true,
       render: (content) => (
         <div className="text-sm">
-          <div className="font-medium text-gray-900">
+          <div className="font-medium text-emerald-900">
             £{((content.price_cents || 0) / 100).toFixed(2)}
           </div>
           {content.special_offer_active && content.special_offer_price_cents && (
@@ -715,7 +715,7 @@ export default function ContentManagement() {
               Special: £{(content.special_offer_price_cents / 100).toFixed(2)}
             </div>
           )}
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-emerald-500">
             {content.is_purchasable ? 'Purchasable' : 'Free'}
           </div>
         </div>
@@ -726,7 +726,7 @@ export default function ContentManagement() {
       label: 'Published',
       sortable: true,
       render: (content) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-emerald-500">
           {content.published_at ? formatDate(content.published_at) : 'Not published'}
         </span>
       ),
@@ -965,7 +965,7 @@ export default function ContentManagement() {
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                       {/* Question List */}
                       <div className="lg:col-span-1">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Questions</h4>
+                        <h4 className="text-sm font-medium text-emerald-700 mb-3">Questions</h4>
                         <div className="space-y-2">
                           {formData.questions.map((_, index) => (
                             <button
@@ -975,7 +975,7 @@ export default function ContentManagement() {
                               className={`w-full text-left px-3 py-2 text-sm rounded-lg border ${
                                 selectedQuestionIndex === index
                                   ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                                  : 'bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-50'
                               }`}
                             >
                               Question {index + 1}

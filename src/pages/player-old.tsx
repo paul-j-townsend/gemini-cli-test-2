@@ -258,7 +258,7 @@ const PodcastPlayer = () => {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>
         </div>
       </Layout>
     );
@@ -270,8 +270,8 @@ const PodcastPlayer = () => {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Episode Not Found</h1>
-            <p className="text-gray-600 mb-4">{error || 'The requested episode could not be found.'}</p>
+            <h1 className="text-2xl font-bold text-emerald-900 mb-2">Episode Not Found</h1>
+            <p className="text-emerald-600 mb-4">{error || 'The requested episode could not be found.'}</p>
             <button 
               onClick={() => router.push('/podcasts')}
               className="btn-primary"
@@ -291,12 +291,12 @@ const PodcastPlayer = () => {
         <meta name="description" content={episode.description} />
       </Head>
 
-      <div className="bg-gradient-to-br from-primary-50 via-white to-neutral-50">
+      <div className="bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
         {/* Header */}
         <div className="container-wide py-1">
           <button
             onClick={() => router.push('/podcasts')}
-            className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors"
+            className="flex items-center space-x-2 text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             <ArrowLeft size={20} />
             <span>Back to Episodes</span>
@@ -327,15 +327,15 @@ const PodcastPlayer = () => {
                   {/* Episode Details */}
                   <div className="flex-1">
                     <div className="text-left flex-1">
-                      <h1 className="text-base lg:text-lg font-bold text-gray-900 mb-1">
+                      <h1 className="text-base lg:text-lg font-bold text-emerald-900 mb-1">
                         {episode.title}
                       </h1>
-                      <p className="text-gray-600 text-xs mb-2 leading-tight line-clamp-2">
+                      <p className="text-emerald-600 text-xs mb-2 leading-tight line-clamp-2">
                         {episode.description}
                       </p>
                       
                       {/* Episode Meta */}
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-500 mb-2">
                         {episode.episode_number && (
                           <span>Episode {episode.episode_number}</span>
                         )}
@@ -399,7 +399,7 @@ const PodcastPlayer = () => {
               </div>
 
               {/* Audio Player Controls */}
-              <div className="bg-gray-50 px-3 lg:px-4 py-2">
+              <div className="bg-emerald-50 px-3 lg:px-4 py-2">
                 {/* Progress Bar */}
                 <div className="mb-2">
                   <div className="relative">
@@ -419,7 +419,7 @@ const PodcastPlayer = () => {
                       }}
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 mt-2">
+                  <div className="flex justify-between text-sm text-emerald-500 mt-2">
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                   </div>
@@ -429,7 +429,7 @@ const PodcastPlayer = () => {
                 <div className="flex items-center justify-center space-x-2">
                   <button
                     onClick={() => skipTime(-15)}
-                    className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+                    className="p-2 rounded-full bg-emerald-200 hover:bg-emerald-300 transition-colors"
                   >
                     <SkipBack size={18} />
                   </button>
@@ -437,14 +437,14 @@ const PodcastPlayer = () => {
                   <button
                     onClick={handlePlayPause}
                     disabled={!currentAudioSrc}
-                    className="p-3 rounded-full bg-primary-600 hover:bg-primary-700 text-white transition-colors disabled:opacity-50"
+                    className="p-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white transition-colors disabled:opacity-50"
                   >
                     {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                   </button>
 
                   <button
                     onClick={() => skipTime(15)}
-                    className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+                    className="p-2 rounded-full bg-emerald-200 hover:bg-emerald-300 transition-colors"
                   >
                     <SkipForward size={18} />
                   </button>
@@ -454,7 +454,7 @@ const PodcastPlayer = () => {
                 <div className="flex items-center justify-between mt-2">
                   {/* Volume */}
                   <div className="flex items-center space-x-2">
-                    <button onClick={toggleMute} className="p-2 text-gray-600 hover:text-gray-800">
+                    <button onClick={toggleMute} className="p-2 text-emerald-600 hover:text-emerald-800">
                       {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
                     </button>
                     <input
@@ -464,7 +464,7 @@ const PodcastPlayer = () => {
                       step="0.1"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-16 accent-primary-600"
+                      className="w-16 accent-emerald-600"
                     />
                   </div>
 
@@ -472,7 +472,7 @@ const PodcastPlayer = () => {
                   <div className="relative">
                     <button
                       onClick={() => setShowSettings(!showSettings)}
-                      className="p-2 text-gray-600 hover:text-gray-800 flex items-center space-x-1"
+                      className="p-2 text-emerald-600 hover:text-emerald-800 flex items-center space-x-1"
                     >
                       <Settings size={20} />
                       <span className="text-sm">{playbackRate}x</span>
@@ -484,8 +484,8 @@ const PodcastPlayer = () => {
                           <button
                             key={rate}
                             onClick={() => handlePlaybackRateChange(rate)}
-                            className={`block w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 ${
-                              playbackRate === rate ? 'bg-primary-50 text-primary-600' : ''
+                            className={`block w-full text-left px-3 py-2 text-sm rounded hover:bg-emerald-100 ${
+                              playbackRate === rate ? 'bg-emerald-50 text-emerald-600' : ''
                             }`}
                           >
                             {rate}x
@@ -512,7 +512,7 @@ const PodcastPlayer = () => {
                   <h2 className="text-2xl font-bold">Episode Quiz</h2>
                   <button
                     onClick={() => setShowQuiz(false)}
-                    className="p-2 text-gray-400 hover:text-gray-600"
+                    className="p-2 text-emerald-400 hover:text-emerald-600"
                   >
                     <X size={24} />
                   </button>

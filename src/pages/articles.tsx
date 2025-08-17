@@ -90,10 +90,10 @@ const Articles = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-emerald-900 mb-4">
             Veterinary Articles & Insights
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-emerald-600 max-w-3xl mx-auto">
             Stay updated with the latest in veterinary medicine, best practices and industry insights
           </p>
         </div>
@@ -112,7 +112,7 @@ const Articles = () => {
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedCategory === 'all'
                 ? 'bg-teal-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-emerald-200 text-emerald-700 hover:bg-emerald-300'
             }`}
           >
             All Articles
@@ -124,7 +124,7 @@ const Articles = () => {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 selectedCategory === category
                   ? 'bg-teal-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-emerald-200 text-emerald-700 hover:bg-emerald-300'
               }`}
             >
               {category}
@@ -136,7 +136,7 @@ const Articles = () => {
         {/* Search Results Header */}
         {searchResults && (
           <div className="mb-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-emerald-600">
               Found {searchResults.length} article{searchResults.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -146,16 +146,16 @@ const Articles = () => {
         {loading && !searchResults ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-            <p className="mt-2 text-gray-600">Loading articles...</p>
+            <p className="mt-2 text-emerald-600">Loading articles...</p>
           </div>
         ) : isSearching ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-            <p className="mt-2 text-gray-600">Searching...</p>
+            <p className="mt-2 text-emerald-600">Searching...</p>
           </div>
         ) : displayedArticles.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">
+            <p className="text-emerald-600">
               {searchResults !== null ? 'No articles found matching your search.' : 'No articles found in this category.'}
             </p>
           </div>
@@ -204,14 +204,14 @@ const Articles = () => {
                         ))}
                       </div>
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+                    <h2 className="text-xl font-semibold text-emerald-900 mb-2 line-clamp-2">
                       {article.title}
                     </h2>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
+                    <p className="text-emerald-600 mb-4 line-clamp-3">
                       {article.excerpt}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-emerald-500">
                         By: {article.author}
                       </span>
                       <span className="text-teal-600 font-medium text-sm hover:text-teal-700">

@@ -56,13 +56,13 @@ export default function News() {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'Vaccination': return 'bg-blue-100 text-blue-800';
-      case 'Research': return 'bg-green-100 text-green-800';
-      case 'Regulation': return 'bg-purple-100 text-purple-800';
-      case 'Wellness': return 'bg-pink-100 text-pink-800';
-      case 'Public Health': return 'bg-red-100 text-red-800';
-      case 'Technology': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Vaccination': return 'bg-emerald-100 text-emerald-800';
+      case 'Research': return 'bg-teal-100 text-teal-800';
+      case 'Regulation': return 'bg-emerald-100 text-emerald-800';
+      case 'Wellness': return 'bg-teal-100 text-teal-800';
+      case 'Public Health': return 'bg-emerald-100 text-emerald-800';
+      case 'Technology': return 'bg-teal-100 text-teal-800';
+      default: return 'bg-emerald-100 text-emerald-800';
     }
   };
 

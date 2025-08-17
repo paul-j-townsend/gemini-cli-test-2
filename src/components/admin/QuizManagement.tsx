@@ -235,8 +235,8 @@ const QuizManagement = () => {
       sortable: true,
       render: (quiz) => (
         <div>
-          <div className="font-semibold text-gray-900">{quiz.title}</div>
-          <div className="text-sm text-gray-500">{quiz.description}</div>
+          <div className="font-semibold text-emerald-900">{quiz.title}</div>
+          <div className="text-sm text-emerald-500">{quiz.description}</div>
         </div>
       )
     },
@@ -319,7 +319,7 @@ const QuizManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Quiz Management</h2>
+        <h2 className="text-2xl font-bold text-emerald-900">Quiz Management</h2>
         {!editingQuiz && (
           <Button 
             onClick={handleCreateQuiz}
@@ -329,7 +329,7 @@ const QuizManagement = () => {
           </Button>
         )}
         {editingQuiz && (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-emerald-500">
             Editing: {editingQuiz.title}
           </div>
         )}
@@ -415,7 +415,7 @@ const QuizQuestionsEditor: React.FC<QuizQuestionsEditorProps> = ({ questions, on
       ))}
       
       {questions.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-emerald-500">
           <p>No questions yet. Click "Add Question" to get started.</p>
         </div>
       )}
@@ -459,9 +459,9 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, index, onChan
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+    <div className="border border-emerald-200 rounded-lg p-4 space-y-4">
       <div className="flex justify-between items-start">
-        <h5 className="font-medium text-gray-900">Question {question.question_number}</h5>
+        <h5 className="font-medium text-emerald-900">Question {question.question_number}</h5>
         <Button
           onClick={onRemove}
           variant="ghost"
@@ -474,41 +474,41 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, index, onChan
       
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+          <label className="block text-sm font-medium text-emerald-700 mb-1">Question Text</label>
           <textarea
             value={question.question_text}
             onChange={(e) => onChange({ ...question, question_text: e.target.value })}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             placeholder="Enter your question here..."
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Learning Outcome</label>
+          <label className="block text-sm font-medium text-emerald-700 mb-1">Learning Outcome</label>
           <textarea
             value={question.learning_outcome || ''}
             onChange={(e) => onChange({ ...question, learning_outcome: e.target.value })}
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             placeholder="What the student should learn from this question..."
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rationale</label>
+          <label className="block text-sm font-medium text-emerald-700 mb-1">Rationale</label>
           <textarea
             value={question.rationale || ''}
             onChange={(e) => onChange({ ...question, rationale: e.target.value })}
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             placeholder="Explain why the correct answer is correct..."
           />
         </div>
         
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-gray-700">Answers</label>
+            <label className="block text-sm font-medium text-emerald-700">Answers</label>
             <Button onClick={handleAddAnswer} variant="ghost" size="sm">
               Add Answer
             </Button>
@@ -521,7 +521,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, index, onChan
                   type="text"
                   value={answer.answer_text}
                   onChange={(e) => handleAnswerChange(answerIndex, { ...answer, answer_text: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="flex-1 px-3 py-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder={`Answer ${answer.answer_letter}`}
                 />
                 <label className="flex items-center text-sm">

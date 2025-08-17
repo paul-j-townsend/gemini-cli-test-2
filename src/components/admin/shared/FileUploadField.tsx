@@ -47,7 +47,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-emerald-700">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -79,7 +79,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
       </div>
 
       {helpText && (
-        <p className="text-xs text-gray-500">{helpText}</p>
+        <p className="text-xs text-emerald-500">{helpText}</p>
       )}
 
       {error && (
@@ -95,7 +95,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
           <img
             src={value}
             alt="Preview"
-            className="h-20 w-20 object-cover rounded-lg border border-gray-200"
+            className="h-20 w-20 object-cover rounded-lg border border-emerald-200"
           />
         </div>
       )}

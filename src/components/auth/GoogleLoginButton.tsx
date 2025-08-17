@@ -67,7 +67,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
           />
         </svg>
       )}
-      <span className="text-sm font-medium text-gray-700">
+      <span className="text-sm font-medium text-emerald-700">
         {isLoading ? 'Connecting...' : 'Continue with Google'}
       </span>
     </button>

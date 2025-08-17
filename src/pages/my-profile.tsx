@@ -17,8 +17,8 @@ const MyProfile: React.FC = () => {
       <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="mb-6 sm:mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">My Profile</h1>
-              <p className="text-neutral-600 text-sm sm:text-base">Manage your account information and preferences</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-emerald-900 mb-2">My Profile</h1>
+              <p className="text-emerald-600 text-sm sm:text-base">Manage your account information and preferences</p>
             </div>
 
             {/* Profile Card */}

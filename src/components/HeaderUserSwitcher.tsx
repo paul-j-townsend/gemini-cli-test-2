@@ -65,9 +65,9 @@ export const HeaderUserSwitcher: React.FC = () => {
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-            <div className="p-3 border-b border-gray-100">
-              <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <div className="absolute right-0 mt-2 w-64 bg-white border border-emerald-200 rounded-lg shadow-lg z-50">
+            <div className="p-3 border-b border-emerald-100">
+              <div className="text-xs font-medium text-emerald-500 uppercase tracking-wider">
                 🔧 Dev Tools: User Switcher
               </div>
             </div>
@@ -83,10 +83,10 @@ export const HeaderUserSwitcher: React.FC = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-emerald-900">
                         {availableUser.name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-emerald-500">
                         {availableUser.email}
                       </div>
                     </div>
@@ -107,8 +107,8 @@ export const HeaderUserSwitcher: React.FC = () => {
             </div>
             
             {user && (
-              <div className="p-3 border-t border-gray-100 bg-gray-50">
-                <div className="text-xs text-gray-600">
+              <div className="p-3 border-t border-emerald-100 bg-emerald-50">
+                <div className="text-xs text-emerald-600">
                   <div><strong>Current:</strong> {user.name}</div>
                   <div><strong>Role:</strong> <span style={{ color: getRoleColor(user.role) }}>{getRoleDisplayName(user.role)}</span></div>
                 </div>

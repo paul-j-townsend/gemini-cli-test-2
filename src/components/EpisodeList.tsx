@@ -74,8 +74,8 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
                 }}
               />
             ) : (
-              <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 text-xs">No Image</span>
+              <div className="w-12 h-12 bg-emerald-200 rounded-lg flex items-center justify-center">
+                <span className="text-emerald-400 text-xs">No Image</span>
               </div>
             )}
           </div>
@@ -90,12 +90,12 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
       sortable: true,
       render: (title, episode) => (
         <div className="max-w-full overflow-hidden">
-          <div className="font-medium text-gray-900 truncate" title={title}>
+          <div className="font-medium text-emerald-900 truncate" title={title}>
             {title}
           </div>
           {episode.description && (
             <div 
-              className="text-sm text-gray-500 mt-1 break-words overflow-hidden" 
+              className="text-sm text-emerald-500 mt-1 break-words overflow-hidden" 
               style={{
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -134,8 +134,8 @@ export default function EpisodeList({ episodes, onEdit, onDelete, isLoading = fa
       render: (audioUrl) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
           audioUrl 
-            ? 'bg-blue-100 text-blue-800' 
-            : 'bg-gray-100 text-gray-800'
+            ? 'bg-emerald-100 text-emerald-800' 
+            : 'bg-emerald-100 text-emerald-800'
         }`}>
           {audioUrl ? 'Has Audio' : 'No Audio'}
         </span>

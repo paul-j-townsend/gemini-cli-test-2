@@ -140,7 +140,7 @@ const LoginPage = () => {
           </form>
 
           <div className="text-center">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-emerald-500">
               Development mode: Use existing user emails or sign in with Google
             </p>
           </div>

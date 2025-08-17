@@ -65,7 +65,7 @@ const PrivacyPolicy = () => {
             <p className="mb-4">We collect anonymous data on how people use our site (like pages visited and searches made). This helps us improve the website.</p>
             <p className="mb-4">We may use cookies—small files stored on your device—to collect this information. Cookies do <strong>not</strong> identify you personally and don't harm your computer. You can manage cookies in your browser settings.</p>
             <p className="mb-4">We may also use web tags (invisible tracking tools) in combination with cookies to help us measure the success of our site or adverts. These tools may involve third-party services, but they only collect aggregated, anonymous data.</p>
-            <p className="mb-4">To manage third-party tracking or learn more, visit the <a href="https://thenai.org/" className="text-blue-600 hover:underline">Network Advertising Initiative</a> website.</p>
+            <p className="mb-4">To manage third-party tracking or learn more, visit the <a href="https://thenai.org/" className="text-emerald-600 hover:underline">Network Advertising Initiative</a> website.</p>
           </section>
 
           <section className="mb-8">

@@ -18,14 +18,14 @@ const Podcasts = () => {
 
   // Color palette for series badges
   const seriesColors = [
-    '#3B82F6', // blue
-    '#10B981', // emerald
-    '#F59E0B', // amber
-    '#EF4444', // red
-    '#8B5CF6', // violet
-    '#06B6D4', // cyan
-    '#F97316', // orange
-    '#84CC16', // lime
+    '#059669', // emerald
+    '#0d9488', // teal
+    '#10b981', // emerald
+    '#14b8a6', // teal
+    '#0f766e', // emerald
+    '#115e59', // teal
+    '#134e4a', // emerald
+    '#064e3b', // teal
   ];
 
   useEffect(() => {

@@ -39,20 +39,20 @@ export default function MigratePage() {
         <h2 className="text-xl font-semibold mb-4">Add Learning Outcome Column</h2>
         
         <p className="mb-4">
-          This will add the <code className="bg-gray-100 px-2 py-1 rounded">learning_outcome</code> column 
-          to the <code className="bg-gray-100 px-2 py-1 rounded">quiz_questions</code> table.
+          This will add the <code className="bg-emerald-100 px-2 py-1 rounded">learning_outcome</code> column 
+          to the <code className="bg-emerald-100 px-2 py-1 rounded">quiz_questions</code> table.
         </p>
         
         <button 
           onClick={runMigration}
           disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+          className="bg-emerald-500 text-white px-4 py-2 rounded hover:bg-emerald-600 disabled:opacity-50"
         >
           {loading ? 'Checking...' : 'Check Database Status'}
         </button>
         
         {status && (
-          <div className="mt-4 p-4 bg-gray-50 rounded">
+          <div className="mt-4 p-4 bg-emerald-50 rounded">
             <p className="whitespace-pre-wrap">{status}</p>
           </div>
         )}
@@ -62,7 +62,7 @@ export default function MigratePage() {
           <p className="text-yellow-700 mb-3">
             Please run this SQL in your Supabase SQL Editor:
           </p>
-          <code className="block bg-gray-900 text-green-400 p-3 rounded text-sm">
+          <code className="block bg-emerald-900 text-green-400 p-3 rounded text-sm">
             ALTER TABLE quiz_questions ADD COLUMN learning_outcome TEXT;
           </code>
           <p className="text-yellow-700 mt-3 text-sm">

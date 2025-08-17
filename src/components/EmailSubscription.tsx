@@ -70,9 +70,9 @@ const EmailSubscription = ({
   const isDark = variant === 'dark';
 
   return (
-    <div className={`${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} p-6 sm:p-8 rounded-xl shadow-lg ${className}`}>
+    <div className={`${isDark ? 'bg-emerald-900 text-white' : 'bg-white text-emerald-900'} p-6 sm:p-8 rounded-xl shadow-lg ${className}`}>
       <h3 className="text-xl sm:text-2xl font-bold mb-4">{title}</h3>
-      <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-6 text-sm sm:text-base`}>
+      <p className={`${isDark ? 'text-emerald-300' : 'text-emerald-600'} mb-6 text-sm sm:text-base`}>
         {description}
       </p>
       
@@ -86,8 +86,8 @@ const EmailSubscription = ({
             required
             className={`flex-1 min-w-0 px-4 py-3 rounded-lg border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
               isDark 
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' 
-                : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
+                ? 'bg-emerald-800 border-emerald-600 text-white placeholder-emerald-400' 
+                : 'bg-emerald-50 border-emerald-300 text-emerald-900 placeholder-emerald-500'
             }`}
           />
           <button
@@ -110,7 +110,7 @@ const EmailSubscription = ({
         )}
       </form>
       
-      <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-4`}>
+      <p className={`text-xs ${isDark ? 'text-emerald-400' : 'text-emerald-500'} mt-4`}>
         We respect your privacy. Unsubscribe at any time.
       </p>
     </div>

@@ -124,7 +124,7 @@ const SupabaseTest = () => {
 
       <div className="container-wide py-20">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-neutral-900 mb-8">Supabase Test Page</h1>
+          <h1 className="text-4xl font-bold text-emerald-900 mb-8">Supabase Test Page</h1>
           
           {/* Connection Status */}
           <div className="card p-6 mb-8">

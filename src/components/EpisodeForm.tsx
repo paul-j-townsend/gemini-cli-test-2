@@ -353,13 +353,13 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <h2 className="text-2xl font-bold text-emerald-900 mb-6">
         {episode ? 'Edit Episode' : 'Create New Episode'}
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="title" className="block text-sm font-medium text-emerald-700 mb-1">
             Title *
           </label>
           <input
@@ -475,16 +475,16 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           {/* Select Existing Audio Tab */}
           {audioInputType === 'url' && (
             <div>
-              <label htmlFor="audio_url" className="block text-sm text-gray-600 mb-2">
+              <label htmlFor="audio_url" className="block text-sm text-emerald-600 mb-2">
                 Select from uploaded audio files
               </label>
               
               {loadingAudioFiles ? (
                 <div className="flex items-center justify-center py-4">
-                  <div className="text-sm text-gray-500">Loading audio files...</div>
+                  <div className="text-sm text-emerald-500">Loading audio files...</div>
                 </div>
               ) : audioFiles.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-emerald-500">
                   <p>No audio files found.</p>
                   <p className="text-sm mt-1">Upload files using the "Upload File" tab first.</p>
                 </div>
@@ -497,7 +497,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
                   className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 ${
                     errors.audio_url 
                       ? 'border-red-500 focus:ring-red-500' 
-                      : 'border-gray-300 focus:ring-primary-500'
+                      : 'border-emerald-300 focus:ring-emerald-500'
                   }`}
                   disabled={isLoading || uploading}
                 >
@@ -535,7 +535,7 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
           <label className="block text-sm font-medium text-emerald-700 mb-1">
             Episode Thumbnail
           </label>
-          <p className="text-sm text-gray-500 mb-3">Choose an image file or select from existing thumbnails</p>
+          <p className="text-sm text-emerald-500 mb-3">Choose an image file or select from existing thumbnails</p>
           
           {/* Image Input Type Tabs */}
           <div className="flex border-b border-emerald-200 mb-4">
@@ -584,10 +584,10 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
               
               {loadingImageFiles ? (
                 <div className="flex items-center justify-center py-4">
-                  <div className="text-sm text-gray-500">Loading thumbnail images...</div>
+                  <div className="text-sm text-emerald-500">Loading thumbnail images...</div>
                 </div>
               ) : imageFiles.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-emerald-500">
                   <p>No thumbnail images found.</p>
                   <p className="text-sm mt-1">Upload files using the "Upload New" tab first.</p>
                 </div>
@@ -608,17 +608,17 @@ export default function EpisodeForm({ episode, onSave, onCancel, isLoading = fal
                         }
                       }}
                     >
-                      <div className="aspect-square rounded-md overflow-hidden bg-gray-100">
+                      <div className="aspect-square rounded-md overflow-hidden bg-emerald-100">
                         <img
                           src={file.url}
                           alt={file.displayName}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <p className="text-xs text-gray-600 mt-1 truncate" title={file.displayName}>
+                      <p className="text-xs text-emerald-600 mt-1 truncate" title={file.displayName}>
                         {file.displayName}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-emerald-400">
                         {Math.round(file.size / 1024)} KB
                       </p>
                       {formData.thumbnail_path === file.path && (

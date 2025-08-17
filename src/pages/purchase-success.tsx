@@ -47,14 +47,14 @@ const PurchaseSuccessPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-emerald-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
           <div className="text-center">
             <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-emerald-900 mb-2">
               Processing Your Purchase
             </h1>
-            <p className="text-gray-600">
+            <p className="text-emerald-600">
               Please wait while we confirm your payment...
             </p>
           </div>
@@ -64,20 +64,20 @@ const PurchaseSuccessPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-emerald-50 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
         <div className="text-center">
           <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-8 h-8 text-white" />
           </div>
           
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl font-bold text-emerald-900 mb-4">
             Purchase Successful!
           </h1>
           
-          <p className="text-gray-600 mb-6">
+          <p className="text-emerald-600 mb-6">
             Thank you for your purchase! You now have full access to{' '}
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-emerald-900">
               {contentTitle || 'your CPD content'}
             </span>
             , including the podcast, quiz, report, and certificate.
@@ -94,7 +94,7 @@ const PurchaseSuccessPage: React.FC = () => {
             
             <button
               onClick={() => router.push('/')}
-              className="w-full text-gray-600 hover:text-gray-800 font-medium py-2 transition-colors"
+              className="w-full text-emerald-600 hover:text-emerald-800 font-medium py-2 transition-colors"
             >
               Return to Homepage
             </button>

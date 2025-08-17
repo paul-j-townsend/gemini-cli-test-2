@@ -10,9 +10,9 @@ const Cookies = () => {
       </Head>
       <div className="container-wide py-12">
         <div className="max-w-4xl mx-auto prose prose-lg">
-          <h1 className="text-4xl font-bold mb-8 text-neutral-900">How We Use Cookies</h1>
+          <h1 className="text-4xl font-bold mb-8 text-emerald-900">How We Use Cookies</h1>
           
-          <p className="text-lg text-neutral-700 mb-6">
+          <p className="text-lg text-emerald-700 mb-6">
             Like most websites, we use small files called cookies to help improve your experience. These cookies are saved on your device when you visit our site – either by us or by trusted third parties whose features we use.
           </p>
 
@@ -21,10 +21,10 @@ const Cookies = () => {
           </p>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-neutral-900">The Types of Cookies We Use</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-emerald-900">The Types of Cookies We Use</h2>
             
-            <div className="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-              <h3 className="text-xl font-semibold mb-4 text-neutral-900">Strictly Necessary Cookies</h3>
+            <div className="mb-8 p-6 bg-teal-50 rounded-lg border border-teal-200">
+              <h3 className="text-xl font-semibold mb-4 text-emerald-900">Strictly Necessary Cookies</h3>
               <p className="mb-4">
                 These cookies are needed to make the website work properly and let you do things like:
               </p>
@@ -38,7 +38,7 @@ const Cookies = () => {
             </div>
 
             <div className="mb-8 p-6 bg-green-50 rounded-lg border border-green-200">
-              <h3 className="text-xl font-semibold mb-4 text-neutral-900">Statistics Cookies</h3>
+              <h3 className="text-xl font-semibold mb-4 text-emerald-900">Statistics Cookies</h3>
               <p className="mb-4">
                 These help us understand how people use the site, so we can improve it over time. For example, they tell us:
               </p>
@@ -49,16 +49,16 @@ const Cookies = () => {
               <p className="mb-3">
                 <strong>We use:</strong> Google Analytics (<span className="font-mono text-sm bg-white p-1 rounded border">_ga</span>, <span className="font-mono text-sm bg-white p-1 rounded border">_gid</span>, <span className="font-mono text-sm bg-white p-1 rounded border">_gat</span>, <span className="font-mono text-sm bg-white p-1 rounded border">collect</span>)
               </p>
-              <p className="mb-3 text-sm text-gray-600">
+              <p className="mb-3 text-sm text-emerald-600">
                 We've <em>not</em> enabled any advertising features in Google Analytics.
               </p>
               <p className="mb-0">
-                <strong>Want to opt out?</strong> You can install <a href="https://tools.google.com/dlpage/gaoptout" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">Google's browser add-on</a> to block Google Analytics on any website.
+                <strong>Want to opt out?</strong> You can install <a href="https://tools.google.com/dlpage/gaoptout" className="text-emerald-600 hover:text-emerald-700 underline" target="_blank" rel="noopener noreferrer">Google's browser add-on</a> to block Google Analytics on any website.
               </p>
             </div>
 
             <div className="mb-8 p-6 bg-orange-50 rounded-lg border border-orange-200">
-              <h3 className="text-xl font-semibold mb-4 text-neutral-900">Advertising Cookies</h3>
+              <h3 className="text-xl font-semibold mb-4 text-emerald-900">Advertising Cookies</h3>
               <p className="mb-4">
                 We use these to anonymously track how well banner ads are performing, such as:
               </p>
@@ -74,7 +74,7 @@ const Cookies = () => {
             </div>
 
             <div className="mb-8 p-6 bg-purple-50 rounded-lg border border-purple-200">
-              <h3 className="text-xl font-semibold mb-4 text-neutral-900">Sharing Cookies</h3>
+              <h3 className="text-xl font-semibold mb-4 text-emerald-900">Sharing Cookies</h3>
               <p className="mb-4">
                 These make it easier for you to share our content on social media like Facebook, X and LinkedIn.
               </p>
@@ -82,27 +82,27 @@ const Cookies = () => {
                 <strong>We use:</strong> AddThis (sets cookies like <span className="font-mono text-sm bg-white p-1 rounded border">_atuvc</span>, <span className="font-mono text-sm bg-white p-1 rounded border">_atuvs</span>, <span className="font-mono text-sm bg-white p-1 rounded border">uid</span>, <span className="font-mono text-sm bg-white p-1 rounded border">vc</span> and others)
               </p>
               <p className="mb-0">
-                <strong>Want to opt out?</strong> You can do that via the <a href="https://www.oracle.com/legal/privacy/addthis-privacy-policy.html" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">AddThis privacy settings</a>.
+                <strong>Want to opt out?</strong> You can do that via the <a href="https://www.oracle.com/legal/privacy/addthis-privacy-policy.html" className="text-emerald-600 hover:text-emerald-700 underline" target="_blank" rel="noopener noreferrer">AddThis privacy settings</a>.
               </p>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-neutral-900">Keeping Things Updated</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-emerald-900">Keeping Things Updated</h2>
             <p>
               We review our cookie policy regularly. The last update was made on <strong>15 March 2018</strong>.
             </p>
           </section>
 
-          <div className="border-t border-neutral-200 pt-8 mt-12">
-            <h3 className="text-xl font-semibold mb-4 text-neutral-900">Got Questions?</h3>
+          <div className="border-t border-emerald-200 pt-8 mt-12">
+            <h3 className="text-xl font-semibold mb-4 text-emerald-900">Got Questions?</h3>
             <p className="mb-3">
               If you have any questions about how we use cookies or anything else about your data, feel free to get in touch:
             </p>
             <p className="flex items-center">
               <span className="mr-2">📧</span>
               <strong>Email us at:</strong> 
-              <a href="mailto:admin@vetsidekick.com" className="text-primary-600 hover:text-primary-700 ml-2">admin@vetsidekick.com</a>
+              <a href="mailto:admin@vetsidekick.com" className="text-emerald-600 hover:text-emerald-700 ml-2">admin@vetsidekick.com</a>
             </p>
           </div>
         </div>

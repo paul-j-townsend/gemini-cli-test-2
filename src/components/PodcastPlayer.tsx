@@ -110,40 +110,40 @@ const PodcastPlayer = () => {
           <div key={i} className="card-glow p-6 animate-pulse">
             {/* Header Section Skeleton */}
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gray-200 rounded-2xl flex-shrink-0"></div>
+              <div className="w-16 h-16 lg:w-20 lg:h-20 bg-emerald-200 rounded-2xl flex-shrink-0"></div>
               <div className="flex-grow min-w-0">
-                <div className="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded mb-1 w-full"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2 w-2/3"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-5 bg-emerald-200 rounded mb-2 w-3/4"></div>
+                <div className="h-4 bg-emerald-200 rounded mb-1 w-full"></div>
+                <div className="h-4 bg-emerald-200 rounded mb-2 w-2/3"></div>
+                <div className="h-3 bg-emerald-200 rounded w-1/3"></div>
               </div>
             </div>
             
             {/* Progress Bar Skeleton */}
             <div className="mb-4">
               <div className="flex justify-between mb-2">
-                <div className="h-3 bg-gray-200 rounded w-8"></div>
-                <div className="h-3 bg-gray-200 rounded w-8"></div>
+                <div className="h-3 bg-emerald-200 rounded w-8"></div>
+                <div className="h-3 bg-emerald-200 rounded w-8"></div>
               </div>
-              <div className="h-2 bg-gray-200 rounded w-full"></div>
+              <div className="h-2 bg-emerald-200 rounded w-full"></div>
             </div>
             
             {/* Controls Skeleton */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
-                <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
-                <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                <div className="w-8 h-8 bg-emerald-200 rounded-lg"></div>
+                <div className="w-12 h-12 bg-emerald-200 rounded-xl"></div>
+                <div className="w-8 h-8 bg-emerald-200 rounded-lg"></div>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-20 h-8 bg-gray-200 rounded-lg"></div>
-                <div className="w-12 h-8 bg-gray-200 rounded-lg"></div>
+                <div className="w-20 h-8 bg-emerald-200 rounded-lg"></div>
+                <div className="w-12 h-8 bg-emerald-200 rounded-lg"></div>
               </div>
             </div>
             
             {/* Action Buttons Skeleton */}
             <div className="pt-6 border-t border-emerald-200/80">
-              <div className="h-12 bg-gray-200 rounded-xl w-full"></div>
+              <div className="h-12 bg-emerald-200 rounded-xl w-full"></div>
             </div>
           </div>
         ))}
@@ -168,8 +168,8 @@ const PodcastPlayer = () => {
   if (podcasts.length === 0 && !error) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600">No podcast episodes available yet.</p>
-        <p className="text-sm text-gray-500 mt-2">Check back soon for new content.</p>
+        <p className="text-emerald-600">No podcast episodes available yet.</p>
+        <p className="text-sm text-emerald-500 mt-2">Check back soon for new content.</p>
       </div>
     );
   }

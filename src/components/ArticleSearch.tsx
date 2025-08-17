@@ -103,11 +103,11 @@ const ArticleSearch = ({ onSearchResults, onSearching }: ArticleSearchProps) => 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search articles by title, content, or excerpt..."
-          className="w-full px-4 py-3 pl-12 pr-10 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+          className="w-full px-4 py-3 pl-12 pr-10 text-emerald-900 placeholder-emerald-500 bg-white border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
         />
         <div className="absolute inset-y-0 left-0 flex items-center pl-4">
           <svg
-            className="w-5 h-5 text-gray-400"
+            className="w-5 h-5 text-emerald-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ const ArticleSearch = ({ onSearchResults, onSearching }: ArticleSearchProps) => 
             type="button"
           >
             <svg
-              className="w-5 h-5 text-gray-400 hover:text-gray-600"
+              className="w-5 h-5 text-emerald-400 hover:text-emerald-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -145,7 +145,7 @@ const ArticleSearch = ({ onSearchResults, onSearching }: ArticleSearchProps) => 
       {showSearching && (
         <div className="absolute inset-x-0 top-full mt-1 flex items-center justify-center py-2">
           <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
-          <span className="ml-2 text-sm text-gray-600">Searching...</span>
+          <span className="ml-2 text-sm text-emerald-600">Searching...</span>
         </div>
       )}
     </div>

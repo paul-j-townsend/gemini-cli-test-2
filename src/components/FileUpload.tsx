@@ -191,7 +191,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     <div className={`space-y-3 ${className}`}>
       {/* Browse existing files button */}
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-gray-700">
+        <h4 className="text-sm font-medium text-emerald-700">
           {type === 'image' ? 'Article Image' : 'Audio File'}
         </h4>
         <button
@@ -228,7 +228,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           <div className="flex flex-col items-center space-y-3">
             {/* Progress indicator */}
             <div className="w-16 h-16 relative">
-              <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
+              <div className="w-16 h-16 border-4 border-emerald-200 rounded-full"></div>
               <div 
                 className="w-16 h-16 border-4 border-emerald-600 rounded-full border-t-transparent absolute top-0 animate-spin"
                 style={{
@@ -242,10 +242,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-emerald-700">
                 Uploading {selectedFile?.name}...
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-emerald-500">
                 {selectedFile && formatFileSize(selectedFile.size)}
               </p>
             </div>
@@ -270,20 +270,20 @@ const FileUpload: React.FC<FileUploadProps> = ({
           <div className="flex flex-col items-center space-y-3">
             <div className="w-12 h-12 mx-auto">
               {type === 'image' ? (
-                <svg className="w-full h-full text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                <svg className="w-full h-full text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
                 </svg>
               ) : (
-                <svg className="w-full h-full text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                <svg className="w-full h-full text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l4-4h20l4 4v13M9 19l3 3h24l3-3M9 19v19a2 2 0 002 2h26a2 2 0 002-2V19M9 19h30M15 15h6m6 0h6" />
                 </svg>
               )}
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-emerald-700">
                 Drop your {type} here or <span className="text-emerald-600 underline">browse</span>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-emerald-500">
                 {type === 'image' 
                   ? 'PNG, JPG, GIF, WebP up to 5MB' 
                   : 'MP3, WAV, M4A, OGG up to 100MB'
@@ -299,7 +299,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <img 
               src={previewUrl} 
               alt="Preview" 
-              className="max-w-32 max-h-32 mx-auto rounded-lg object-cover border-2 border-gray-200"
+              className="max-w-32 max-h-32 mx-auto rounded-lg object-cover border-2 border-emerald-200"
             />
           </div>
         )}
@@ -307,14 +307,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
       
       {/* Current file display */}
       {currentValue && !uploading && !successMessage && (
-        <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
+        <div className="mt-3 p-3 bg-emerald-50 rounded-lg border">
           {type === 'image' ? (
             <div className="flex items-center space-x-3">
               <div className="w-16 h-16 relative">
                 <img
                   src={currentValue}
                   alt="Current image"
-                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                  className="w-16 h-16 object-cover rounded-lg border border-emerald-200"
                   onError={(e: any) => {
                     // Hide the broken image and show fallback
                     e.target.style.display = 'none';
@@ -324,13 +324,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     }
                   }}
                 />
-                <div className="fallback-image w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center absolute inset-0 border border-gray-200" style={{display: 'none'}}>
-                  <span className="text-gray-400 text-xs">No Image</span>
+                <div className="fallback-image w-16 h-16 bg-emerald-200 rounded-lg flex items-center justify-center absolute inset-0 border border-emerald-200" style={{display: 'none'}}>
+                  <span className="text-emerald-400 text-xs">No Image</span>
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-700">Current image:</p>
-                <p className="text-sm text-gray-500 truncate" title={currentValue}>
+                <p className="text-sm font-medium text-emerald-700">Current image:</p>
+                <p className="text-sm text-emerald-500 truncate" title={currentValue}>
                   {currentValue.split('/').pop() || currentValue}
                 </p>
               </div>
@@ -338,13 +338,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
           ) : (
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l4-4h6a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-700">Current audio:</p>
-                <p className="text-sm text-gray-500 truncate" title={currentValue}>
+                <p className="text-sm font-medium text-emerald-700">Current audio:</p>
+                <p className="text-sm text-emerald-500 truncate" title={currentValue}>
                   {currentValue.split('/').pop() || currentValue}
                 </p>
               </div>

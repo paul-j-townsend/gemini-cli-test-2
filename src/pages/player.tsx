@@ -288,7 +288,7 @@ const PodcastPlayer = () => {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>
         </div>
       </Layout>
     );
@@ -300,8 +300,8 @@ const PodcastPlayer = () => {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Episode Not Found</h1>
-            <p className="text-gray-600 mb-4">{error || 'The requested episode could not be found.'}</p>
+            <h1 className="text-2xl font-bold text-emerald-900 mb-2">Episode Not Found</h1>
+            <p className="text-emerald-600 mb-4">{error || 'The requested episode could not be found.'}</p>
             <button 
               onClick={() => router.push('/podcasts')}
               className="btn-primary"
@@ -321,12 +321,12 @@ const PodcastPlayer = () => {
         <meta name="description" content={episode.description} />
       </Head>
 
-      <div className="bg-gradient-to-br from-primary-50 via-white to-neutral-50">
+      <div className="bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
         {/* Header */}
         <div className="container-wide py-1">
           <button
             onClick={() => router.push('/podcasts')}
-            className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors"
+            className="flex items-center space-x-2 text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             <ArrowLeft size={20} />
             <span>Back to Episodes</span>
@@ -361,14 +361,14 @@ const PodcastPlayer = () => {
                       <h1 className="text-lg font-bold text-green-700 mb-1 line-clamp-1">
                         {episode.title}
                       </h1>
-                      <p className="text-gray-600 text-sm mb-2">
+                      <p className="text-emerald-600 text-sm mb-2">
                         {episode.description}
                       </p>
 
                       {/* Learning Progress Breadcrumbs - Display Only */}
                       <div className="flex items-center gap-1 mb-2 text-xs">
                         <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
-                          hasListened ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                          hasListened ? 'bg-green-100 text-green-700' : 'bg-emerald-100 text-emerald-500'
                         }`}>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h6m-6 4h6m4 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -376,11 +376,11 @@ const PodcastPlayer = () => {
                           <span className="font-medium">Listen to podcast</span>
                           {hasListened && <Check size={10} />}
                         </div>
-                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                         </svg>
                         <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
-                          reportDownloaded ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                          reportDownloaded ? 'bg-green-100 text-green-700' : 'bg-emerald-100 text-emerald-500'
                         }`}>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -388,11 +388,11 @@ const PodcastPlayer = () => {
                           <span className="font-medium">Download Report</span>
                           {reportDownloaded && <Check size={10} />}
                         </div>
-                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                         </svg>
                         <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
-                          progressQuizCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                          progressQuizCompleted ? 'bg-green-100 text-green-700' : 'bg-emerald-100 text-emerald-500'
                         }`}>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -400,11 +400,11 @@ const PodcastPlayer = () => {
                           <span className="font-medium">Take Quiz</span>
                           {progressQuizCompleted && <Check size={10} />}
                         </div>
-                        <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                         </svg>
                         <div className={`flex items-center gap-1 px-2 py-1 rounded-full transition-colors ${
-                          certificateDownloaded ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                          certificateDownloaded ? 'bg-green-100 text-green-700' : 'bg-emerald-100 text-emerald-500'
                         }`}>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -447,7 +447,7 @@ const PodcastPlayer = () => {
                             background: `linear-gradient(to right, rgb(20, 184, 166) 0%, rgb(20, 184, 166) ${progressPercentage}%, rgb(228, 228, 231) ${progressPercentage}%, rgb(228, 228, 231) 100%)`
                           }}
                         />
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <div className="flex justify-between text-xs text-emerald-500 mt-1">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
@@ -457,7 +457,7 @@ const PodcastPlayer = () => {
                       <div className="flex items-center justify-between">
                         {/* Volume - Compact */}
                         <div className="flex items-center gap-1">
-                          <button onClick={toggleMute} className="p-1 text-gray-600 hover:text-gray-800">
+                          <button onClick={toggleMute} className="p-1 text-emerald-600 hover:text-emerald-800">
                             {isMuted || volume === 0 ? <VolumeX size={14} /> : <Volume2 size={14} />}
                           </button>
                           <input
@@ -467,7 +467,7 @@ const PodcastPlayer = () => {
                             step="0.1"
                             value={isMuted ? 0 : volume}
                             onChange={handleVolumeChange}
-                            className="w-10 accent-primary-600"
+                            className="w-10 accent-emerald-600"
                           />
                         </div>
 
@@ -475,7 +475,7 @@ const PodcastPlayer = () => {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => skipTime(-15)}
-                            className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                            className="p-1 rounded-full bg-emerald-100 hover:bg-emerald-200 transition-colors"
                           >
                             <SkipBack size={14} />
                           </button>
@@ -483,14 +483,14 @@ const PodcastPlayer = () => {
                           <button
                             onClick={handlePlayPause}
                             disabled={false}
-                            className="p-2 rounded-full bg-primary-600 hover:bg-primary-700 text-white transition-colors disabled:opacity-50"
+                            className="p-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white transition-colors disabled:opacity-50"
                           >
                             {isPlaying ? <Pause size={16} /> : <Play size={16} />}
                           </button>
 
                           <button
                             onClick={() => skipTime(15)}
-                            className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                            className="p-1 rounded-full bg-emerald-100 hover:bg-emerald-200 transition-colors"
                           >
                             <SkipForward size={14} />
                           </button>
@@ -500,7 +500,7 @@ const PodcastPlayer = () => {
                         <div className="relative">
                           <button
                             onClick={() => setShowSettings(!showSettings)}
-                            className="p-1 text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                            className="p-1 text-emerald-600 hover:text-emerald-800 flex items-center gap-1"
                           >
                             <Settings size={14} />
                             <span className="text-xs">{playbackRate}x</span>
@@ -512,8 +512,8 @@ const PodcastPlayer = () => {
                                 <button
                                   key={rate}
                                   onClick={() => handlePlaybackRateChange(rate)}
-                                  className={`block w-full text-left px-2 py-1 text-xs rounded hover:bg-gray-100 ${
-                                    playbackRate === rate ? 'bg-primary-50 text-primary-600' : ''
+                                  className={`block w-full text-left px-2 py-1 text-xs rounded hover:bg-emerald-100 ${
+                                    playbackRate === rate ? 'bg-emerald-50 text-emerald-600' : ''
                                   }`}
                                 >
                                   {rate}x

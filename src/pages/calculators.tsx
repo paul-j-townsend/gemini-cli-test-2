@@ -300,8 +300,8 @@ export default function Calculators() {
       </Head>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">UK Veterinary Calculators</h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-emerald-900 mb-4">UK Veterinary Calculators</h1>
+          <p className="text-lg text-emerald-600 max-w-3xl mx-auto">
             Essential calculators for UK veterinary professionals covering drug dosing, emergency toxicity assessments, 
             anaesthesia planning, nutritional requirements and clinical procedures. Designed for use in UK veterinary practice.
           </p>
@@ -323,7 +323,7 @@ export default function Calculators() {
                   type="number"
                   value={dogWeight}
                   onChange={(e) => setDogWeight(e.target.value)}
-                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Enter weight in kg"
                 />
               </div>
@@ -335,7 +335,7 @@ export default function Calculators() {
                   type="number"
                   value={drugDose}
                   onChange={(e) => setDrugDose(e.target.value)}
-                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Enter dose in mg/kg"
                 />
               </div>
@@ -410,10 +410,10 @@ export default function Calculators() {
                   }`}>
                     {chocolateTox.severity}
                   </p>
-                  <p className="text-sm text-gray-700 mb-2">
+                  <p className="text-sm text-emerald-700 mb-2">
                     Total Methylxanthines: {chocolateTox.total} mg/kg
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-emerald-600">
                     {chocolateTox.recommendation}
                   </p>
                 </div>
@@ -748,7 +748,7 @@ export default function Calculators() {
           {/* Unit Conversion Calculator */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-emerald-900 mb-4 flex items-center">
-              <span className="w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">⚖️</span>
+              <span className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">⚖️</span>
               Unit Converter
             </h2>
             <div className="space-y-4">
@@ -759,7 +759,7 @@ export default function Calculators() {
                 <select
                   value={convertCategory}
                   onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="weight">Weight</option>
                   <option value="volume">Volume</option>
@@ -774,7 +774,7 @@ export default function Calculators() {
                   type="number"
                   value={convertValue}
                   onChange={(e) => setConvertValue(e.target.value)}
-                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Enter value"
                 />
               </div>
@@ -786,7 +786,7 @@ export default function Calculators() {
                   <select
                     value={convertFrom}
                     onChange={(e) => setConvertFrom(e.target.value)}
-                    className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     {unitCategories[convertCategory].units.map(unit => (
                       <option key={unit} value={unit}>{unit}</option>
@@ -800,7 +800,7 @@ export default function Calculators() {
                   <select
                     value={convertTo}
                     onChange={(e) => setConvertTo(e.target.value)}
-                    className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-emerald-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     {unitCategories[convertCategory].units.map(unit => (
                       <option key={unit} value={unit}>{unit}</option>
@@ -809,8 +809,8 @@ export default function Calculators() {
                 </div>
               </div>
               {convertUnits() && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-lg font-semibold text-gray-900">
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <p className="text-lg font-semibold text-emerald-900">
                     Result: {convertUnits()} {convertTo}
                   </p>
                 </div>
@@ -859,9 +859,9 @@ export default function Calculators() {
                 <h3 className="font-medium text-red-900">Adrenaline (Cardiac Arrest)</h3>
                 <p className="text-sm text-red-700">0.01-0.02 mg/kg IV/IO (1:1000 solution)</p>
               </div>
-              <div className="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50">
-                <h3 className="font-medium text-blue-900">Atropine Sulphate</h3>
-                <p className="text-sm text-blue-700">0.02-0.04 mg/kg IV/IM/SC</p>
+              <div className="border-l-4 border-emerald-500 pl-4 py-2 bg-emerald-50">
+                <h3 className="font-medium text-emerald-900">Atropine Sulphate</h3>
+                <p className="text-sm text-emerald-700">0.02-0.04 mg/kg IV/IM/SC</p>
               </div>
               <div className="border-l-4 border-green-500 pl-4 py-2 bg-green-50">
                 <h3 className="font-medium text-green-900">Diazepam (Seizures)</h3>
@@ -885,15 +885,15 @@ export default function Calculators() {
           </div>
         </div>
 
-        <div className="mt-12 bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">Important Disclaimer - UK Veterinary Practice</h3>
-          <p className="text-blue-800 text-sm mb-3">
+        <div className="mt-12 bg-emerald-50 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-emerald-900 mb-2">Important Disclaimer - UK Veterinary Practice</h3>
+          <p className="text-emerald-800 text-sm mb-3">
             These calculators are provided for educational purposes only and should not replace clinical judgement. 
             Always verify calculations independently and consult current UK veterinary protocols, the BSAVA formulary, 
             and VMD-approved drug datasheets before administering any treatments. All calculations should be reviewed 
             in accordance with RCVS guidance on responsible prescribing.
           </p>
-          <p className="text-blue-700 text-xs">
+          <p className="text-emerald-700 text-xs">
             For emergency cases, contact your local veterinary emergency service or the Veterinary Poisons Information Service (VPIS). 
             Always follow current UK legislation including the Veterinary Medicines Regulations (VMR).
           </p>

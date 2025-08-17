@@ -51,8 +51,8 @@ export default function MigrationRunner() {
     <Card>
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Database Migration</h3>
-          <p className="text-gray-600 mt-1">
+          <h3 className="text-lg font-medium text-emerald-900">Database Migration</h3>
+          <p className="text-emerald-600 mt-1">
             Run the unified content schema migration to combine podcast and quiz data.
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function MigrationRunner() {
           </Button>
         </div>
 
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-emerald-500">
           <p><strong>Warning:</strong> This will clear all existing data and create a new unified schema.</p>
           <p>Make sure you have a backup if needed.</p>
         </div>

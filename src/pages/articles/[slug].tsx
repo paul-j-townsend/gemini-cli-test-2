@@ -43,8 +43,8 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
     return (
       <Layout>
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Article Not Found</h1>
-          <p className="text-gray-600 mb-8">The article you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-emerald-900 mb-4">Article Not Found</h1>
+          <p className="text-emerald-600 mb-8">The article you're looking for doesn't exist.</p>
           <Link href="/articles" className="text-teal-600 hover:text-teal-700 font-medium">
             ← Back to Articles
           </Link>
@@ -86,18 +86,18 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm">
             <li>
-              <Link href="/" className="text-gray-500 hover:text-gray-700">
+              <Link href="/" className="text-emerald-500 hover:text-emerald-700">
                 Home
               </Link>
             </li>
-            <li className="text-gray-400">/</li>
+            <li className="text-emerald-400">/</li>
             <li>
-              <Link href="/articles" className="text-gray-500 hover:text-gray-700">
+              <Link href="/articles" className="text-emerald-500 hover:text-emerald-700">
                 Articles
               </Link>
             </li>
-            <li className="text-gray-400">/</li>
-            <li className="text-gray-900 font-medium">
+            <li className="text-emerald-400">/</li>
+            <li className="text-emerald-900 font-medium">
               {article.category?.split(',').map((cat, index) => (
                 <span key={index}>
                   {cat.trim()}
@@ -124,13 +124,13 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
               </span>
             )}
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-emerald-900 mb-4">
             {article.title}
           </h1>
-          <div className="flex items-center justify-between text-gray-600">
+          <div className="flex items-center justify-between text-emerald-600">
             <div>
               <span>By: </span>
-              <span className="font-medium text-gray-900">{article.author}</span>
+              <span className="font-medium text-emerald-900">{article.author}</span>
             </div>
           </div>
         </header>
@@ -175,7 +175,7 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
           {/* Related Articles */}
           {relatedArticles.length > 0 && (
             <div className="mt-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-emerald-900 mb-6">
                 Related Articles
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -209,10 +209,10 @@ const ArticlePage = ({ article, relatedArticles }: ArticlePageProps) => {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-teal-600 transition-colors line-clamp-2">
+                        <h3 className="font-semibold text-emerald-900 group-hover:text-teal-600 transition-colors line-clamp-2">
                           {related.title}
                         </h3>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        <p className="text-sm text-emerald-600 mt-1 line-clamp-2">
                           {related.excerpt}
                         </p>
                       </div>

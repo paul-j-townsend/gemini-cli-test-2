@@ -92,8 +92,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ selectedCategories,
           onClick={() => handleCategoryToggle(category)}
           className={`px-3 py-1 text-sm rounded-full border transition-all duration-200 ${
             selectedCategories.includes(category)
-              ? 'bg-primary-500 text-white border-primary-500'
-              : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+              ? 'bg-emerald-500 text-white border-emerald-500'
+              : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200'
           }`}
         >
           {category}
@@ -197,8 +197,8 @@ export default function PodcastManagement() {
               className="rounded-lg object-cover"
             />
           ) : (
-            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-gray-400 text-xs">No Image</span>
+            <div className="w-12 h-12 bg-emerald-200 rounded-lg flex items-center justify-center">
+              <span className="text-emerald-400 text-xs">No Image</span>
             </div>
           )}
         </div>
@@ -209,7 +209,7 @@ export default function PodcastManagement() {
       label: 'Episode',
       render: (episode) => (
         <div className="text-sm">
-          <div className="text-gray-900 font-medium">
+          <div className="text-emerald-900 font-medium">
             S{episode.season || 1}E{episode.episode_number || 1}
           </div>
           {episode.featured && (
@@ -225,11 +225,11 @@ export default function PodcastManagement() {
       label: 'Title',
       render: (episode) => (
         <div className="max-w-xs">
-          <div className="font-medium text-gray-900 truncate" title={episode.title}>
+          <div className="font-medium text-emerald-900 truncate" title={episode.title}>
             {episode.title}
           </div>
           {episode.description && (
-            <div className="text-sm text-gray-500 mt-1 line-clamp-2" title={episode.description}>
+            <div className="text-sm text-emerald-500 mt-1 line-clamp-2" title={episode.description}>
               {episode.description}
             </div>
           )}
@@ -240,7 +240,7 @@ export default function PodcastManagement() {
       key: 'duration',
       label: 'Duration',
       render: (episode) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-emerald-500">
           {episode.duration ? formatDuration(episode.duration) : 'Unknown'}
         </span>
       ),
@@ -254,7 +254,7 @@ export default function PodcastManagement() {
             {episode.vsk_quizzes.title}
           </span>
         ) : (
-          <span className="text-gray-400">No Quiz</span>
+          <span className="text-emerald-400">No Quiz</span>
         )
       ),
     },
@@ -282,7 +282,7 @@ export default function PodcastManagement() {
       key: 'published_at',
       label: 'Published',
       render: (episode) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-emerald-500">
           {episode.published_at ? formatDate(episode.published_at) : 'Not published'}
         </span>
       ),
@@ -311,8 +311,8 @@ export default function PodcastManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Podcast Management</h2>
-          <p className="text-gray-600 mt-1">Manage your podcast episodes</p>
+          <h2 className="text-2xl font-bold text-emerald-900">Podcast Management</h2>
+          <p className="text-emerald-600 mt-1">Manage your podcast episodes</p>
         </div>
         <div className="flex space-x-3">
           {podcastManagement.error && typeof podcastManagement.error === 'string' && podcastManagement.error.includes('Failed to fetch episodes') && (
@@ -367,7 +367,7 @@ export default function PodcastManagement() {
 
             {/* Categories section - temporarily disabled until database column is added
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Categories</label>
+              <label className="block text-sm font-medium text-emerald-700">Categories</label>
               <CategorySelector
                 selectedCategories={formData.category}
                 onCategoryChange={(categories) => handleChange('category', categories)}

@@ -165,7 +165,7 @@ export default function Jobs() {
                       <ul className="text-sm text-emerald-600 space-y-1">
                         {job.benefits.map((benefit, idx) => (
                           <li key={idx} className="flex items-center">
-                            <svg className="w-3 h-3 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-3 h-3 mr-2 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                             </svg>
                             {benefit}
@@ -180,7 +180,7 @@ export default function Jobs() {
                   <button className="w-full lg:w-auto bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors mb-2">
                     Apply Now
                   </button>
-                  <button className="w-full lg:w-auto border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button className="w-full lg:w-auto border border-emerald-300 text-emerald-700 px-6 py-2 rounded-lg hover:bg-emerald-50 transition-colors">
                     Save Job
                   </button>
                 </div>
@@ -191,7 +191,7 @@ export default function Jobs() {
 
         {/* Load More */}
         <div className="text-center mt-12">
-          <button className="bg-gray-100 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+          <button className="bg-emerald-100 text-emerald-700 px-8 py-3 rounded-lg hover:bg-emerald-200 transition-colors">
             Load More Jobs
           </button>
         </div>

@@ -196,8 +196,8 @@ const SeriesManagement: React.FC = () => {
               className="object-cover rounded"
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-              <span className="text-xs text-gray-500">No image</span>
+            <div className="w-full h-full bg-emerald-200 rounded flex items-center justify-center">
+              <span className="text-xs text-emerald-500">No image</span>
             </div>
           )}
         </div>
@@ -209,7 +209,7 @@ const SeriesManagement: React.FC = () => {
       render: (series) => (
         <div>
           <div className="font-medium">{series.name}</div>
-          <div className="text-sm text-gray-500">{series.slug}</div>
+          <div className="text-sm text-emerald-500">{series.slug}</div>
         </div>
       ),
     },
@@ -298,7 +298,7 @@ const SeriesManagement: React.FC = () => {
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <div className="text-sm font-medium text-gray-500">
+                            <div className="text-sm font-medium text-emerald-500">
                               {index + 1}
                             </div>
                             <div className="w-8 h-8 relative">
@@ -310,12 +310,12 @@ const SeriesManagement: React.FC = () => {
                                   className="object-cover rounded"
                                 />
                               ) : (
-                                <div className="w-full h-full bg-gray-200 rounded"></div>
+                                <div className="w-full h-full bg-emerald-200 rounded"></div>
                               )}
                             </div>
                             <div>
                               <div className="font-medium">{seriesItem.name}</div>
-                              <div className="text-sm text-gray-500">{seriesItem.slug}</div>
+                              <div className="text-sm text-emerald-500">{seriesItem.slug}</div>
                             </div>
                           </div>
                         </div>

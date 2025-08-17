@@ -12,7 +12,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white">
+    <footer className="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900 text-white">
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/20 to-transparent"></div>
       

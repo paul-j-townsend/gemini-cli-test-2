@@ -84,7 +84,7 @@ export function AdminForm<T extends Record<string, any>>({
       case 'textarea':
         return (
           <div className="space-y-2">
-            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+            <label htmlFor={field.name} className="block text-sm font-medium text-emerald-700">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -97,7 +97,7 @@ export function AdminForm<T extends Record<string, any>>({
               className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                 fieldError
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'
+                  : 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500'
               }`}
               placeholder={field.placeholder}
               required={field.required}
@@ -110,7 +110,7 @@ export function AdminForm<T extends Record<string, any>>({
       case 'select':
         return (
           <div className="space-y-2">
-            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+            <label htmlFor={field.name} className="block text-sm font-medium text-emerald-700">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -122,7 +122,7 @@ export function AdminForm<T extends Record<string, any>>({
               className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                 fieldError
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'
+                  : 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500'
               }`}
               required={field.required}
               disabled={isFieldDisabled}
@@ -148,10 +148,10 @@ export function AdminForm<T extends Record<string, any>>({
                 checked={value || false}
                 onChange={(e) => handleFieldChange(e.target.checked)}
                 onBlur={handleFieldBlur}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-emerald-300 rounded"
                 disabled={isFieldDisabled}
               />
-              <label htmlFor={field.name} className="ml-2 block text-sm text-gray-700">
+              <label htmlFor={field.name} className="ml-2 block text-sm text-emerald-700">
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
@@ -237,7 +237,7 @@ export function AdminForm<T extends Record<string, any>>({
           <div key={sectionIndex} className="space-y-4">
             {section.title && (
               <div className="border-b pb-2">
-                <h3 className="text-lg font-medium text-gray-900">{section.title}</h3>
+                <h3 className="text-lg font-medium text-emerald-900">{section.title}</h3>
               </div>
             )}
             

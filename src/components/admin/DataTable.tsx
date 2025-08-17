@@ -175,12 +175,12 @@ export function DataTable<T extends Record<string, any>>({
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-64 mb-4"></div>
+          <div className="h-4 bg-emerald-200 rounded w-64 mb-4"></div>
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="grid grid-cols-6 gap-4">
                 {[...Array(6)].map((_, j) => (
-                  <div key={j} className="h-4 bg-gray-200 rounded"></div>
+                  <div key={j} className="h-4 bg-emerald-200 rounded"></div>
                 ))}
               </div>
             ))}
@@ -192,19 +192,19 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-emerald-200">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-emerald-900">
             {filteredAndSortedData.length} {filteredAndSortedData.length === 1 ? 'item' : 'items'}
           </h3>
           <div className="relative w-64">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-emerald-400" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-emerald-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -212,13 +212,13 @@ export function DataTable<T extends Record<string, any>>({
 
       {filteredAndSortedData.length === 0 ? (
         <div className="p-12 text-center">
-          <p className="text-gray-500">{searchTerm ? 'No results found for your search.' : emptyMessage}</p>
+          <p className="text-emerald-500">{searchTerm ? 'No results found for your search.' : emptyMessage}</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <div className="relative" style={{ minWidth: '100%' }}>
             {/* Header background that extends full width */}
-            <div className="absolute top-0 left-0 right-0 bg-gray-50 pointer-events-none" style={{ height: '3rem' }}></div>
+            <div className="absolute top-0 left-0 right-0 bg-emerald-50 pointer-events-none" style={{ height: '3rem' }}></div>
             <table 
               ref={tableRef} 
               className="border-collapse bg-white"
@@ -235,7 +235,7 @@ export function DataTable<T extends Record<string, any>>({
                   return (
                     <th
                       key={key}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative select-none bg-gray-50"
+                      className="px-4 py-3 text-left text-xs font-medium text-emerald-500 uppercase tracking-wider relative select-none bg-emerald-50"
                       style={{ 
                         width: `${columnWidths[key]}px`
                       }}
@@ -244,20 +244,20 @@ export function DataTable<T extends Record<string, any>>({
                         <button
                           onClick={() => handleSort(key)}
                           className={`flex items-center space-x-1 ${
-                            column.sortable !== false ? 'hover:text-gray-700 cursor-pointer' : ''
+                            column.sortable !== false ? 'hover:text-emerald-700 cursor-pointer' : ''
                           }`}
                         >
                           <span>{column.header}</span>
                           {column.sortable !== false && (
                             <div className="flex flex-col ml-1">
                               {isActive && sortDirection === 'asc' ? (
-                                <ChevronUpIcon className="h-4 w-4 text-primary-600" />
+                                <ChevronUpIcon className="h-4 w-4 text-emerald-600" />
                               ) : isActive && sortDirection === 'desc' ? (
-                                <ChevronDownIcon className="h-4 w-4 text-primary-600" />
+                                <ChevronDownIcon className="h-4 w-4 text-emerald-600" />
                               ) : (
                                 <div className="flex flex-col">
-                                  <ChevronUpIcon className="h-3 w-3 text-gray-300" />
-                                  <ChevronDownIcon className="h-3 w-3 text-gray-300 -mt-1" />
+                                  <ChevronUpIcon className="h-3 w-3 text-emerald-300" />
+                                  <ChevronDownIcon className="h-3 w-3 text-emerald-300 -mt-1" />
                                 </div>
                               )}
                             </div>
@@ -268,33 +268,33 @@ export function DataTable<T extends Record<string, any>>({
                       
                       {/* Resize handle */}
                       <div
-                        className="absolute right-0 top-0 bottom-0 w-1 bg-transparent hover:bg-gray-300 cursor-col-resize group"
+                        className="absolute right-0 top-0 bottom-0 w-1 bg-transparent hover:bg-emerald-300 cursor-col-resize group"
                         onMouseDown={(e) => handleMouseDown(e, key)}
                       >
-                        <div className="w-full h-full bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="w-full h-full bg-emerald-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       </div>
                     </th>
                   );
                 })}
                 {(onEdit || onDelete) && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 border-l border-gray-200" style={{ minWidth: '120px' }}>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-emerald-500 uppercase tracking-wider sticky right-0 bg-emerald-50 border-l border-emerald-200" style={{ minWidth: '120px' }}>
                     ACTIONS
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200 relative z-10">
+            <tbody className="bg-white divide-y divide-emerald-200 relative z-10">
               {filteredAndSortedData.map((row, index) => (
                 <tr key={index} className="group relative">
                   {/* Full-width hover background */}
-                  <td className="absolute inset-0 bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ left: 0, right: '-100vw', zIndex: -1 }}></td>
+                  <td className="absolute inset-0 bg-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ left: 0, right: '-100vw', zIndex: -1 }}></td>
                   {columns.map((column) => {
                     const key = String(column.key);
                     const value = getValue(row, key);
                     return (
                       <td
                         key={key}
-                        className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0 bg-white relative z-10"
+                        className="px-4 py-3 text-sm text-emerald-900 border-r border-emerald-200 last:border-r-0 bg-white relative z-10"
                         style={{ 
                           width: `${columnWidths[key]}px`
                         }}
@@ -310,12 +310,12 @@ export function DataTable<T extends Record<string, any>>({
                     );
                   })}
                   {(onEdit || onDelete) && (
-                    <td className="px-4 py-3 text-sm font-medium sticky right-0 bg-white border-l border-gray-200 relative z-10" style={{ minWidth: '120px' }}>
+                    <td className="px-4 py-3 text-sm font-medium sticky right-0 bg-white border-l border-emerald-200 relative z-10" style={{ minWidth: '120px' }}>
                       <div className="flex space-x-2">
                         {onEdit && (
                           <button
                             onClick={() => onEdit(row)}
-                            className="text-primary-600 hover:text-primary-900 font-medium"
+                            className="text-emerald-600 hover:text-emerald-900 font-medium"
                           >
                             Edit
                           </button>

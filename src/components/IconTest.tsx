@@ -41,7 +41,7 @@ const IconTest: React.FC = () => {
         {/* Social Media Icons Test */}
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Social Media Icons</h3>
-          <div className="flex items-center space-x-4 bg-gray-800 p-4 rounded group">
+          <div className="flex items-center space-x-4 bg-emerald-800 p-4 rounded group">
             <YouTubeIcon />
             <TwitterIcon />
             <LinkedInIcon />
