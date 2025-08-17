@@ -1,7 +1,11 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { getSupabaseConfig, getStorageKey } from './env'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co'
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'your-service-key'
+const { url: supabaseUrl, serviceRoleKey: supabaseServiceKey } = getSupabaseConfig()
+
+if (!supabaseServiceKey) {
+  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable')
+}
 
 // Global singleton to prevent multiple instances, persists through HMR
 const globalForSupabaseAdmin = globalThis as unknown as {
@@ -12,7 +16,7 @@ const globalForSupabaseAdmin = globalThis as unknown as {
 if (!globalForSupabaseAdmin.supabaseAdminInstance) {
   globalForSupabaseAdmin.supabaseAdminInstance = createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
-      storageKey: 'vsk-admin-simple',
+      storageKey: getStorageKey('admin-simple'),
       autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,

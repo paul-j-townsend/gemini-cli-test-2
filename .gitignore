@@ -1,6 +1,10 @@
 node_modules
 .next/
 .env.local
+
+# Environment files (keep only .env.example)
+.env.development
+.env.staging
 .env.production
 supabase/migrations/
 next.config.js

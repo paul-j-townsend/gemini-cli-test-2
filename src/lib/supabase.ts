@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseConfig, getStorageKey } from './env'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'your-anon-key'
+const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseConfig()
 
 // Global singleton to prevent multiple instances, persists through HMR
 const globalForSupabase = globalThis as unknown as {
@@ -12,7 +12,7 @@ const globalForSupabase = globalThis as unknown as {
 if (!globalForSupabase.supabaseInstance) {
   globalForSupabase.supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-      storageKey: 'vsk-main-auth-v3', // Fixed key as per CLAUDE.md
+      storageKey: getStorageKey('main-auth-v3'), // Environment-specific storage key
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true
