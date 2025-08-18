@@ -41,6 +41,14 @@ interface Episode {
   featured?: boolean;
   full_audio_url?: string;
   quiz_id: string; // Required - enforces one-to-one relationship
+  price_cents: number | null;
+  stripe_price_id: string | null;
+  is_purchasable: boolean;
+  special_offer_price_cents: number | null;
+  special_offer_active: boolean;
+  special_offer_start_date: string | null;
+  special_offer_end_date: string | null;
+  special_offer_description: string | null;
   vsk_quizzes?: {
     id: string;
     title: string;
@@ -287,6 +295,33 @@ export default function PodcastManagement() {
         </span>
       ),
     },
+    {
+      key: 'pricing',
+      label: 'Pricing',
+      render: (episode) => (
+        <div className="text-sm">
+          {episode.is_purchasable ? (
+            <div className="space-y-1">
+              {episode.price_cents > 0 && (
+                <div className="text-emerald-900 font-medium">
+                  £{(episode.price_cents / 100).toFixed(2)}
+                </div>
+              )}
+              {episode.special_offer_active && episode.special_offer_price_cents && (
+                <div className="text-green-600 font-medium">
+                  Special: £{(episode.special_offer_price_cents / 100).toFixed(2)}
+                </div>
+              )}
+              <span className="inline-flex px-1.5 py-0.5 text-xs font-medium rounded bg-emerald-100 text-emerald-800">
+                Purchasable
+              </span>
+            </div>
+          ) : (
+            <span className="text-emerald-400">Free</span>
+          )}
+        </div>
+      ),
+    },
     { key: 'actions', label: 'Actions' },
   ];
 
@@ -464,6 +499,107 @@ export default function PodcastManagement() {
               required
               error={errors.published_at}
             />
+
+            {/* Pricing & Purchase Settings */}
+            <div className="mt-6 p-4 bg-emerald-50 rounded-lg">
+              <h4 className="text-md font-medium text-emerald-900 mb-4">Pricing & Purchase Settings</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Regular Price (£)"
+                  type="number"
+                  step={0.01}
+                  min={0}
+                  value={formData.price_cents === 0 ? '' : (formData.price_cents / 100).toString()}
+                  onChange={(value) => {
+                    if (value === '' || value === null || value === undefined) {
+                      handleChange('price_cents', 0);
+                      return;
+                    }
+                    const numValue = parseFloat(value);
+                    if (isNaN(numValue)) {
+                      return;
+                    }
+                    const centsValue = Math.round(numValue * 100);
+                    handleChange('price_cents', centsValue);
+                  }}
+                  placeholder="9.99"
+                />
+                
+                <Input
+                  label="Stripe Price ID"
+                  value={formData.stripe_price_id}
+                  onChange={(value) => handleChange('stripe_price_id', value)}
+                  placeholder="price_1234567890"
+                />
+              </div>
+              
+              <div className="mt-4">
+                <Checkbox
+                  label="Available for Purchase"
+                  checked={formData.is_purchasable}
+                  onChange={(checked) => handleChange('is_purchasable', checked)}
+                />
+              </div>
+            </div>
+
+            {/* Special Offer Settings */}
+            <div className="mt-4 p-4 bg-emerald-50 rounded-lg">
+              <h5 className="text-sm font-medium text-emerald-900 mb-3">Special Offer Settings</h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Special Offer Price (£)"
+                  type="number"
+                  step={0.01}
+                  min={0}
+                  value={formData.special_offer_price_cents === 0 ? '' : (formData.special_offer_price_cents / 100).toString()}
+                  onChange={(value) => {
+                    if (value === '' || value === null || value === undefined) {
+                      handleChange('special_offer_price_cents', 0);
+                      return;
+                    }
+                    const numValue = parseFloat(value);
+                    if (isNaN(numValue)) {
+                      return;
+                    }
+                    const centsValue = Math.round(numValue * 100);
+                    handleChange('special_offer_price_cents', centsValue);
+                  }}
+                  placeholder="7.99"
+                />
+                
+                <Checkbox
+                  label="Special Offer Active"
+                  checked={formData.special_offer_active}
+                  onChange={(checked) => handleChange('special_offer_active', checked)}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <Input
+                  label="Offer Start Date"
+                  type="datetime-local"
+                  value={formData.special_offer_start_date}
+                  onChange={(value) => handleChange('special_offer_start_date', value)}
+                />
+                
+                <Input
+                  label="Offer End Date"
+                  type="datetime-local"
+                  value={formData.special_offer_end_date}
+                  onChange={(value) => handleChange('special_offer_end_date', value)}
+                />
+              </div>
+              
+              <div className="mt-4">
+                <TextArea
+                  label="Special Offer Description"
+                  value={formData.special_offer_description}
+                  onChange={(value) => handleChange('special_offer_description', value)}
+                  placeholder="Limited time offer - 20% off!"
+                  rows={2}
+                />
+              </div>
+            </div>
 
             <div className="flex gap-3 pt-4">
               <Button

@@ -15,6 +15,14 @@ export interface EpisodeFormData {
   full_audio_url: string;
   quiz_id: string; // Required - enforces one-to-one relationship
   category: string[];
+  price_cents: number;
+  stripe_price_id: string;
+  is_purchasable: boolean;
+  special_offer_price_cents: number;
+  special_offer_active: boolean;
+  special_offer_start_date: string;
+  special_offer_end_date: string;
+  special_offer_description: string;
 }
 
 export const podcastValidationSchema: ValidationSchema<EpisodeFormData> = {
@@ -98,7 +106,15 @@ export const createInitialEpisodeData = (
     published: false,
     full_audio_url: '',
     quiz_id: quiz_id, // Required - must be provided
-    category: []
+    category: [],
+    price_cents: 0,
+    stripe_price_id: '',
+    is_purchasable: false,
+    special_offer_price_cents: 0,
+    special_offer_active: false,
+    special_offer_start_date: '',
+    special_offer_end_date: '',
+    special_offer_description: ''
   };
 };
 
@@ -118,7 +134,15 @@ export const mapEpisodeToFormData = (episode: any): EpisodeFormData => ({
   published: episode.published || false,
   full_audio_url: episode.full_audio_url || '',
   quiz_id: episode.quiz_id || '',
-  category: episode.category ? (Array.isArray(episode.category) ? episode.category : [episode.category]) : []
+  category: episode.category ? (Array.isArray(episode.category) ? episode.category : [episode.category]) : [],
+  price_cents: episode.price_cents || 0,
+  stripe_price_id: episode.stripe_price_id || '',
+  is_purchasable: episode.is_purchasable || false,
+  special_offer_price_cents: episode.special_offer_price_cents || 0,
+  special_offer_active: episode.special_offer_active || false,
+  special_offer_start_date: episode.special_offer_start_date || '',
+  special_offer_end_date: episode.special_offer_end_date || '',
+  special_offer_description: episode.special_offer_description || ''
 });
 
 export const formatDate = (dateString: string) => {

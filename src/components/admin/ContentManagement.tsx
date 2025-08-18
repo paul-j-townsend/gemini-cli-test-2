@@ -905,37 +905,6 @@ export default function ContentManagement() {
                   />
                 </div>
                 
-                <div className="mt-4 p-4 bg-emerald-50 rounded-lg">
-                  <h5 className="text-sm font-medium text-emerald-900 mb-3">Special Offer Settings</h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                      label="Special Offer Price (£)"
-                      type="number"
-                      step={0.01}
-                      min={0}
-                      value={formData.special_offer_price_cents === 0 ? '' : (formData.special_offer_price_cents / 100).toString()}
-                      onChange={(value) => {
-                        if (value === '' || value === null || value === undefined) {
-                          handleChange('special_offer_price_cents', 0);
-                          return;
-                        }
-                        const numValue = parseFloat(value);
-                        if (isNaN(numValue)) {
-                          return;
-                        }
-                        const centsValue = Math.round(numValue * 100);
-                        handleChange('special_offer_price_cents', centsValue);
-                      }}
-                      placeholder="7.99"
-                    />
-                    
-                    <Checkbox
-                      label="Special Offer Active"
-                      checked={formData.special_offer_active}
-                      onChange={(checked) => handleChange('special_offer_active', checked)}
-                    />
-                  </div>
-                </div>
               </div>
 
               {/* Quiz Settings */}
@@ -1398,6 +1367,65 @@ export default function ContentManagement() {
                       label="Available for Purchase"
                       checked={formData.is_purchasable}
                       onChange={(checked) => handleChange('is_purchasable', checked)}
+                    />
+                  </div>
+                </div>
+
+                {/* Special Offer Settings */}
+                <div className="mt-4 p-4 bg-emerald-50 rounded-lg">
+                  <h5 className="text-lg font-medium text-emerald-900 mb-3">Special Offer Settings</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Special Offer Price (£)"
+                      type="number"
+                      step={0.01}
+                      min={0}
+                      value={formData.special_offer_price_cents === 0 ? '' : (formData.special_offer_price_cents / 100).toString()}
+                      onChange={(value) => {
+                        if (value === '' || value === null || value === undefined) {
+                          handleChange('special_offer_price_cents', 0);
+                          return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) {
+                          return;
+                        }
+                        const centsValue = Math.round(numValue * 100);
+                        handleChange('special_offer_price_cents', centsValue);
+                      }}
+                      placeholder="7.99"
+                    />
+                    
+                    <Checkbox
+                      label="Special Offer Active"
+                      checked={formData.special_offer_active}
+                      onChange={(checked) => handleChange('special_offer_active', checked)}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <Input
+                      label="Offer Start Date"
+                      type="datetime-local"
+                      value={formData.special_offer_start_date}
+                      onChange={(value) => handleChange('special_offer_start_date', value)}
+                    />
+                    
+                    <Input
+                      label="Offer End Date"
+                      type="datetime-local"
+                      value={formData.special_offer_end_date}
+                      onChange={(value) => handleChange('special_offer_end_date', value)}
+                    />
+                  </div>
+                  
+                  <div className="mt-4">
+                    <TextArea
+                      label="Special Offer Description"
+                      value={formData.special_offer_description}
+                      onChange={(value) => handleChange('special_offer_description', value)}
+                      placeholder="Limited time offer - 20% off!"
+                      rows={2}
                     />
                   </div>
                 </div>
