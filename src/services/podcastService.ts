@@ -1,5 +1,10 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { supabase } from '@/lib/supabase';
+
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 
 export interface PodcastEpisode {
   id: string;
@@ -168,6 +173,7 @@ class PodcastService {
   async getPublishedEpisodes(limit?: number): Promise<PodcastEpisode[]> {
     try {
       // Direct database access for server-side calls
+      const supabaseAdmin = await getSupabaseAdmin();
       let query = supabaseAdmin
         .from('vsk_content')
         .select(`

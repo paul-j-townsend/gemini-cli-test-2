@@ -1,6 +1,11 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { QuizCompletion, QuizAnswer, UserProgress, Badge, QuizContinuationStatus } from '../types/database';
 import { continuationService } from './continuationService';
+
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 
 class QuizCompletionService {
   async createCompletion(completion: Omit<QuizCompletion, 'id'>): Promise<QuizCompletion> {
@@ -10,6 +15,7 @@ class QuizCompletionService {
     try {
       // Check if user exists in vsk_users table
       console.log('Step 1: Checking if user exists...');
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data: user, error: userError } = await supabaseAdmin
         .from('vsk_users')
         .select('id')
@@ -126,6 +132,7 @@ class QuizCompletionService {
 
   async findCompletionsByUserId(userId: string): Promise<QuizCompletion[]> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_quiz_completions')
         .select('*')
@@ -153,6 +160,7 @@ class QuizCompletionService {
   }
 
   async findCompletionById(id: string): Promise<QuizCompletion | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('*')
@@ -167,6 +175,7 @@ class QuizCompletionService {
   }
 
   async findCompletionsByQuizId(quiz_id: string): Promise<QuizCompletion[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('*')
@@ -181,6 +190,7 @@ class QuizCompletionService {
 
 
   async hasUserCompletedQuiz(user_id: string, quiz_id: string): Promise<boolean> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('id')
@@ -196,6 +206,7 @@ class QuizCompletionService {
   }
 
   async hasUserPassedQuiz(user_id: string, quiz_id: string): Promise<boolean> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('id')
@@ -212,6 +223,7 @@ class QuizCompletionService {
   }
 
   async getUserQuizAttempts(user_id: string, quiz_id: string): Promise<number> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { count, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('id', { count: 'exact' })
@@ -226,6 +238,7 @@ class QuizCompletionService {
   }
 
   async getUserBestScore(user_id: string, quiz_id: string): Promise<QuizCompletion | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('*')
@@ -243,6 +256,7 @@ class QuizCompletionService {
   }
 
   async getRecentCompletions(limit: number = 10): Promise<QuizCompletion[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('*')
@@ -257,6 +271,7 @@ class QuizCompletionService {
   }
 
   async getUserRecentCompletions(user_id: string, limit: number = 10): Promise<QuizCompletion[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('*')
@@ -272,6 +287,7 @@ class QuizCompletionService {
   }
 
   async deleteCompletion(id: string): Promise<boolean> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .delete()
@@ -288,6 +304,7 @@ class QuizCompletionService {
   
 
   async getUserProgress(user_id: string): Promise<UserProgress | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_user_progress')
       .select('*')
@@ -302,6 +319,7 @@ class QuizCompletionService {
   }
 
   async updateUserProgress(user_id: string, completion: QuizCompletion): Promise<UserProgress> {
+    const supabaseAdmin = await getSupabaseAdmin();
     let { data: progress, error: fetchError } = await supabaseAdmin
       .from('vsk_user_progress')
       .select('*')
@@ -426,6 +444,7 @@ class QuizCompletionService {
   }
 
   async getLeaderboard(limit: number = 10): Promise<UserProgress[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_user_progress')
       .select('*')
@@ -446,6 +465,7 @@ class QuizCompletionService {
     passRate: number;
     averageTimeSpent: number;
   }> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .select('*')

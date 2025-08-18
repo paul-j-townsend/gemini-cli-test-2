@@ -41,6 +41,7 @@ const ArticlesManagement = () => {
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [saving, setSaving] = useState(false);
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState('');
 
   const [formData, setFormData] = useState<ArticleFormData>({
     title: '',
@@ -223,6 +224,37 @@ const ArticlesManagement = () => {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const opts = Array.from(e.target.selectedOptions).map((o:any)=>o.value);
     setFormData({ ...formData, category: opts });
+  };
+
+  const removeCategory = (index: number) => {
+    const newCategories = formData.category.filter((_, i) => i !== index);
+    setFormData({ ...formData, category: newCategories });
+  };
+
+  const addCategory = () => {
+    if (newCategory.trim() && !formData.category.includes(newCategory.trim())) {
+      setFormData({ 
+        ...formData, 
+        category: [...formData.category, newCategory.trim()] 
+      });
+      setNewCategory('');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      content: '',
+      excerpt: '',
+      author: '',
+      category: [],
+      published: false,
+      featured: false,
+      slug: '',
+      image_url: '',
+    });
+    setNewCategory('');
+    setEditingArticle(null);
   };
 
   useEffect(() => {

@@ -1,4 +1,8 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 
 export interface UserContentProgress {
   id?: string;
@@ -20,6 +24,7 @@ export interface UserContentProgress {
 class UserContentProgressService {
   async getProgress(userId: string, contentId: string): Promise<UserContentProgress | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_user_content_progress')
         .select('*')
@@ -46,6 +51,7 @@ class UserContentProgressService {
     hasListened: boolean = false
   ): Promise<UserContentProgress | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const updateData: Partial<UserContentProgress> = {
         listen_progress_percentage: progressPercentage,
         has_listened: hasListened,
@@ -84,6 +90,7 @@ class UserContentProgressService {
 
   async markQuizCompleted(userId: string, contentId: string): Promise<UserContentProgress | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_user_content_progress')
         .upsert({
@@ -111,6 +118,7 @@ class UserContentProgressService {
 
   async markReportDownloaded(userId: string, contentId: string): Promise<UserContentProgress | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_user_content_progress')
         .upsert({
@@ -138,6 +146,7 @@ class UserContentProgressService {
 
   async markCertificateDownloaded(userId: string, contentId: string): Promise<UserContentProgress | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const updateData = {
         user_id: userId,
         content_id: contentId,
@@ -173,6 +182,7 @@ class UserContentProgressService {
     certificatesDownloaded: number;
   }> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_user_content_progress')
         .select('*')

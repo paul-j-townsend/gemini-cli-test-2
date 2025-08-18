@@ -1,4 +1,8 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 import { 
   transformToQuizPodcastEntity, 
   QUIZ_PODCAST_QUERY_FRAGMENT,
@@ -48,6 +52,7 @@ interface Quiz {
 
 class QuizService {
   async getQuizById(id: string): Promise<Quiz | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quizzes')
       .select(QUIZ_PODCAST_QUERY_FRAGMENT)
@@ -70,6 +75,7 @@ class QuizService {
   }
 
   async getAllQuizzes(): Promise<Quiz[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quizzes')
       .select(QUIZ_PODCAST_QUERY_FRAGMENT);
@@ -101,6 +107,7 @@ class QuizService {
       }[];
     }[];
   }): Promise<Quiz> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quizzes')
       .insert({
@@ -180,6 +187,7 @@ class QuizService {
     pass_percentage?: number;
     is_active?: boolean;
   }): Promise<Quiz | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quizzes')
       .update(updates)
@@ -198,6 +206,7 @@ class QuizService {
   }
 
   async deleteQuiz(id: string): Promise<boolean> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { error } = await supabaseAdmin
       .from('vsk_quizzes')
       .delete()

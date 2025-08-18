@@ -1,5 +1,9 @@
 import { stripe } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 import { ContentPurchase, Subscription, Content } from '@/types/database';
 import Stripe from 'stripe';
 
@@ -14,6 +18,7 @@ export class PaymentService {
     priceCents?: number
   ): Promise<Stripe.Checkout.Session> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       // Get content details
       const { data: content, error: contentError } = await supabaseAdmin
         .from('vsk_content')
@@ -126,6 +131,7 @@ export class PaymentService {
   // Get or create Stripe customer for user
   private async getOrCreateStripeCustomer(userId: string): Promise<Stripe.Customer> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       // Get user details
       const { data: user, error: userError } = await supabaseAdmin
         .from('vsk_users')
@@ -166,6 +172,7 @@ export class PaymentService {
   // Process successful payment from webhook
   async processPaymentSuccess(session: Stripe.Checkout.Session): Promise<void> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { content_id, user_id, type } = session.metadata || {};
 
       if (!content_id || !user_id) {
@@ -203,6 +210,7 @@ export class PaymentService {
     eventType: string
   ): Promise<void> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const userId = subscription.metadata?.user_id;
       if (!userId) {
         throw new Error('Missing user_id in subscription metadata');
@@ -241,6 +249,7 @@ export class PaymentService {
   // Get user's purchases
   async getUserPurchases(userId: string): Promise<ContentPurchase[]> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_content_purchases')
         .select('*')
@@ -262,6 +271,7 @@ export class PaymentService {
   // Get user's active subscription
   async getUserSubscription(userId: string): Promise<Subscription | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_subscriptions')
         .select('*')
@@ -305,6 +315,7 @@ export class PaymentService {
       });
 
       // Update purchase record
+      const supabaseAdmin = await getSupabaseAdmin();
       const { error } = await supabaseAdmin
         .from('vsk_content_purchases')
         .update({

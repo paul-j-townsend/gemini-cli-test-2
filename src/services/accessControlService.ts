@@ -1,6 +1,11 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { supabase } from '@/lib/supabase';
 import { ContentPurchase, Subscription, Content } from '@/types/database';
+
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 
 export class AccessControlService {
 
@@ -20,6 +25,7 @@ export class AccessControlService {
       }
 
       // Check if content is free (price_cents is null or 0)
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data: content } = await supabaseAdmin
         .from('vsk_content')
         .select('price_cents, is_purchasable')
@@ -40,6 +46,7 @@ export class AccessControlService {
   // Check if user has active subscription
   async hasActiveSubscription(userId: string): Promise<boolean> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_subscriptions')
         .select('id, status, current_period_end')
@@ -65,6 +72,7 @@ export class AccessControlService {
   // Check if user has purchased specific content
   async hasContentPurchase(userId: string, contentId: string): Promise<boolean> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_content_purchases')
         .select('id')
@@ -85,6 +93,8 @@ export class AccessControlService {
     try {
       const accessibleContentIds: string[] = [];
 
+      const supabaseAdmin = await getSupabaseAdmin();
+      
       // If user has active subscription, they have access to all purchasable content
       const hasSubscription = await this.hasActiveSubscription(userId);
       if (hasSubscription) {
@@ -135,6 +145,8 @@ export class AccessControlService {
     purchasedContentIds: string[];
   }> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
+      
       // Get purchases
       const { data: purchases } = await supabaseAdmin
         .from('vsk_content_purchases')
@@ -273,6 +285,8 @@ export class AccessControlService {
         return true;
       }
 
+      const supabaseAdmin = await getSupabaseAdmin();
+      
       // Get all content in series
       const { data: seriesContent } = await supabaseAdmin
         .from('vsk_content')

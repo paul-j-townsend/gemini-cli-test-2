@@ -836,7 +836,7 @@ export default function ContentManagement() {
               </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleFormSubmit} className="space-y-6">
               {/* Basic Information */}
               <div className="border-b border-emerald-200 mb-6">
                 <h4 className="text-lg font-medium text-emerald-900 mb-4">Basic Information</h4>
@@ -898,7 +898,6 @@ export default function ContentManagement() {
                     label="Available for Purchase"
                     checked={formData.is_purchasable}
                     onChange={(checked) => handleChange('is_purchasable', checked)}
-                    error={errors.is_purchasable}
                   />
                 </div>
                 
@@ -1010,7 +1009,7 @@ export default function ContentManagement() {
                                 onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'question_text', value)}
                                 rows={3}
                                 placeholder="Enter your question here..."
-                                error={errors.questions?.[selectedQuestionIndex]?.question_text}
+                                error={errors.questions?.[selectedQuestionIndex] as string}
                               />
 
                               <TextArea
@@ -1019,7 +1018,7 @@ export default function ContentManagement() {
                                 onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'learning_outcome', value)}
                                 rows={2}
                                 placeholder="What should students learn from this question?"
-                                error={errors.questions?.[selectedQuestionIndex]?.learning_outcome}
+                                error={errors.questions?.[selectedQuestionIndex] as string}
                               />
 
                               <TextArea
@@ -1028,7 +1027,7 @@ export default function ContentManagement() {
                                 onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'rationale', value)}
                                 rows={3}
                                 placeholder="Explain why the correct answer is correct..."
-                                error={errors.questions?.[selectedQuestionIndex]?.rationale}
+                                error={errors.questions?.[selectedQuestionIndex] as string}
                               />
 
                               <div>
@@ -1044,7 +1043,7 @@ export default function ContentManagement() {
                                         onChange={(value) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'answer_text', value)}
                                         placeholder={`Answer ${answer.answer_letter}`}
                                         className="flex-1"
-                                        error={errors.questions?.[selectedQuestionIndex]?.answers?.[answerIndex]?.answer_text}
+                                        error={errors.questions?.[selectedQuestionIndex] as string}
                                       />
                                       <label className="flex items-center text-sm">
                                         <input

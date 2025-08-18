@@ -1,4 +1,8 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 import { Series, SeriesTable } from '@/types/database';
 
 interface CreateSeriesData {
@@ -20,6 +24,7 @@ interface UpdateSeriesData {
 
 class SeriesService {
   async createSeries(data: CreateSeriesData): Promise<Series> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data: series, error } = await supabaseAdmin
       .from('vsk_series')
       .insert({
@@ -42,6 +47,7 @@ class SeriesService {
   }
 
   async updateSeries(id: string, data: UpdateSeriesData): Promise<Series> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const updateData: Partial<SeriesTable> = {
       updated_at: new Date().toISOString()
     };
@@ -69,6 +75,7 @@ class SeriesService {
   }
 
   async updateSeriesOrder(seriesOrderUpdates: { id: string; display_order: number }[]): Promise<void> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { error } = await supabaseAdmin.rpc('update_series_order', {
       series_updates: seriesOrderUpdates
     });
@@ -93,6 +100,7 @@ class SeriesService {
   }
 
   async getSeries(includeInactive = false): Promise<Series[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     let query = supabaseAdmin
       .from('vsk_series')
       .select('*')
@@ -113,6 +121,7 @@ class SeriesService {
   }
 
   async getSeriesById(id: string): Promise<Series | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data: series, error } = await supabaseAdmin
       .from('vsk_series')
       .select('*')
@@ -131,6 +140,7 @@ class SeriesService {
   }
 
   async getSeriesBySlug(slug: string): Promise<Series | null> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data: series, error } = await supabaseAdmin
       .from('vsk_series')
       .select('*')
@@ -150,6 +160,7 @@ class SeriesService {
   }
 
   async deleteSeries(id: string): Promise<void> {
+    const supabaseAdmin = await getSupabaseAdmin();
     // First check if any content is assigned to this series
     const { data: contentCount, error: countError } = await supabaseAdmin
       .from('vsk_content')
@@ -177,6 +188,7 @@ class SeriesService {
   }
 
   async getContentBySeries(seriesId: string): Promise<any[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data: content, error } = await supabaseAdmin
       .from('vsk_content')
       .select('*')
@@ -193,6 +205,7 @@ class SeriesService {
   }
 
   async assignContentToSeries(contentId: string, seriesId: string | null): Promise<void> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { error } = await supabaseAdmin
       .from('vsk_content')
       .update({ series_id: seriesId })
@@ -205,6 +218,7 @@ class SeriesService {
   }
 
   async getSeriesWithContentCount(): Promise<(Series & { content_count: number })[]> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data: seriesWithCount, error } = await supabaseAdmin
       .from('vsk_series')
       .select(`

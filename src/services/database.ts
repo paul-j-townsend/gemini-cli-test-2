@@ -1,4 +1,8 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 import { User, UserRole, UserStatus } from '../types/database';
 import { userService } from './userService';
 
@@ -52,6 +56,7 @@ class MockDatabase {
 
   // Database operations for quiz completions (if needed)
   async createQuizCompletion(completionData: any): Promise<any> {
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('vsk_quiz_completions')
       .insert(completionData)

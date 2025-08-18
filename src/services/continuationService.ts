@@ -1,5 +1,10 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { QuizContinuationLimits, QuizContinuationStatus, Quiz } from '../types/database';
+
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 
 class ContinuationService {
   private readonly DEFAULT_MAX_ATTEMPTS = 3;
@@ -204,6 +209,7 @@ class ContinuationService {
 
   private async getQuizSettings(quizId: string): Promise<Quiz | null> {
     try {
+      const supabaseAdmin = await getSupabaseAdmin();
       const { data, error } = await supabaseAdmin
         .from('vsk_quizzes')
         .select('*')

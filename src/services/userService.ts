@@ -1,5 +1,10 @@
 import { User, UserRole } from '../types/database';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+
+// Lazy load admin client to avoid importing on client side
+const getSupabaseAdmin = async () => {
+  const { supabaseAdmin } = await import('@/lib/supabase-admin');
+  return supabaseAdmin;
+};
 
 // Mock users for development since we don't have real auth setup
 const mockUsers: User[] = [
