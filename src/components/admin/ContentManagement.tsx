@@ -751,6 +751,10 @@ export default function ContentManagement() {
     return <LoadingState message="Loading content..." />;
   }
 
+  if (error && error !== 'MIGRATION_NEEDED') {
+    return <ErrorDisplay error={error} onRetry={fetchContent} />;
+  }
+
   // Special case: Migration needed - TEMPORARILY DISABLED FOR DEBUGGING
   if (error === 'MIGRATION_NEEDED_DISABLED') {
     return (
@@ -1146,4 +1150,488 @@ export default function ContentManagement() {
       </div>
     );
   }
+
+  // Main render for normal content management
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-emerald-900">Content Management</h2>
+          <p className="text-emerald-700 mt-1">Unified podcast episodes and quiz management</p>
+        </div>
+        <Button
+          onClick={handleCreateNew}
+          variant="primary"
+        >
+          Add New Content
+        </Button>
+      </div>
+
+      {error && (
+        <ErrorDisplay error={error} onRetry={fetchContent} />
+      )}
+
+      {/* Content Form */}
+      {showForm && (
+        <div className="bg-white border border-emerald-200 rounded-lg p-6 shadow-sm mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-medium text-emerald-900">
+              {editingContent ? 'Edit Content' : 'Add New Content'}
+            </h3>
+            <Button
+              onClick={handleCancel}
+              variant="ghost"
+              size="sm"
+            >
+              Cancel
+            </Button>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="border-b border-emerald-200 mb-6">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('podcast')}
+                className={`${
+                  activeTab === 'podcast'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-500 hover:text-emerald-700 hover:border-emerald-300'
+                } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm`}
+              >
+                Podcast Details
+              </button>
+              <button
+                onClick={() => setActiveTab('quiz')}
+                className={`${
+                  activeTab === 'quiz'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-emerald-500 hover:text-emerald-700 hover:border-emerald-300'
+                } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm`}
+              >
+                Quiz Questions ({formData.questions.length})
+              </button>
+            </nav>
+          </div>
+
+          <form onSubmit={handleFormSubmit} className="space-y-6">
+            {activeTab === 'podcast' && (
+              <>
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">Basic Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Title *"
+                      value={formData.title}
+                      onChange={(value) => handleChange('title', value)}
+                      placeholder="Enter content title"
+                      error={errors.title}
+                    />
+                    
+                    <Input
+                      label="Episode Number *"
+                      type="number"
+                      min={1}
+                      value={formData.episode_number.toString()}
+                      onChange={(value) => handleChange('episode_number', parseInt(value) || 1)}
+                      error={errors.episode_number}
+                    />
+
+                    <Input
+                      label="Season *"
+                      type="number"
+                      min={1}
+                      value={formData.season.toString()}
+                      onChange={(value) => handleChange('season', parseInt(value) || 1)}
+                      error={errors.season}
+                    />
+
+                    <DurationInput
+                      label="Duration"
+                      value={formData.duration}
+                      onChange={(value) => handleChange('duration', value)}
+                      error={errors.duration}
+                    />
+                  </div>
+
+                  <TextArea
+                    label="Description"
+                    value={formData.description}
+                    onChange={(value) => handleChange('description', value)}
+                    rows={3}
+                    placeholder="Enter content description"
+                    error={errors.description}
+                  />
+                </div>
+
+                {/* Media Files */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">Media Files</h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <FileUploadField
+                      label="Thumbnail Image"
+                      value={formData.thumbnail_path}
+                      onChange={(value) => handleChange('thumbnail_path', value)}
+                      accept="image/*"
+                      bucket="images"
+                      path="thumbnails/"
+                    />
+
+                    <FileUploadField
+                      label="Audio File"
+                      value={formData.audio_src}
+                      onChange={(value) => handleChange('audio_src', value)}
+                      accept="audio/*"
+                      bucket="audio"
+                      path="episodes/"
+                    />
+
+                    <FileUploadField
+                      label="Full Audio File"
+                      value={formData.full_audio_src}
+                      onChange={(value) => handleChange('full_audio_src', value)}
+                      accept="audio/*"
+                      bucket="audio"
+                      path="episodes/"
+                    />
+                  </div>
+                </div>
+
+                {/* Publishing */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">Publishing</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Published At"
+                      type="datetime-local"
+                      value={formData.published_at}
+                      onChange={(value) => handleChange('published_at', value)}
+                      error={errors.published_at}
+                    />
+
+                    <div className="space-y-3">
+                      <Checkbox
+                        label="Published"
+                        checked={formData.is_published}
+                        onChange={(checked) => handleChange('is_published', checked)}
+                      />
+
+                      <Checkbox
+                        label="Featured"
+                        checked={formData.featured}
+                        onChange={(checked) => handleChange('featured', checked)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Categories */}
+                {availableKeywords.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-emerald-900">Categories</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {availableKeywords.map((keyword) => (
+                        <Checkbox
+                          key={keyword}
+                          label={keyword}
+                          checked={selectedCategories.includes(keyword)}
+                          onChange={() => handleCategoryToggle(keyword)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Series Selection */}
+                {availableSeries.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-emerald-900">Series</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-emerald-700 mb-2">
+                          Series
+                        </label>
+                        <select
+                          value={formData.series_id}
+                          onChange={(e) => handleChange('series_id', e.target.value)}
+                          className="w-full px-3 py-2 border border-emerald-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                          <option value="">No Series</option>
+                          {availableSeries.map((series) => (
+                            <option key={series.id} value={series.id}>
+                              {series.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pricing */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">Pricing</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Price (£)"
+                      type="number"
+                      step={0.01}
+                      min={0}
+                      value={formData.price_cents === 0 ? '' : (formData.price_cents / 100).toString()}
+                      onChange={(value) => {
+                        if (value === '' || value === null || value === undefined) {
+                          handleChange('price_cents', 0);
+                          return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) {
+                          return;
+                        }
+                        const centsValue = Math.round(numValue * 100);
+                        handleChange('price_cents', centsValue);
+                      }}
+                      placeholder="9.99"
+                      error={errors.price_cents}
+                    />
+                    
+                    <Checkbox
+                      label="Available for Purchase"
+                      checked={formData.is_purchasable}
+                      onChange={(checked) => handleChange('is_purchasable', checked)}
+                    />
+                  </div>
+                </div>
+
+                {/* SEO */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">SEO</h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <Input
+                      label="Meta Title"
+                      value={formData.meta_title}
+                      onChange={(value) => handleChange('meta_title', value)}
+                      placeholder="SEO title (leave blank for auto-generate)"
+                      error={errors.meta_title}
+                    />
+                    
+                    <TextArea
+                      label="Meta Description"
+                      value={formData.meta_description}
+                      onChange={(value) => handleChange('meta_description', value)}
+                      rows={2}
+                      placeholder="SEO description (leave blank for auto-generate)"
+                      error={errors.meta_description}
+                    />
+                  </div>
+                </div>
+
+                {/* Show Notes */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">Content Details</h4>
+                  <TextArea
+                    label="Show Notes"
+                    value={formData.show_notes}
+                    onChange={(value) => handleChange('show_notes', value)}
+                    rows={6}
+                    placeholder="Detailed show notes, learning objectives, resources, etc."
+                    error={errors.show_notes}
+                  />
+                </div>
+
+                {/* Quiz Settings */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-emerald-900">Quiz Settings</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Quiz Title"
+                      value={formData.quiz_title}
+                      onChange={(value) => handleChange('quiz_title', value)}
+                      placeholder="Auto-generated from episode title"
+                      error={errors.quiz_title}
+                    />
+                    
+                    <Input
+                      label="Quiz Category"
+                      value={formData.quiz_category}
+                      onChange={(value) => handleChange('quiz_category', value)}
+                      placeholder="Enter quiz category"
+                      error={errors.quiz_category}
+                    />
+                  </div>
+
+                  <TextArea
+                    label="Quiz Description"
+                    value={formData.quiz_description}
+                    onChange={(value) => handleChange('quiz_description', value)}
+                    rows={2}
+                    placeholder="Brief description of the quiz"
+                    error={errors.quiz_description}
+                  />
+
+                  <Checkbox
+                    label="Quiz Active"
+                    checked={formData.quiz_is_active}
+                    onChange={(checked) => handleChange('quiz_is_active', checked)}
+                  />
+                </div>
+              </>
+            )}
+
+            {activeTab === 'quiz' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-lg font-medium text-emerald-900">Quiz Questions</h4>
+                  <Button
+                    type="button"
+                    onClick={handleAddQuestion}
+                    variant="secondary"
+                  >
+                    Add Question
+                  </Button>
+                </div>
+
+                {formData.questions.length > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Question List */}
+                    <div className="lg:col-span-1">
+                      <h5 className="text-sm font-medium text-emerald-700 mb-3">Questions</h5>
+                      <div className="space-y-2">
+                        {formData.questions.map((_, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setSelectedQuestionIndex(index)}
+                            className={`w-full text-left px-3 py-2 text-sm rounded-lg border ${
+                              selectedQuestionIndex === index
+                                ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                                : 'bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                            }`}
+                          >
+                            Question {index + 1}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Question Editor */}
+                    <div className="lg:col-span-3">
+                      {formData.questions[selectedQuestionIndex] && (
+                        <div className="bg-white border border-emerald-200 rounded-lg p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <h5 className="text-lg font-medium text-emerald-900">
+                              Question {selectedQuestionIndex + 1}
+                            </h5>
+                            <Button
+                              type="button"
+                              onClick={() => handleRemoveQuestion(selectedQuestionIndex)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              Remove
+                            </Button>
+                          </div>
+
+                          <div className="space-y-4">
+                            <TextArea
+                              label="Question Text"
+                              value={formData.questions[selectedQuestionIndex].question_text}
+                              onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'question_text', value)}
+                              rows={3}
+                              placeholder="Enter your question here..."
+                              error={errors.questions?.[selectedQuestionIndex] as string}
+                            />
+
+                            <TextArea
+                              label="Learning Outcome"
+                              value={formData.questions[selectedQuestionIndex].learning_outcome || 'Analyze and apply key veterinary nursing concepts in clinical practice scenarios'}
+                              onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'learning_outcome', value)}
+                              rows={2}
+                              placeholder="What should students learn from this question?"
+                              error={errors.questions?.[selectedQuestionIndex] as string}
+                            />
+
+                            <TextArea
+                              label="Rationale"
+                              value={formData.questions[selectedQuestionIndex].rationale || 'Understanding this concept is essential for safe and effective veterinary nursing practice. The correct answer demonstrates knowledge of evidence-based protocols and clinical reasoning.'}
+                              onChange={(value) => handleQuestionChange(selectedQuestionIndex, 'rationale', value)}
+                              rows={3}
+                              placeholder="Explain why the correct answer is correct..."
+                              error={errors.questions?.[selectedQuestionIndex] as string}
+                            />
+
+                            <div>
+                              <label className="block text-sm font-medium text-emerald-700 mb-3">Answer Options</label>
+                              <div className="space-y-3">
+                                {formData.questions[selectedQuestionIndex].answers?.map((answer, answerIndex) => (
+                                  <div key={answerIndex} className="flex items-center gap-3">
+                                    <span className="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-sm font-medium text-emerald-600">
+                                      {answer.answer_letter}
+                                    </span>
+                                    <Input
+                                      value={answer.answer_text}
+                                      onChange={(value) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'answer_text', value)}
+                                      placeholder={`Answer ${answer.answer_letter}`}
+                                      className="flex-1"
+                                      error={errors.questions?.[selectedQuestionIndex] as string}
+                                    />
+                                    <label className="flex items-center text-sm">
+                                      <input
+                                        type="checkbox"
+                                        checked={answer.is_correct}
+                                        onChange={(e) => handleAnswerChange(selectedQuestionIndex, answerIndex, 'is_correct', e.target.checked)}
+                                        className="mr-2 text-emerald-600 focus:ring-emerald-500"
+                                      />
+                                      Correct
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-emerald-600">
+                    <p>No questions yet. Click "Add Question" to get started.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button
+                type="submit"
+                disabled={!isValid || saving}
+                loading={saving}
+                variant="primary"
+              >
+                {editingContent ? 'Update Content' : 'Create Content'}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleCancel}
+                variant="ghost"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Content List */}
+      <AdminDataTable
+        title={`Content Management (${content.length})`}
+        data={content}
+        columns={columns}
+        actions={actions}
+        loading={loading}
+        emptyMessage="No content found. Create your first podcast episode with quiz to get started."
+        onRowClick={handleEdit}
+      />
+    </div>
+  );
 }
