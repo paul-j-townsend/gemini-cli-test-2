@@ -52,3 +52,4 @@ tsconfig.tsbuildinfo
 
 # MCP configuration
 mcp.json
+vps-connect.sh
