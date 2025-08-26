@@ -7,3 +7,5 @@ Log your CPD at [the RCVS 1CPD website](https://onecpd.rcvs.org.uk/accounts/logi
 add cpd packs
 
 add user 'courses completed' view with downlaodable cert, transcript, report, learning relections.
+
+psql postgresql://postgres:Polltax_107@db.qqpkrastmsvdtscbevmh.supabase.co:5432/postgres < schema.sql
