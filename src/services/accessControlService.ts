@@ -128,6 +128,7 @@ export class AccessControlService {
         accessibleContentIds.push(...freeContent.map(c => c.id));
       }
 
+
       // Remove duplicates
       return Array.from(new Set(accessibleContentIds));
     } catch (error) {
@@ -229,7 +230,7 @@ export class AccessControlService {
     subscriptionStatus: string | null;
     purchasedContentIds: string[];
   }> {
-    // In development, return mock data for authenticated users
+    // In development, return mock data for authenticated users indicating they have access
     if (userId) {
       return {
         totalPurchases: 0,
@@ -258,15 +259,18 @@ export class AccessControlService {
         const response = await fetch(`/api/payments/user-purchases?userId=${userId}`);
         if (response.ok) {
           const data = await response.json();
+          console.log('API response for accessible content:', data);
           return data.accessibleContentIds || [];
         }
 
+        console.log('API call failed, using fallback to get all published content');
         // Fallback: Just get all published content without checking subscriptions/purchases
         const { data: allContent } = await supabase
           .from('vsk_content')
           .select('id')
           .eq('is_published', true);
         
+        console.log('Fallback content IDs:', allContent?.map(c => c.id));
         return allContent?.map(c => c.id) || [];
       } catch (error) {
         console.error('Error getting accessible content (client):', error);

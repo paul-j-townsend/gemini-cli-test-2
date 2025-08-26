@@ -8,7 +8,7 @@ node_modules
 .env.production
 supabase/migrations/
 next.config.js
-my_docs
+02_my_docsmy_docs
 
 # macOS system files
 .DS_Store
@@ -54,3 +54,4 @@ tsconfig.tsbuildinfo
 mcp.json
 vps-connect.sh
 02_my_docs/01_planning/podcast-planning.md
+02_my_docs/01_planning/podcast intro guidelines.md

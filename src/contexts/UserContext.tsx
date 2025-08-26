@@ -269,6 +269,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // Get payment summary
       const summary = await getUserPaymentSummary();
       setPaymentSummary(summary);
+      
+      console.log('Payment status refreshed:', {
+        accessibleContentIds: contentIds,
+        paymentSummary: summary,
+        userId: user.id
+      });
     } catch (error) {
       console.error('Error refreshing payment status:', error);
     } finally {

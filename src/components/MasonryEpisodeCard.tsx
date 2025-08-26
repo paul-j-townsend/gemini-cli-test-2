@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useUserContentProgress } from '../hooks/useUserContentProgress';
 import { useUser } from '@/contexts/UserContext';
 import PurchaseCPDButton from './payments/PurchaseCPDButton';
@@ -43,43 +42,18 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubPosition, setScrubPosition] = useState(0);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   
-  const { isQuizCompleted, isQuizPassedWithThreshold } = useQuizCompletion();
-  const quizCompleted = isQuizCompleted(episode.content_id);
-  const quizPassed = isQuizPassedWithThreshold(episode.content_id, 70);
-  
   const { certificateDownloaded } = useUserContentProgress(episode.content_id);
-  const { user, hasFullCPDAccess } = useUser();
+  const { accessibleContentIds, refreshPaymentStatus } = useUser();
+  
+  // Check if user has access using centralized state
+  const hasAccess = accessibleContentIds.includes(episode.content_id);
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const displayPercentage = isScrubbing ? scrubPosition : progressPercentage;
   const displayTime = isScrubbing ? (scrubPosition / 100) * duration : currentTime;
 
-  // Check if user has access to this content
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (!user) {
-        setHasAccess(false);
-        setIsCheckingAccess(false);
-        return;
-      }
-
-      try {
-        const access = await hasFullCPDAccess(episode.content_id);
-        setHasAccess(access);
-      } catch (error) {
-        console.error('Error checking access:', error);
-        setHasAccess(false);
-      } finally {
-        setIsCheckingAccess(false);
-      }
-    };
-
-    checkAccess();
-  }, [user, episode.content_id, hasFullCPDAccess]);
   
   const getDefaultAudioUrl = (): string => {
     // Try to get from Supabase storage first, fallback to a sample audio
@@ -198,6 +172,13 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
   };
 
   const handleCardClick = () => {
+    console.log('Episode card clicked:', {
+      episodeId: episode.content_id,
+      hasAccess,
+      accessibleContentIds,
+      certificateDownloaded
+    });
+    
     if (hasAccess) {
       // User has purchased, go to player
       router.push(`/player?id=${episode.content_id}`);
@@ -207,9 +188,9 @@ const MasonryEpisodeCard: React.FC<MasonryEpisodeCardProps> = ({
     }
   };
 
-  const handlePurchaseComplete = () => {
-    // Refresh access status after purchase
-    setHasAccess(true);
+  const handlePurchaseComplete = async () => {
+    // Refresh payment status to sync centralized state
+    await refreshPaymentStatus();
     // Navigate to player
     router.push(`/player?id=${episode.content_id}`);
   };

@@ -36,40 +36,19 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
   const [error, setError] = useState<string | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubPosition, setScrubPosition] = useState(0);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   
   // Track certificate download status
   const { certificateDownloaded } = useUserContentProgress(episode.content_id);
-  const { user, hasFullCPDAccess } = useUser();
+  const { accessibleContentIds, refreshPaymentStatus } = useUser();
+  
+  // Check if user has access using centralized state
+  const hasAccess = accessibleContentIds.includes(episode.content_id);
   
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const displayPercentage = isScrubbing ? scrubPosition : progressPercentage;
   const displayTime = isScrubbing ? (scrubPosition / 100) * duration : currentTime;
 
-  // Check if user has access to this content
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (!user) {
-        setHasAccess(false);
-        setIsCheckingAccess(false);
-        return;
-      }
-
-      try {
-        const access = await hasFullCPDAccess(episode.content_id);
-        setHasAccess(access);
-      } catch (error) {
-        console.error('Error checking access:', error);
-        setHasAccess(false);
-      } finally {
-        setIsCheckingAccess(false);
-      }
-    };
-
-    checkAccess();
-  }, [user, episode.content_id, hasFullCPDAccess]);
   
   const getDefaultAudioUrl = (): string => {
     const { data } = supabase.storage
@@ -185,9 +164,9 @@ const CompactEpisodeCard: React.FC<CompactEpisodeCardProps> = ({ episode }) => {
     }
   };
 
-  const handlePurchaseComplete = () => {
-    // Refresh access status after purchase
-    setHasAccess(true);
+  const handlePurchaseComplete = async () => {
+    // Refresh payment status to sync centralized state
+    await refreshPaymentStatus();
     // Navigate to player
     router.push(`/player?id=${episode.content_id}`);
   };

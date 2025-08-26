@@ -11,6 +11,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { userId } = req.query;
 
+    console.log('User purchases API called for userId:', userId);
+
     // Validate required fields
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
@@ -27,6 +29,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Get payment summary
     const paymentSummary = await accessControlService.getUserPaymentSummary(userId as string);
+
+    console.log('Purchase data for user:', {
+      userId,
+      purchasesCount: purchases.length,
+      purchases: purchases.map(p => ({ contentId: p.content_id, status: p.status })),
+      accessibleContentIds,
+      paymentSummary
+    });
 
     res.status(200).json({
       success: true,

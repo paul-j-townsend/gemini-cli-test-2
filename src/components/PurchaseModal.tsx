@@ -18,7 +18,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   onClose,
   onPurchaseComplete,
 }) => {
-  const { user, hasFullCPDAccess, refreshPaymentStatus } = useUser();
+  const { user, hasFullCPDAccess, refreshPaymentStatus, accessibleContentIds } = useUser();
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingAccess, setIsCheckingAccess] = useState(true);
@@ -32,7 +32,19 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
         return;
       }
 
+      // First check centralized state for quick response
+      const hasAccessFromCentralState = accessibleContentIds.includes(episode.content_id);
+      if (hasAccessFromCentralState) {
+        setHasAccess(true);
+        setIsCheckingAccess(false);
+        // If user already has access, close modal and complete
+        onPurchaseComplete?.();
+        onClose();
+        return;
+      }
+
       try {
+        // Fallback to API check if not in central state
         const access = await hasFullCPDAccess(episode.content_id);
         setHasAccess(access);
         if (access) {
@@ -49,7 +61,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     };
 
     checkAccess();
-  }, [user, episode.content_id, hasFullCPDAccess, isOpen, onPurchaseComplete, onClose]);
+  }, [user, episode.content_id, hasFullCPDAccess, isOpen, onPurchaseComplete, onClose, accessibleContentIds]);
 
   const getDefaultThumbnailUrl = (): string => {
     try {
