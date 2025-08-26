@@ -1239,29 +1239,23 @@ export default function ContentManagement() {
                   <div className="grid grid-cols-1 gap-4">
                     <FileUploadField
                       label="Thumbnail Image"
+                      type="image"
                       value={formData.thumbnail_path}
-                      onChange={(value) => handleChange('thumbnail_path', value)}
-                      accept="image/*"
-                      bucket="images"
-                      path="thumbnails/"
+                      onChange={(url, path) => handleChange('thumbnail_path', path)}
                     />
 
                     <FileUploadField
                       label="Audio File"
+                      type="audio"
                       value={formData.audio_src}
-                      onChange={(value) => handleChange('audio_src', value)}
-                      accept="audio/*"
-                      bucket="audio"
-                      path="episodes/"
+                      onChange={(url, path) => handleChange('audio_src', path)}
                     />
 
                     <FileUploadField
                       label="Full Audio File"
+                      type="audio"
                       value={formData.full_audio_src}
-                      onChange={(value) => handleChange('full_audio_src', value)}
-                      accept="audio/*"
-                      bucket="audio"
-                      path="episodes/"
+                      onChange={(url, path) => handleChange('full_audio_src', path)}
                     />
                   </div>
                 </div>
