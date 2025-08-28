@@ -1,6 +1,5 @@
 import React from 'react';
 import Head from 'next/head';
-import { UserSwitcher } from '../components/UserSwitcher';
 import { UserProgressDashboard } from '../components/UserProgressDashboard';
 import { useAuth } from '../hooks/useAuth';
 import Layout from '@/components/Layout';
@@ -32,7 +31,6 @@ const MyProgress: React.FC = () => {
         <meta name="description" content="Track your CPD progress and learning achievements" />
       </Head>
       <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
-        <UserSwitcher />
         <UserProgressDashboard />
       </div>
     </Layout>

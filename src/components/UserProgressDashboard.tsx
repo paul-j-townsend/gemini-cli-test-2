@@ -1,17 +1,23 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuizCompletion } from '../hooks/useQuizCompletion';
 import { useAuth } from '../hooks/useAuth';
+import { useUser } from '@/contexts/UserContext';
 import { formatDuration, calculateUserLevel } from '../utils/progressUtils';
 import { useMemoizedProgressCalculations } from '../utils/performanceUtils';
 import Certificate from './Certificate';
+import PurchasedContentCard from './PurchasedContentCard';
+import { DownloadService } from '@/services/downloadService';
 import { QuizCompletion } from '../types/database';
 
 export const UserProgressDashboard: React.FC = React.memo(() => {
   const { user } = useAuth();
+  const { accessibleContentIds, paymentSummary } = useUser();
   const { completions, userProgress, isLoading, deleteCompletion } = useQuizCompletion();
   const [quizTitles, setQuizTitles] = useState<Record<string, string>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCertificate, setShowCertificate] = useState<QuizCompletion | null>(null);
+  const [purchasedContent, setPurchasedContent] = useState<any[]>([]);
+  const [loadingPurchases, setLoadingPurchases] = useState(false);
 
   const progressSummary = useMemoizedProgressCalculations(completions);
 
@@ -64,6 +70,78 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
 
     loadQuizTitles();
   }, [uniqueQuizIds, completions]);
+
+  // Load purchased content data
+  useEffect(() => {
+    const loadPurchasedContent = async () => {
+      if (!user?.id || accessibleContentIds.length === 0) {
+        setPurchasedContent([]);
+        return;
+      }
+
+      setLoadingPurchases(true);
+      try {
+        const contentPromises = accessibleContentIds.map(async (contentId) => {
+          const response = await fetch(`/api/admin/content?id=${contentId}`);
+          if (response.ok) {
+            const content = await response.json();
+            return {
+              id: contentId,
+              title: content.title || `Content ${contentId.slice(0, 8)}...`,
+              thumbnail_url: content.thumbnail_url,
+              purchased_at: new Date().toISOString() // This should come from purchase data
+            };
+          }
+          return null;
+        });
+
+        const contentResults = await Promise.all(contentPromises);
+        setPurchasedContent(contentResults.filter(Boolean));
+      } catch (error) {
+        console.error('Error loading purchased content:', error);
+        setPurchasedContent([]);
+      } finally {
+        setLoadingPurchases(false);
+      }
+    };
+
+    loadPurchasedContent();
+  }, [user?.id, accessibleContentIds]);
+
+  // Download handler functions
+  const handleDownloadReport = useCallback(async (contentId: string) => {
+    if (!user?.id) return;
+    try {
+      await DownloadService.downloadLearningReport(user.id, contentId);
+    } catch (error) {
+      console.error('Failed to download report:', error);
+      alert('Failed to download learning report. Please try again.');
+    }
+  }, [user?.id]);
+
+  const handleDownloadPodcast = useCallback(async (contentId: string) => {
+    if (!user?.id) return;
+    try {
+      await DownloadService.downloadPodcast(user.id, contentId);
+    } catch (error) {
+      console.error('Failed to download podcast:', error);
+      alert('Failed to download podcast. Please try again.');
+    }
+  }, [user?.id]);
+
+  const handleDownloadCertificate = useCallback(async (contentId: string) => {
+    if (!user?.id) return;
+    try {
+      // Find the completion for this content to show certificate
+      const completion = completions.find(c => c.quiz_id === contentId);
+      if (completion) {
+        setShowCertificate(completion);
+      }
+    } catch (error) {
+      console.error('Failed to show certificate:', error);
+      alert('Failed to show certificate. Please try again.');
+    }
+  }, [user?.id, completions]);
 
   const handleDeleteCompletion = useCallback(async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this quiz completion? This action cannot be undone.')) {
@@ -127,38 +205,8 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Learning Progress</h1>
-            <p className="text-emerald-100">Welcome back, {user.name}!</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold">Level {userLevel.level}</div>
-            <div className="text-sm text-emerald-100">
-              {userLevel.nextLevelScore} pts to next level
-            </div>
-          </div>
-        </div>
-        
-        {/* Progress bar */}
-        <div className="mt-4">
-          <div className="flex justify-between text-sm mb-2">
-            <span>Progress to Level {userLevel.level + 1}</span>
-            <span>{userLevel.progress}%</span>
-          </div>
-          <div className="w-full bg-emerald-700 rounded-full h-2">
-            <div 
-              className="bg-white rounded-full h-2 transition-all duration-300"
-              style={{ width: `${userLevel.progress}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl p-6 border border-emerald-200 text-center">
           <div className="text-3xl font-bold text-emerald-600 mb-2">
             {progressSummary?.totalQuizzes || 0}
@@ -172,13 +220,37 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
           </div>
           <p className="text-emerald-700">CPD Hours Earned</p>
         </div>
-        
-        <div className="bg-white rounded-xl p-6 border border-emerald-200 text-center">
-          <div className="text-3xl font-bold text-purple-600 mb-2">
-            {progressSummary?.streakDays || 0}
+      </div>
+
+      {/* My Purchased Content */}
+      <div className="bg-white rounded-xl p-6 border border-emerald-200">
+        <h2 className="text-xl font-bold text-emerald-900 mb-4">My Purchased Content</h2>
+        {loadingPurchases ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
+            <p className="text-emerald-700 mt-2">Loading your purchases...</p>
           </div>
-          <p className="text-emerald-700">Day Streak</p>
-        </div>
+        ) : purchasedContent.length > 0 ? (
+          <div className="space-y-4">
+            {purchasedContent.map((content) => (
+              <PurchasedContentCard
+                key={content.id}
+                content={content}
+                onDownloadReport={() => handleDownloadReport(content.id)}
+                onDownloadPodcast={() => handleDownloadPodcast(content.id)}
+                onDownloadCertificate={() => handleDownloadCertificate(content.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-emerald-500">
+            <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <p>No purchased content yet</p>
+            <p className="text-sm">Purchase a learning unit to access content downloads!</p>
+          </div>
+        )}
       </div>
 
       {/* Detailed Progress */}
@@ -288,33 +360,6 @@ export const UserProgressDashboard: React.FC = React.memo(() => {
               <p className="text-sm">Complete quizzes to earn achievements!</p>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Study Statistics */}
-      <div className="bg-white rounded-xl p-6 border border-emerald-200">
-        <h2 className="text-xl font-bold text-emerald-900 mb-4">Study Statistics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-600 mb-2">
-              {formatDuration(progressSummary?.totalTimeSpent || 0)}
-            </div>
-            <p className="text-emerald-600">Total Study Time</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">
-              {progressSummary?.totalPassed || 0}
-            </div>
-            <p className="text-emerald-600">Quizzes Passed</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-600 mb-2">
-              {userProgress?.badges?.length || 0}
-            </div>
-            <p className="text-emerald-600">Badges Earned</p>
-          </div>
         </div>
       </div>
 

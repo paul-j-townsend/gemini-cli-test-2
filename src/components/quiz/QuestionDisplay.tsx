@@ -5,12 +5,14 @@ interface QuestionDisplayProps {
   question: Question;
   showExplanation: boolean;
   lastAttempt: QuizAttempt | undefined;
+  isLastQuestion?: boolean;
 }
 
 export const QuestionDisplay: React.FC<QuestionDisplayProps> = React.memo(({
   question,
   showExplanation,
-  lastAttempt
+  lastAttempt,
+  isLastQuestion = false
 }) => {
   const isCurrentQuestionCorrect = useMemo(() => 
     lastAttempt && lastAttempt.is_correct, 
@@ -68,7 +70,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = React.memo(({
                   isCurrentQuestionCorrect ? 'text-success-800' : 'text-error-800'
                 }`}>
                   {isCurrentQuestionCorrect 
-                    ? 'You can proceed to the next question or finish the quiz!' 
+                    ? (isLastQuestion ? 'Great work! You can now finish the quiz!' : 'You can proceed to the next question!')
                     : 'That\'s not quite right. Please try again!'
                   }
                 </p>

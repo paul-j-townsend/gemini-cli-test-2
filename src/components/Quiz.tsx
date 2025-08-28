@@ -138,6 +138,7 @@ const Quiz: React.FC<QuizProps> = ({ quizId, podcastId, episodeTitle, episodeDur
           question={currentQuestion}
           showExplanation={showExplanation}
           lastAttempt={lastAttempt}
+          isLastQuestion={currentQuestionIndex + 1 >= quiz.questions.length}
         />
         
         <AnswerOptions 
