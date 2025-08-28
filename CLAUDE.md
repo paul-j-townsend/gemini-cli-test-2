@@ -190,3 +190,5 @@ alwaysAllowEdits: ["*.ts", "*.tsx"]
 - Use TypeScript strict mode
 - Follow existing naming conventions (camelCase for JS, snake_case for DB)
 - Prefer functional components and modern React patterns
+
+ensure fallback report 28th august is kept up to date when new fallback functionality is added and alert me to the update.
